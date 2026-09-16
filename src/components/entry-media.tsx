@@ -14,18 +14,20 @@ export function EntryMediaFigure({
 }) {
   const kind = mediaKind(media);
   const alt = media.alt ?? "";
+  const unoptimized = media.src.endsWith(".svg");
 
   switch (kind) {
     case "image":
       return (
-        <figure className="overflow-hidden bg-muted">
+        <figure className="aluminum-frame overflow-hidden bg-[#08090b]">
           <div className="relative aspect-video w-full">
             <Image
               src={media.src}
               alt={alt}
               fill
+              unoptimized={unoptimized}
               priority={priority}
-              sizes="(min-width: 896px) 52rem, 100vw"
+              sizes="(min-width: 672px) 42rem, 100vw"
               className="object-cover"
             />
           </div>
@@ -33,14 +35,14 @@ export function EntryMediaFigure({
       );
     case "video":
       return (
-        <figure className="overflow-hidden bg-muted">
+        <figure className="aluminum-frame overflow-hidden bg-[#08090b]">
           <video
             src={media.src}
             controls
             playsInline
             preload="metadata"
             aria-label={alt || undefined}
-            className="aspect-video w-full bg-black object-cover"
+            className="aspect-video w-full object-cover"
           />
         </figure>
       );

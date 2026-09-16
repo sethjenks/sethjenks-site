@@ -1,0 +1,13 @@
+{
+  "id": "domain-and-scaffold",
+  "date": "2026-09-15",
+  "title": "Domain locked, scaffold underway",
+  "summary": "Seth locked sethjenks.com for a public daily log of curated agentic work. The first milestone covers feed schema, a Next.js scaffold on Origin, and a DNS plan with no live changes yet.",
+  "tags": ["personal"],
+  "media": {
+    "src": "/media/domain-and-scaffold.svg",
+    "alt": "Geometric scaffold diagram on a dark field, aluminum grid and a single cyan focus point.",
+    "type": "image"
+  },
+  "paperRef": "paper://entries/domain-and-scaffold"
+}

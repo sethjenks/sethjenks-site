@@ -180,15 +180,7 @@ export function groupEntriesByDay(entries: Entry[]): DayGroup[] {
 }
 
 export function formatDayHeading(date: string): string {
-  const [year, month, day] = date.split("-").map(Number);
-  const instant = new Date(Date.UTC(year, month - 1, day));
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(instant);
+  return date.replaceAll("-", ".");
 }
 
 export async function getEntries(): Promise<Entry[]> {
