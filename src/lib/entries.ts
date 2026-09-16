@@ -8,12 +8,21 @@ const FILENAME_PATTERN = /^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.json$
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+export type MediaType = "image" | "video";
+
+export type EntryMedia = {
+  src: string;
+  alt?: string;
+  type?: MediaType;
+};
+
 export type Entry = {
   id: string;
   date: string;
   title: string;
   summary: string;
   tags?: string[];
+  media?: EntryMedia;
 };
 
 export type DayGroup = {
@@ -21,16 +30,53 @@ export type DayGroup = {
   entries: Entry[];
 };
 
-type RawEntry = {
-  id?: unknown;
-  date?: unknown;
-  title?: unknown;
-  summary?: unknown;
-  tags?: unknown;
-};
+type RawRecord = Record<string, unknown>;
 
-function isRecord(value: unknown): value is RawEntry {
-  return typeof value === "object" && value !== null;
+function isRecord(value: unknown): value is RawRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseMedia(raw: unknown, filename: string): EntryMedia | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  if (!isRecord(raw)) {
+    throw new Error(`Entry "${filename}" media must be an object.`);
+  }
+
+  const { src, alt, type } = raw;
+
+  if (typeof src !== "string" || src.trim().length === 0) {
+    throw new Error(`Entry "${filename}" media.src is required.`);
+  }
+
+  if (alt !== undefined && typeof alt !== "string") {
+    throw new Error(`Entry "${filename}" media.alt must be a string.`);
+  }
+
+  if (type !== undefined && type !== "image" && type !== "video") {
+    throw new Error(
+      `Entry "${filename}" media.type must be "image" or "video".`,
+    );
+  }
+
+  return {
+    src: src.trim(),
+    ...(alt ? { alt: alt.trim() } : {}),
+    ...(type ? { type } : {}),
+  };
+}
+
+function toPublicEntry(entry: Entry): Entry {
+  return {
+    id: entry.id,
+    date: entry.date,
+    title: entry.title,
+    summary: entry.summary,
+    ...(entry.tags ? { tags: entry.tags } : {}),
+    ...(entry.media ? { media: entry.media } : {}),
+  };
 }
 
 function parseEntry(raw: unknown, filename: string): Entry {
@@ -48,7 +94,8 @@ function parseEntry(raw: unknown, filename: string): Entry {
     throw new Error(`Entry "${filename}" must be a JSON object.`);
   }
 
-  const { id, date, title, summary, tags } = raw;
+  const { id, date, title, summary, tags, media } = raw;
+  // paperRef is agents-only and is intentionally unread for the public model.
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
     throw new Error(
@@ -93,13 +140,14 @@ function parseEntry(raw: unknown, filename: string): Entry {
     }
   }
 
-  return {
+  return toPublicEntry({
     id,
     date,
     title: title.trim(),
     summary: summary.trim(),
-    ...(tags ? { tags: tags.map((tag) => tag.trim()) } : {}),
-  };
+    ...(tags ? { tags: tags.map((tag) => String(tag).trim()) } : {}),
+    ...(media !== undefined ? { media: parseMedia(media, filename) } : {}),
+  });
 }
 
 export function sortEntries(entries: Entry[]): Entry[] {
@@ -136,7 +184,6 @@ export function formatDayHeading(date: string): string {
   const instant = new Date(Date.UTC(year, month - 1, day));
 
   return new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",

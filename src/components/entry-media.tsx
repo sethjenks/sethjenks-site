@@ -1,0 +1,52 @@
+import Image from "next/image";
+import type { EntryMedia, MediaType } from "@/lib/entries";
+
+function mediaKind(media: EntryMedia): MediaType {
+  return media.type ?? "image";
+}
+
+export function EntryMediaFigure({
+  media,
+  priority = false,
+}: {
+  media: EntryMedia;
+  priority?: boolean;
+}) {
+  const kind = mediaKind(media);
+  const alt = media.alt ?? "";
+
+  switch (kind) {
+    case "image":
+      return (
+        <figure className="overflow-hidden bg-muted">
+          <div className="relative aspect-video w-full">
+            <Image
+              src={media.src}
+              alt={alt}
+              fill
+              priority={priority}
+              sizes="(min-width: 896px) 52rem, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </figure>
+      );
+    case "video":
+      return (
+        <figure className="overflow-hidden bg-muted">
+          <video
+            src={media.src}
+            controls
+            playsInline
+            preload="metadata"
+            aria-label={alt || undefined}
+            className="aspect-video w-full bg-black object-cover"
+          />
+        </figure>
+      );
+    default: {
+      const _exhaustive: never = kind;
+      throw new Error(`Unhandled media type: ${_exhaustive}`);
+    }
+  }
+}

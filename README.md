@@ -1,8 +1,10 @@
 # Seth Jenks
 
-Personal chronological feed. First milestone: read JSON entries and render them on the home page, grouped by day.
+Visual-forward chronological log. The home page reads JSON entries, sorts them, groups them by day, and leads with media plus type — not a plain text blog.
 
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
+
+Paper will later be the UI design source and the place media is exported from. v1 uses sample files under `public/media/`.
 
 ## Run locally
 
@@ -21,7 +23,8 @@ pnpm build
 
 1. Create a file at `content/entries/YYYY-MM-DD-<slug>.json`.
 2. Dates are calendar days in **America/Denver**.
-3. Fill the locked fields:
+3. Put images or videos in `public/media/` (or similar) and point `media.src` at that public path.
+4. Fill the locked fields:
 
 ```json
 {
@@ -29,7 +32,13 @@ pnpm build
   "date": "2026-09-15",
   "title": "A short title",
   "summary": "One or two curated sentences. Never paste raw chat.",
-  "tags": ["personal"]
+  "tags": ["personal"],
+  "media": {
+    "src": "/media/kebab-case-slug.jpg",
+    "alt": "What the frame shows.",
+    "type": "image"
+  },
+  "paperRef": "paper://entries/kebab-case-slug"
 }
 ```
 
@@ -37,6 +46,8 @@ pnpm build
 - `date` must match the filename date (`YYYY-MM-DD`).
 - `summary` is curated copy, 1–2 sentences.
 - `tags` is optional. Prefer `Arcana`, `Philo`, or `personal`.
+- `media` is optional. `src` is required; `alt` is optional; `type` is `"image"` or `"video"` (defaults to image).
+- `paperRef` is agents-only. The public page does not render it.
 
 The site reads every `content/entries/*.json` file, sorts by date descending then `id`, and groups by day for display (newest day first).
 
