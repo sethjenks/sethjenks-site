@@ -93,9 +93,11 @@ Dark field, cool metal, one cyan. Cyan is rare on purpose.
 
 ## Typography
 
-**Display / Body Font:** Geist Sans  
+**Display / Body / UI Font:** Geist Sans  
 **Label / Stamp Font:** Geist Mono  
 **Flourish Font:** Geist Pixel Square  
+
+**Load:** the `geist` package (`geist/font/sans`, `geist/font/mono`, `geist/font/pixel`). That is next/font. Apply `GeistSans.className` on `<html>` plus the CSS variables so titles, body, and UI inherit Geist. Never `next/font/google` Inter. Never list Inter in a fallback stack.
 
 **Character:** Geometric, technical, quiet. Pixel is a stamp, not a voice.
 
@@ -108,7 +110,7 @@ Dark field, cool metal, one cyan. Cyan is rare on purpose.
 
 **The Pixel Budget Rule.** Pixel Square appears a few times per page. If a sentence needs it, use Sans instead.
 
-No Geist Serif. No Inter. No italic-serif decoration.
+**The Geist Load Rule.** Titles, body, and UI are Geist Sans via `geist/font/sans`. Geist Mono is only for machine stamps (`2026.09.15`) and technical labels. Pixel Square is a flourish. No Geist Serif. No Inter. No italic-serif decoration.
 
 ## Layout
 
@@ -159,6 +161,7 @@ Full-bleed in the column, aluminum-edged. The 1px metal edge is the elevation â€
 
 ### Don't:
 - **Don't** use beige grounds, italic-serif decoration, cream paper, Polaroids, or rubber-stamp dates.
+- **Don't** default type to Inter or load it from `next/font/google`.
 - **Don't** use generic purple gradients, pulsing dots, equal-weight card grids, or vague marketing headlines.
 - **Don't** nest cards in cards or sprinkle chip soup.
 - **Don't** render `paperRef` or a Paper iframe.

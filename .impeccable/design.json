@@ -39,6 +39,11 @@
         "section": "typography"
       },
       {
+        "name": "The Geist Load Rule",
+        "body": "Load Geist through the geist package (next/font). Titles, body, and UI are Geist Sans. Geist Mono is for day stamps and technical labels only. Never Inter.",
+        "section": "typography"
+      },
+      {
         "name": "The No Halo Rule",
         "body": "Do not paint zero-offset chromatic glows on type or cards.",
         "section": "elevation"
@@ -50,6 +55,7 @@
     ],
     "donts": [
       "Don't use beige grounds, italic-serif decoration, or rubber-stamp dates.",
+      "Don't default type to Inter or load it from next/font/google.",
       "Don't use generic purple gradients, pulsing dots, or chip soup.",
       "Don't render paperRef or a Paper iframe."
     ]
