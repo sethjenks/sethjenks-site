@@ -11,11 +11,11 @@ export default async function Home() {
         <header className="glass-panel px-5 py-6 sm:px-6 sm:py-7">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <p className="font-pixel text-[10px] leading-none tracking-[0.22em] text-aluminum">
-                SJ
-              </p>
-              <h1 className="mt-3 text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">
+              <h1 className="text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">
                 Seth Jenks
+                <span className="font-pixel ml-3 align-middle text-[11px] tracking-[0.18em] text-aluminum">
+                  SJ
+                </span>
               </h1>
               <p className="mt-4 max-w-md text-sm leading-6 text-quiet sm:text-[0.95rem] sm:leading-7">
                 A public daily log of curated agentic work — notes from Arcana,
@@ -30,12 +30,9 @@ export default async function Home() {
         <main id="log" className="flex-1 scroll-mt-8 pt-16 sm:pt-20">
           <Feed groups={groups} />
         </main>
-        <footer className="mt-20 border-t border-aluminum-dim/60 pt-6">
-          <p className="font-pixel text-[10px] tracking-[0.18em] text-aluminum-dim">
-            DNS
-          </p>
-          <p className="mt-2 font-mono text-[11px] tracking-[0.14em] text-aluminum-dim uppercase">
-            sethjenks.com planned · deferred
+        <footer className="mt-20 border-t border-aluminum/40 pt-6">
+          <p className="font-mono text-[11px] text-aluminum">
+            sethjenks.com planned · DNS deferred
           </p>
         </footer>
       </div>

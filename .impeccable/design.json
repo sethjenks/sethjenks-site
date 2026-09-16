@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-16T01:31:00.000Z",
+  "title": "Design System: Seth Jenks",
+  "extensions": {
+    "colorMeta": {
+      "ground": { "role": "neutral", "displayName": "Void Ground", "canonical": "#0c0d10" },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#e8eaed" },
+      "accent": { "role": "primary", "displayName": "Signal Cyan", "canonical": "#6ec8ff" },
+      "aluminum": { "role": "neutral", "displayName": "Aluminum", "canonical": "#8a9199" }
+    },
+    "shadows": [
+      {
+        "name": "aluminum-frame",
+        "value": "1px solid #8a9199",
+        "purpose": "Media frames. The edge is the elevation; no wide diffuse shadow."
+      }
+    ],
+    "breakpoints": [{ "name": "column", "value": "42rem" }]
+  },
+  "narrative": {
+    "northStar": "Anodized night log",
+    "overview": "A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist as the only type family.",
+    "keyCharacteristics": [
+      "Ground #0c0d10, ink #e8eaed, one accent #6ec8ff",
+      "Frosted glass used sparingly",
+      "Machine day stamps 2026.09.15",
+      "Command-key primary controls"
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "#6ec8ff is the only chromatic accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The Pixel Budget Rule",
+        "body": "Pixel Square appears a few times per page. Never body or long titles.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Halo Rule",
+        "body": "Do not paint zero-offset chromatic glows on type or cards.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the column near 42rem and group by day.",
+      "Do write 1–2 curated sentences. Never raw chat."
+    ],
+    "donts": [
+      "Don't use beige grounds, italic-serif decoration, or rubber-stamp dates.",
+      "Don't use generic purple gradients, pulsing dots, or chip soup.",
+      "Don't render paperRef or a Paper iframe."
+    ]
+  }
+}

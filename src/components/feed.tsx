@@ -27,7 +27,7 @@ function EntryArticle({
               <li key={tag}>
                 <Badge
                   variant="outline"
-                  className="h-auto rounded-sm border-glass-border bg-glass px-2 py-0.5 font-mono text-[10px] font-normal tracking-[0.14em] text-aluminum uppercase"
+                  className="h-auto rounded-sm border-glass-border bg-glass px-2 py-0.5 font-mono text-[11px] font-normal text-aluminum"
                 >
                   {tag}
                 </Badge>
@@ -59,16 +59,14 @@ export function Feed({ groups }: { groups: DayGroup[] }) {
           aria-labelledby={`day-${group.date}`}
           className="glass-panel px-4 py-5 sm:px-5 sm:py-6"
         >
-          <p className="font-pixel mb-2 text-[10px] tracking-[0.22em] text-aluminum-dim">
-            DAY
-          </p>
           <h2
             id={`day-${group.date}`}
-            className={`mb-5 font-mono text-[11px] tracking-[0.18em] text-aluminum-dim ${
-              groupIndex === 0 ? "day-stamp-active text-accent" : ""
+            className={`mb-5 text-[11px] tracking-[0.16em] text-aluminum ${
+              groupIndex === 0 ? "day-stamp-active" : ""
             }`}
           >
-            {formatDayHeading(group.date)}
+            <span className="font-pixel mr-2 tracking-[0.18em]">DAY</span>
+            <span className="font-mono">{formatDayHeading(group.date)}</span>
           </h2>
           <div className="space-y-8">
             {group.entries.map((entry, entryIndex) => (

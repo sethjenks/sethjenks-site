@@ -1,6 +1,8 @@
 # Seth Jenks
 
-Minimal chronological log. Visual language is locked in `DESIGN.md`. The UI is designed in code. Paper is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
+Minimal chronological log. Product truth lives in `PRODUCT.md`. Visual language is locked in `DESIGN.md` (our brand, not an Impeccable sample theme). The UI is designed in code. Paper is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
+
+Impeccable is installed for this project (`npx impeccable detect`, skills under `.cursor/skills/impeccable`). Run `npx impeccable detect http://127.0.0.1:43127/` before calling a UI pass done.
 
 Type: Geist Sans (UI, titles, body), Geist Mono (day stamps, tech labels), Geist Pixel Square (eyebrows and flourishes only). No Geist Serif. No Inter.
 
