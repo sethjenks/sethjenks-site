@@ -4,7 +4,7 @@ Minimal chronological log. Product truth lives in `PRODUCT.md`. Visual language 
 
 Impeccable is installed for this project (`npx impeccable detect`, skills under `.cursor/skills/impeccable`). Run `npx impeccable detect http://127.0.0.1:43127/` before calling a UI pass done.
 
-Type: Geist Sans via the `geist` package / next/font (UI, titles, body). Geist Mono for day stamps and tech labels. Geist Pixel Square for eyebrows and flourishes only. No Geist Serif. No Inter. No `next/font/google` Inter.
+Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist/font/mono` for day stamps, tags, and tech labels. Family is Sans / Mono / Pixel only — there is no Geist Serif; do not invent one. Geist Pixel is not in v1. No Inter.
 
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
 

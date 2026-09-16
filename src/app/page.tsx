@@ -13,9 +13,6 @@ export default async function Home() {
             <div>
               <h1 className="text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">
                 Seth Jenks
-                <span className="font-pixel ml-3 align-middle text-[11px] tracking-[0.18em] text-aluminum">
-                  SJ
-                </span>
               </h1>
               <p className="mt-4 max-w-md text-sm leading-6 text-quiet sm:text-[0.95rem] sm:leading-7">
                 A public daily log of curated agentic work — notes from Arcana,

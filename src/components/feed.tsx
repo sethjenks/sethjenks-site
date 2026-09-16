@@ -61,12 +61,11 @@ export function Feed({ groups }: { groups: DayGroup[] }) {
         >
           <h2
             id={`day-${group.date}`}
-            className={`mb-5 text-[11px] tracking-[0.16em] text-aluminum ${
+            className={`mb-5 font-mono text-[11px] tracking-[0.16em] text-aluminum ${
               groupIndex === 0 ? "day-stamp-active" : ""
             }`}
           >
-            <span className="font-pixel mr-2 tracking-[0.18em]">DAY</span>
-            <span className="font-mono">{formatDayHeading(group.date)}</span>
+            {formatDayHeading(group.date)}
           </h2>
           <div className="space-y-8">
             {group.entries.map((entry, entryIndex) => (

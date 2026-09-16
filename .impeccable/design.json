@@ -20,7 +20,7 @@
   },
   "narrative": {
     "northStar": "Anodized night log",
-    "overview": "A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist as the only type family.",
+    "overview": "A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans and Geist Mono only in v1.",
     "keyCharacteristics": [
       "Ground #0c0d10, ink #e8eaed, one accent #6ec8ff",
       "Frosted glass used sparingly",
@@ -34,13 +34,8 @@
         "section": "colors"
       },
       {
-        "name": "The Pixel Budget Rule",
-        "body": "Pixel Square appears a few times per page. Never body or long titles.",
-        "section": "typography"
-      },
-      {
         "name": "The Geist Load Rule",
-        "body": "Load Geist through the geist package (next/font). Titles, body, and UI are Geist Sans. Geist Mono is for day stamps and technical labels only. Never Inter.",
+        "body": "Load Geist through geist/font/sans and geist/font/mono. Titles, body, and UI are Geist Sans. Geist Mono is for day stamps, tags, and technical labels. No Geist Serif. No Geist Pixel in v1. Never Inter.",
         "section": "typography"
       },
       {
@@ -56,6 +51,7 @@
     "donts": [
       "Don't use beige grounds, italic-serif decoration, or rubber-stamp dates.",
       "Don't default type to Inter or load it from next/font/google.",
+      "Don't invent a Geist Serif or load Geist Pixel in v1.",
       "Don't use generic purple gradients, pulsing dots, or chip soup.",
       "Don't render paperRef or a Paper iframe."
     ]
