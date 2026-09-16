@@ -70,7 +70,11 @@ export function Feed({ groups }: { groups: DayGroup[] }) {
               <EntryArticle
                 key={entry.id}
                 entry={entry}
-                priorityMedia={groupIndex === 0 && entryIndex === 0}
+                priorityMedia={
+                  groupIndex === 0 &&
+                  entryIndex ===
+                    group.entries.findIndex((item) => item.media)
+                }
               />
             ))}
           </div>
