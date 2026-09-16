@@ -10,32 +10,28 @@ function EntryArticle({
   priorityMedia: boolean;
 }) {
   return (
-    <article className="rounded-sm px-1 py-3 transition-colors duration-150 hover:bg-glass motion-reduce:transition-none sm:px-2">
-      <div className="space-y-4">
-        {entry.media ? (
-          <EntryMediaFigure media={entry.media} priority={priorityMedia} />
-        ) : null}
-        <h3 className="text-xl leading-snug tracking-tight text-ink sm:text-[1.35rem]">
-          {entry.title}
-        </h3>
-        <p className="text-sm leading-6 text-quiet sm:text-[0.95rem] sm:leading-7">
-          {entry.summary}
-        </p>
-        {entry.tags && entry.tags.length > 0 ? (
-          <ul className="flex flex-wrap gap-2">
-            {entry.tags.map((tag) => (
-              <li key={tag}>
-                <Badge
-                  variant="outline"
-                  className="h-auto rounded-sm border-glass-border bg-glass px-2 py-0.5 font-mono text-[10px] font-normal tracking-[0.14em] text-aluminum uppercase"
-                >
-                  {tag}
-                </Badge>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
+    <article className="space-y-4">
+      {entry.media ? (
+        <EntryMediaFigure media={entry.media} priority={priorityMedia} />
+      ) : null}
+      <h3 className="font-heading text-[1.45rem] leading-snug text-ink sm:text-[1.6rem]">
+        {entry.title}
+      </h3>
+      <p className="text-[1.05rem] leading-7 text-quiet">{entry.summary}</p>
+      {entry.tags && entry.tags.length > 0 ? (
+        <ul className="flex flex-wrap gap-2">
+          {entry.tags.map((tag) => (
+            <li key={tag}>
+              <Badge
+                variant="outline"
+                className="paper-label h-auto rounded-[2px] border-label-edge px-2 py-0.5 text-[11px] font-normal tracking-[0.04em] text-quiet"
+              >
+                {tag}
+              </Badge>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </article>
   );
 }
@@ -43,29 +39,25 @@ function EntryArticle({
 export function Feed({ groups }: { groups: DayGroup[] }) {
   if (groups.length === 0) {
     return (
-      <p className="text-sm text-quiet">
+      <p className="text-quiet">
         Nothing published yet. Add a JSON file under{" "}
-        <code className="font-mono text-aluminum">content/entries</code> to
-        start the log.
+        <code className="font-stamp text-sm">content/entries</code> to start
+        the log.
       </p>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
       {groups.map((group, groupIndex) => (
-        <section
-          key={group.date}
-          aria-labelledby={`day-${group.date}`}
-          className="glass-panel px-4 py-5 sm:px-5 sm:py-6"
-        >
+        <section key={group.date} aria-labelledby={`day-${group.date}`}>
           <h2
             id={`day-${group.date}`}
-            className="mb-5 font-mono text-[11px] tracking-[0.18em] text-aluminum-dim"
+            className="font-stamp mb-7 text-sm tracking-[0.14em] text-quiet"
           >
             {formatDayHeading(group.date)}
           </h2>
-          <div className="space-y-8">
+          <div className="space-y-12">
             {group.entries.map((entry, entryIndex) => (
               <EntryArticle
                 key={entry.id}

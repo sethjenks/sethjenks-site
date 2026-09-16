@@ -1,6 +1,6 @@
 # Seth Jenks
 
-Minimal chronological log. The UI is designed in code. Paper is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
+Minimal chronological log on cream paper. The UI is designed in code. Paper (the product) is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
 
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
 

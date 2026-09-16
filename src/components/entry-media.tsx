@@ -19,8 +19,8 @@ export function EntryMediaFigure({
   switch (kind) {
     case "image":
       return (
-        <figure className="aluminum-frame overflow-hidden bg-[#08090b]">
-          <div className="relative aspect-video w-full">
+        <figure className="photo-print">
+          <div className="relative aspect-video w-full overflow-hidden rounded-[2px] bg-[#efe6d6]">
             <Image
               src={media.src}
               alt={alt}
@@ -35,14 +35,14 @@ export function EntryMediaFigure({
       );
     case "video":
       return (
-        <figure className="aluminum-frame overflow-hidden bg-[#08090b]">
+        <figure className="photo-print">
           <video
             src={media.src}
             controls
             playsInline
             preload="metadata"
             aria-label={alt || undefined}
-            className="aspect-video w-full object-cover"
+            className="aspect-video w-full rounded-[2px] object-cover"
           />
         </figure>
       );

@@ -179,8 +179,31 @@ export function groupEntriesByDay(entries: Entry[]): DayGroup[] {
   }));
 }
 
+const STAMP_MONTHS = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+] as const;
+
 export function formatDayHeading(date: string): string {
-  return date.replaceAll("-", ".");
+  const [year, month, day] = date.split("-");
+  const monthIndex = Number(month) - 1;
+  const stampMonth = STAMP_MONTHS[monthIndex];
+
+  if (!stampMonth) {
+    throw new Error(`Invalid month in date "${date}".`);
+  }
+
+  return `${Number(day)} ${stampMonth} ${year}`;
 }
 
 export async function getEntries(): Promise<Entry[]> {
