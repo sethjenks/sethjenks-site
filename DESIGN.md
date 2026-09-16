@@ -33,6 +33,11 @@ typography:
     fontSize: "0.6875rem"
     fontWeight: 400
     letterSpacing: "0.14em"
+  pixel:
+    fontFamily: "Geist Pixel Square, ui-monospace, monospace"
+    fontSize: "0.6875rem"
+    fontWeight: 400
+    letterSpacing: "0.18em"
 rounded:
   sm: "2px"
   md: "8px"
@@ -58,7 +63,7 @@ components:
 
 **Creative North Star: "Anodized night log"**
 
-A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans and Geist Mono only in v1. It is not a cream notebook, not a Quiet-editor chrome slab, and not a SaaS marketing site.
+A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse accent. It is not a cream notebook, not a Quiet-editor chrome slab, and not a SaaS marketing site.
 
 Paper (the product) is not the UI source. It only exports media into `public/media/`. The public page never renders `paperRef`.
 
@@ -90,20 +95,24 @@ Dark field, cool metal, one cyan. Cyan is rare on purpose.
 
 **Display / Body / UI Font:** Geist Sans  
 **Label / Stamp Font:** Geist Mono  
+**Accent Font:** Geist Pixel Square  
 
-**Load:** the `geist` package (`geist/font/sans`, `geist/font/mono`). That is next/font. Apply `GeistSans.className` on `<html>` plus the CSS variables so titles, body, and UI inherit Geist Sans. Never `next/font/google` Inter. Never list Inter in a fallback stack.
+**Load:** the `geist` package (`geist/font/sans`, `geist/font/mono`, `geist/font/pixel`). Default Pixel face is `GeistPixelSquare`. That is next/font. Apply `GeistSans.className` on `<html>` plus the CSS variables so titles, body, and UI inherit Geist Sans. Never `next/font/google` Inter. Never list Inter in a fallback stack.
 
-**Family:** Geist is Sans / Mono / Pixel only. There is no Geist Serif — do not invent one, do not load a serif, do not map `--font-serif` to a serif face. Geist Pixel is reserved and **not in v1** unless explicitly asked.
+**Family:** Geist is Sans / Mono / Pixel only. There is no Geist Serif — do not invent one, do not load a serif, do not map `--font-serif` to a serif face.
 
-**Character:** Geometric, technical, quiet.
+**Character:** Geometric, technical, quiet. Pixel is a stamp, not a voice.
 
 ### Hierarchy
 - **Display** (500, 1.75–1.9rem, line-height 1): the name only. Geist Sans.
 - **Title** (500, 1.25–1.35rem): entry titles. Geist Sans.
 - **Body** (400, 0.95rem / 1.7): bio and summaries. Geist Sans. Measure stays inside ~42rem.
 - **Label** (Geist Mono, ≥11px, tracked): day stamps `2026.09.15`, tags, key captions, footer and other tech labels.
+- **Pixel** (Geist Pixel Square, ≥11px): day-group eyebrow, tiny labels, occasional wordmark. Never body. Never long titles.
 
-**The Geist Load Rule.** Titles, body, and UI are Geist Sans via `geist/font/sans`. Geist Mono via `geist/font/mono` is for machine stamps, tags, and technical labels. No Geist Serif. No Geist Pixel in v1. No Inter. No italic-serif decoration.
+**The Pixel Budget Rule.** Pixel Square is a fun display accent. A few uses per page: `DAY` beside the machine stamp, an inline `SJ` wordmark, a tiny label. If a sentence needs it, use Sans instead.
+
+**The Geist Load Rule.** Titles, body, and UI are Geist Sans via `geist/font/sans`. Geist Mono via `geist/font/mono` is for machine stamps, tags, and technical labels. Geist Pixel Square via `geist/font/pixel` is the sparse accent. No Geist Serif. No Inter. No italic-serif decoration.
 
 ## Layout
 
@@ -155,7 +164,8 @@ Full-bleed in the column, aluminum-edged. The 1px metal edge is the elevation �
 ### Don't:
 - **Don't** use beige grounds, italic-serif decoration, cream paper, Polaroids, or rubber-stamp dates.
 - **Don't** default type to Inter or load it from `next/font/google`.
-- **Don't** invent a Geist Serif or load Geist Pixel in v1.
+- **Don't** invent a Geist Serif.
+- **Don't** set body copy or long titles in Geist Pixel.
 - **Don't** use generic purple gradients, pulsing dots, equal-weight card grids, or vague marketing headlines.
 - **Don't** nest cards in cards or sprinkle chip soup.
 - **Don't** render `paperRef` or a Paper iframe.
