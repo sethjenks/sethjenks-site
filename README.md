@@ -6,6 +6,8 @@ Impeccable is installed for this project (`npx impeccable detect`, skills under 
 
 Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist/font/mono` for day stamps, tags, and tech labels. Geist Pixel Square via `geist/font/pixel` as a sparse accent (day-group eyebrow, tiny labels, occasional wordmark — never body or long titles). Family is Sans / Mono / Pixel only — there is no Geist Serif; do not invent one. No Inter.
 
+Eight-bit is a wink: Pixel type plus one 1px / 2×2-dithered cyan ember and hard focus edges. Glass and aluminum stay the chrome. No scanlines, CRT, chiptune, or pixelated photos.
+
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
 
 ## Run locally

@@ -63,7 +63,7 @@ components:
 
 **Creative North Star: "Anodized night log"**
 
-A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse accent. It is not a cream notebook, not a Quiet-editor chrome slab, and not a SaaS marketing site.
+A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse accent. Eight-bit marks are a wink, not a theme. It is not a cream notebook, not a Quiet-editor chrome slab, and not a SaaS marketing site.
 
 Paper (the product) is not the UI source. It only exports media into `public/media/`. The public page never renders `paperRef`.
 
@@ -72,7 +72,8 @@ Paper (the product) is not the UI source. It only exports media into `public/med
 - Frosted glass used sparingly (header, day groups, hover)
 - Matte anodized aluminum hairlines and frames
 - Machine day stamps `2026.09.15`
-- Command-key primary controls
+- Command-key primary controls (no LED on the key)
+- Sparse 8-bit accents: Pixel type, one cyan ember, 1px focus edges
 - Curated one-to-two sentence entries; no raw chats
 
 ## Colors
@@ -80,7 +81,7 @@ Paper (the product) is not the UI source. It only exports media into `public/med
 Dark field, cool metal, one cyan. Cyan is rare on purpose.
 
 ### Primary
-- **Signal Cyan** (`#6ec8ff`): focus, text links, the Command-key LED language, and a quiet edge catch. Not a page wash. Not a purple gradient.
+- **Signal Cyan** (`#6ec8ff`): focus, text links, ambient glass catch, and one chassis ember. Not a page wash. Not a purple gradient. Not a LED on the Command key.
 
 ### Neutral
 - **Void Ground** (`#0c0d10`): page background.
@@ -125,9 +126,12 @@ Depth is machined, not papery.
 ### Shadow Vocabulary
 - **Aluminum frame**: 1px matte metal edge, no wide diffuse shadow. The edge is the elevation.
 - **Glass catch** (`inset 0 1px 0 rgba(110,200,255,0.08)`): header and day groups only.
-- **Focus ember** (`outline: 1px solid #6ec8ff`): keyboard focus. No pulsing.
+- **Focus ember** (`outline: 1px solid #6ec8ff`): keyboard focus. Hard 1px pixel edge. No pulsing. No soft halo.
+- **Chassis ember**: one 6px square, 1px cyan edge, 2×2 cyan dither fill. Ambient page chrome only — never on the Command key, never on photos, never on card frames.
 
-**The No Halo Rule.** Do not paint zero-offset chromatic glows on type or cards. Cyan lives in color, outlines, the key well, and a hairline glass catch.
+**The No Halo Rule.** Do not paint zero-offset chromatic glows on type or cards. Cyan lives in color, 1px outlines, the glass catch, and the chassis ember.
+
+**The Eight-Bit Wink Rule.** 8-bit is an accent, not a retro skin. Allowed: Geist Pixel Square on day eyebrows / tiny labels / occasional flourish; 1px hard pixel edges or 2×2 dither on cyan embers and focus dots only. Forbidden: scanlines, CRT overlays, chiptune, busy sprite backgrounds, pixelated photos, pixelated aluminum frames.
 
 ## Shapes
 
@@ -140,8 +144,8 @@ Command-key / Beyza-style primary control, HTML/CSS only (see Paper.tips field n
 
 - **Shape:** recessed tray + specular anodized/plastic face, grain overlay, recessed well.
 - **Primary:** aluminum face, dark tray, mono label.
-- **Unlit well:** a small socket is always visible.
-- **Cyan LED:** the well may light `#6ec8ff` in the on/active/focus state. No extra point lights. No cyan bottom-edge glow on the key (that glow is reserved for ambient page accents).
+- **Unlit well:** a small socket is always visible and stays unlit. No cyan LED, point light, or bottom-edge glow on the key.
+- **Ambient cyan:** lives on the glass catch and the chassis ember, not on the key.
 - **Use:** one or two per page (header). Not every text link.
 
 ### Chips
@@ -160,12 +164,16 @@ Full-bleed in the column, aluminum-edged. The 1px metal edge is the elevation �
 - **Do** write 1–2 curated sentences. Never raw chat.
 - **Do** honor `prefers-reduced-motion`.
 - **Do** treat Paper as media export only.
+- **Do** keep glass and aluminum as the page chrome. 8-bit marks stay rare.
 
 ### Don't:
 - **Don't** use beige grounds, italic-serif decoration, cream paper, Polaroids, or rubber-stamp dates.
 - **Don't** default type to Inter or load it from `next/font/google`.
 - **Don't** invent a Geist Serif.
 - **Don't** set body copy or long titles in Geist Pixel.
+- **Don't** put a cyan LED on the Command key.
+- **Don't** pixelate photos or card frames.
+- **Don't** add scanlines, CRT overlays, chiptune, or sprite backgrounds.
 - **Don't** use generic purple gradients, pulsing dots, equal-weight card grids, or vague marketing headlines.
 - **Don't** nest cards in cards or sprinkle chip soup.
 - **Don't** render `paperRef` or a Paper iframe.

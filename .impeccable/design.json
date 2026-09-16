@@ -20,12 +20,13 @@
   },
   "narrative": {
     "northStar": "Anodized night log",
-    "overview": "A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse accent.",
+    "overview": "A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse 8-bit accent.",
     "keyCharacteristics": [
       "Ground #0c0d10, ink #e8eaed, one accent #6ec8ff",
       "Frosted glass used sparingly",
       "Machine day stamps 2026.09.15",
-      "Command-key primary controls"
+      "Command-key primary controls with no LED on the key",
+      "One dithered cyan chassis ember; 1px hard focus edges"
     ],
     "rules": [
       {
@@ -44,8 +45,13 @@
         "section": "typography"
       },
       {
+        "name": "The Eight-Bit Wink Rule",
+        "body": "8-bit is an accent, not a retro skin. Pixel type plus 1px edges or 2x2 dither on cyan embers and focus dots only. No scanlines, CRT, chiptune, sprite backgrounds, or pixelated photos/frames.",
+        "section": "elevation"
+      },
+      {
         "name": "The No Halo Rule",
-        "body": "Do not paint zero-offset chromatic glows on type or cards.",
+        "body": "Do not paint zero-offset chromatic glows on type or cards. Cyan lives in color, 1px outlines, the glass catch, and one chassis ember — never as an LED on the Command key.",
         "section": "elevation"
       }
     ],
@@ -58,6 +64,8 @@
       "Don't default type to Inter or load it from next/font/google.",
       "Don't invent a Geist Serif.",
       "Don't set body copy or long titles in Geist Pixel.",
+      "Don't put a cyan LED on the Command key.",
+      "Don't pixelate photos or card frames, or add scanlines and CRT overlays.",
       "Don't use generic purple gradients, pulsing dots, or chip soup.",
       "Don't render paperRef or a Paper iframe."
     ]

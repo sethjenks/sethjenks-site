@@ -36,7 +36,7 @@ Dates are America/Denver calendar days. Intended production domain is sethjenks.
 
 ## Brand Commitments
 
-Binding visual lock (see DESIGN.md): dark ground `#0c0d10`, frosted glass, anodized aluminum, cyan `#6ec8ff`, Geist Sans (UI/titles/body), Geist Mono (stamps/tags/labels), Geist Pixel Square as a sparse accent. No Geist Serif. Machine day stamps, Command-key primary controls. Voice is first-person, specific, short. Not SaaS marketing.
+Binding visual lock (see DESIGN.md): dark ground `#0c0d10`, frosted glass, anodized aluminum, cyan `#6ec8ff`, Geist Sans (UI/titles/body), Geist Mono (stamps/tags/labels), Geist Pixel Square as a sparse accent. Eight-bit marks are optional and rare (Pixel type, one dithered cyan ember, 1px focus edges). No LED on the Command key. No Geist Serif. Machine day stamps. Voice is first-person, specific, short. Not SaaS marketing.
 
 ## Evidence on Hand
 

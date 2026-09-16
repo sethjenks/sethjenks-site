@@ -8,7 +8,8 @@ export default async function Home() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="mx-auto flex w-full max-w-[42rem] flex-1 flex-col px-6 py-16 sm:px-8 sm:py-24">
-        <header className="glass-panel px-5 py-6 sm:px-6 sm:py-7">
+        <header className="glass-panel relative px-5 py-6 sm:px-6 sm:py-7">
+          <span className="pixel-ember header-ember" aria-hidden="true" />
           <div className="flex items-start justify-between gap-6">
             <div>
               <h1 className="text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">

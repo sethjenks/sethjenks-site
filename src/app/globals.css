@@ -130,6 +130,7 @@
   :focus-visible {
     outline: 1px solid var(--accent);
     outline-offset: 3px;
+    box-shadow: none;
   }
 }
 
@@ -148,6 +149,27 @@
 
   .day-stamp-active {
     color: var(--accent);
+  }
+
+  .pixel-ember {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border: 1px solid #6ec8ff;
+    border-radius: 0;
+    background-color: #0c0d10;
+    background-image: url("/media/cyan-dither.svg");
+    background-size: 2px 2px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    box-shadow: none;
+  }
+
+  .header-ember {
+    position: absolute;
+    top: 10px;
+    left: 10px;
   }
 
   .key-button {
@@ -210,12 +232,6 @@
       0 0.5px 0 rgba(255, 255, 255, 0.18);
   }
 
-  .key-button:focus-visible .key-button-well,
-  .key-button:active .key-button-well {
-    background: #6ec8ff;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.25);
-  }
-
   .key-button-label {
     position: relative;
     font-family: var(--font-geist-mono), ui-monospace, monospace;
@@ -245,10 +261,5 @@
 
   .key-button:active .key-button-face {
     transform: none;
-  }
-
-  .key-button:focus-visible .key-button-well,
-  .key-button:active .key-button-well {
-    background: #4a4f55;
   }
 }
