@@ -1,6 +1,8 @@
 # Seth Jenks
 
-Minimal chronological log on cream paper. The UI is designed in code. Paper (the product) is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
+Minimal chronological log. Visual language is locked in `DESIGN.md`. The UI is designed in code. Paper is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
+
+Type: Geist Sans (UI, titles, body), Geist Mono (day stamps, tech labels), Geist Pixel Square (eyebrows and flourishes only). No Geist Serif. No Inter.
 
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
 
