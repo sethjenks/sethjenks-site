@@ -19,7 +19,7 @@ export function EntryMediaFigure({
   switch (kind) {
     case "image":
       return (
-        <figure className="aluminum-frame overflow-hidden bg-[#08090b]">
+        <figure className="aluminum-frame overflow-hidden">
           <div className="relative aspect-video w-full">
             <Image
               src={media.src}
@@ -35,7 +35,7 @@ export function EntryMediaFigure({
       );
     case "video":
       return (
-        <figure className="aluminum-frame overflow-hidden bg-[#08090b]">
+        <figure className="aluminum-frame overflow-hidden">
           <video
             src={media.src}
             controls

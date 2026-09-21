@@ -1,15 +1,14 @@
 ---
 name: Seth Jenks
-description: Dark glass-and-aluminum chronological log
+description: Light, sparse chronological log
 colors:
-  ground: "#0c0d10"
-  ink: "#e8eaed"
-  muted: "#9aa0a6"
-  accent: "#6ec8ff"
-  aluminum: "#8a9199"
-  aluminum-dim: "#8a9199"
-  glass: "rgba(255,255,255,0.06)"
-  glass-border: "rgba(255,255,255,0.12)"
+  ground: "#fafafa"
+  paper: "#ffffff"
+  ink: "#111111"
+  muted: "#6b6b6b"
+  hairline: "#e6e6e6"
+  aluminum: "#d0d0d0"
+  aluminum-dim: "#e4e4e4"
 typography:
   display:
     fontFamily: "Geist Sans, ui-sans-serif, system-ui, sans-serif"
@@ -50,8 +49,8 @@ spacing:
   column: "42rem"
 components:
   button-primary:
-    backgroundColor: "{colors.aluminum}"
-    textColor: "{colors.ground}"
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.key}"
     padding: "9px 14px"
     typography: "{typography.label}"
@@ -61,36 +60,37 @@ components:
 
 ## Overview
 
-**Creative North Star: "Anodized night log"**
+**Creative North Star: "Open column"**
 
-A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse accent. Eight-bit marks are a wink, not a theme. It is not a cream notebook, not a Quiet-editor chrome slab, and not a SaaS marketing site.
+A near-white chronological log. The page is mostly ground and type: generous space, a single reading column, machine day stamps, and almost no chrome. Hairlines appear only where a rule earns its place. The command key is a small light-aluminum object with an unlit well. Geist Pixel Square is a rare stamp, not a theme.
+
+This supersedes the anodized night log. Glass and aluminum are light touches on the key and on media edges. They are not the page.
 
 Paper (the product) is not the UI source. It only exports media into `public/media/`. The public page never renders `paperRef`.
 
 **Key Characteristics:**
-- Ground `#0c0d10`, ink `#e8eaed`, one accent `#6ec8ff`
-- Frosted glass used sparingly (header, day groups, hover)
-- Matte anodized aluminum hairlines and frames
+- Ground `#fafafa`, paper `#ffffff`, ink `#111111`, muted `#6b6b6b`
+- Whitespace carries the groups; hairlines only at the footer and media edge
 - Machine day stamps `2026.09.15`
-- Command-key primary controls (no LED on the key)
-- Sparse 8-bit accents: Pixel type, one cyan ember, 1px focus edges
+- Command-key primary control, light aluminum, unlit well, no LED
+- Sparse Pixel accents: `DAY` beside the stamp, an inline `SJ` wordmark
 - Curated one-to-two sentence entries; no raw chats
 
 ## Colors
 
-Dark field, cool metal, one cyan. Cyan is rare on purpose.
-
-### Primary
-- **Signal Cyan** (`#6ec8ff`): focus, text links, ambient glass catch, and one chassis ember. Not a page wash. Not a purple gradient. Not a LED on the Command key.
+Neutral field, near-black type, one muted gray. No chromatic signal.
 
 ### Neutral
-- **Void Ground** (`#0c0d10`): page background.
-- **Ink** (`#e8eaed`): titles and readable body.
-- **Muted** (`#9aa0a6`): summaries and secondary copy. Minimum 4.5:1 on ground.
-- **Aluminum** (`#8a9199`): frames, chips, stamps, dimmer metal. Matte, not mirror chrome.
-- **Glass** (`rgba(255,255,255,0.06)`) with **Glass Edge** (`rgba(255,255,255,0.12)`), blur `16px`.
+- **Ground** (`#fafafa`): the page. Soft off-white, not warm cream.
+- **Paper** (`#ffffff`): media wells and the command-key face.
+- **Ink** (`#111111`): the name, entry titles, the newest day stamp, links, and focus.
+- **Muted** (`#6b6b6b`): summaries, older stamps, tags, the footer. Holds at least 4.5:1 on ground.
+- **Hairline** (`#e6e6e6`): footer rule and media edge. Not a card border system.
+- **Aluminum** (`#d0d0d0`) and **Aluminum Dim** (`#e4e4e4`): the command-key tray and face only. Never body text.
 
-**The One Signal Rule.** `#6ec8ff` is the only chromatic accent. Never beige, terracotta, generic purple, or a second neon.
+**The Quiet Field Rule.** The page stays inside `#fafafa`–`#ffffff` with `#111111` type. Do not reintroduce a dark void, frosted panels, or a cyan wash.
+
+**The No Signal Rule.** There is no chromatic accent. Focus is a 1px ink outline. Do not add cyan, blue LEDs, beige, terracotta, or a second neon.
 
 ## Typography
 
@@ -102,79 +102,80 @@ Dark field, cool metal, one cyan. Cyan is rare on purpose.
 
 **Family:** Geist is Sans / Mono / Pixel only. There is no Geist Serif — do not invent one, do not load a serif, do not map `--font-serif` to a serif face.
 
-**Character:** Geometric, technical, quiet. Pixel is a stamp, not a voice.
+**Character:** Geometric and quiet. Pixel is a stamp, not a voice.
 
 ### Hierarchy
 - **Display** (500, 1.75–1.9rem, line-height 1): the name only. Geist Sans.
 - **Title** (500, 1.25–1.35rem): entry titles. Geist Sans.
-- **Body** (400, 0.95rem / 1.7): bio and summaries. Geist Sans. Measure stays inside ~42rem.
-- **Label** (Geist Mono, ≥11px, tracked): day stamps `2026.09.15`, tags, key captions, footer and other tech labels.
-- **Pixel** (Geist Pixel Square, ≥11px): day-group eyebrow, tiny labels, occasional wordmark. Never body. Never long titles.
+- **Body** (400, 0.95rem / 1.7): bio and summaries. Geist Sans. Measure stays inside ~42rem and near 65ch.
+- **Label** (Geist Mono, ≥11px, tracked): day stamps `2026.09.15`, tags, key captions, footer.
+- **Pixel** (Geist Pixel Square, ≥11px): `DAY` beside the machine stamp, the inline `SJ` wordmark. Never body. Never long titles.
 
-**The Pixel Budget Rule.** Pixel Square is a fun display accent. A few uses per page: `DAY` beside the machine stamp, an inline `SJ` wordmark, a tiny label. If a sentence needs it, use Sans instead.
+**The Pixel Budget Rule.** Pixel Square is a fun display accent. A few uses per page: `DAY` beside the machine stamp, an inline `SJ` wordmark. If a sentence needs it, use Sans instead.
 
 **The Geist Load Rule.** Titles, body, and UI are Geist Sans via `geist/font/sans`. Geist Mono via `geist/font/mono` is for machine stamps, tags, and technical labels. Geist Pixel Square via `geist/font/pixel` is the sparse accent. No Geist Serif. No Inter. No italic-serif decoration.
 
 ## Layout
 
-Single reading column (`max-width: 42rem`). Generous vertical space between days. Card order is fixed: media → title → summary → tags. No heavy nav. Reverse-chronological day groups.
+Single reading column (`max-width: 42rem`). Large vertical gaps between days and between entries. Order inside an entry is fixed: media → title → summary → tags. No panels around the header or the day. No heavy nav. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted.
 
 ## Elevation & Depth
 
-Depth is machined, not papery.
+Depth is almost absent. The page is flat on purpose.
 
 ### Shadow Vocabulary
-- **Aluminum frame**: 1px matte metal edge, no wide diffuse shadow. The edge is the elevation.
-- **Glass catch** (`inset 0 1px 0 rgba(110,200,255,0.08)`): header and day groups only.
-- **Focus ember** (`outline: 1px solid #6ec8ff`): keyboard focus. Hard 1px pixel edge. No pulsing. No soft halo.
-- **Chassis ember**: one 6px square, 1px cyan edge, 2×2 cyan dither fill. Ambient page chrome only — never on the Command key, never on photos, never on card frames.
+- **Hairline**: 1px `#e6e6e6` on the footer and on media. No wide diffuse shadow. No stacked card.
+- **Key recess**: the command key’s tray and face carry a short inset highlight so the object reads as a key. That shadow stays on the key.
+- **Focus**: `outline: 1px solid #111111`, offset 3px. Hard edge. No glow, no pulse.
 
-**The No Halo Rule.** Do not paint zero-offset chromatic glows on type or cards. Cyan lives in color, 1px outlines, the glass catch, and the chassis ember.
+**The Flat Page Rule.** Do not put glass, blur, or inset color catches behind the header or day groups. If a region needs separation, use space first and a hairline second.
 
-**The Eight-Bit Wink Rule.** 8-bit is an accent, not a retro skin. Allowed: Geist Pixel Square on day eyebrows / tiny labels / occasional flourish; 1px hard pixel edges or 2×2 dither on cyan embers and focus dots only. Forbidden: scanlines, CRT overlays, chiptune, busy sprite backgrounds, pixelated photos, pixelated aluminum frames.
+**The No Halo Rule.** Do not paint chromatic glows on type, cards, or the command key. The well on the key stays unlit.
+
+**The Eight-Bit Wink Rule.** 8-bit is type only. Allowed: Geist Pixel Square on `DAY` and the `SJ` wordmark. Forbidden: scanlines, CRT overlays, chiptune, sprite backgrounds, pixelated photos, dithered embers, and pixelated frames.
 
 ## Shapes
 
-Soft-square keys (`9px` face, `13px` tray). Media frames are sharp-edged metal (`0–2px`). Tags are small aluminum chips, not candy pills. No rivets, leather, or gloss candy.
+Soft-square keys (`9px` face, `13px` tray). Media frames are sharp (`0–2px`) with a hairline. Tags are plain mono words, not chips or pills. No rivets, leather, or gloss candy.
 
 ## Components
 
 ### Buttons
-Command-key / Beyza-style primary control, HTML/CSS only (see Paper.tips field note; do not embed Paper).
+Command-key primary control, HTML/CSS only. One in the header.
 
-- **Shape:** recessed tray + specular anodized/plastic face, grain overlay, recessed well.
-- **Primary:** aluminum face, dark tray, mono label.
-- **Unlit well:** a small socket is always visible and stays unlit. No cyan LED, point light, or bottom-edge glow on the key.
-- **Ambient cyan:** lives on the glass catch and the chassis ember, not on the key.
-- **Use:** one or two per page (header). Not every text link.
+- **Shape:** light recessed tray, near-white aluminum face, faint grain, recessed well.
+- **Primary:** paper face, aluminum tray, ink mono label.
+- **Unlit well:** a small dark socket is always visible and stays unlit. No cyan or blue LED, point light, or bottom-edge glow.
+- **Use:** the header jump to the log. Not every text link.
 
-### Chips
-Quiet aluminum/glass chips. Geist Mono, ≥11px. Two tags is a note; a row of many is chip soup.
+### Tags
+Geist Mono, ≥11px, muted. No fill, no border. Two tags is a note; a row of many is chip soup.
 
-### Cards / Containers
-Day groups sit in one glass panel. Entries inside are not nested cards. Media uses an aluminum frame, not a card-in-a-card.
+### Entries
+Day groups are sections of type, not cards. Entries inside are not nested cards. Media, when present, uses a hairline frame on paper.
 
 ### Media
-Full-bleed in the column, aluminum-edged. The 1px metal edge is the elevation — no wide diffuse shadow. Optional. `type` is `image` or `video`.
+Full-bleed in the column, 1px hairline, paper well. The edge is the only elevation. Optional. `type` is `image` or `video`.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** keep the column near 42rem and group by day.
+- **Do** leave more space between days than inside an entry.
 - **Do** write 1–2 curated sentences. Never raw chat.
 - **Do** honor `prefers-reduced-motion`.
 - **Do** treat Paper as media export only.
-- **Do** keep glass and aluminum as the page chrome. 8-bit marks stay rare.
+- **Do** keep the command key unlit, and Pixel marks rare.
 
 ### Don't:
-- **Don't** use beige grounds, italic-serif decoration, cream paper, Polaroids, or rubber-stamp dates.
+- **Don't** use a dark void ground, frosted glass panels, or a cyan chassis ember.
+- **Don't** use warm cream, beige, italic-serif decoration, Polaroids, or rubber-stamp dates.
 - **Don't** default type to Inter or load it from `next/font/google`.
 - **Don't** invent a Geist Serif.
 - **Don't** set body copy or long titles in Geist Pixel.
-- **Don't** put a cyan LED on the Command key.
-- **Don't** pixelate photos or card frames.
-- **Don't** add scanlines, CRT overlays, chiptune, or sprite backgrounds.
+- **Don't** put a blue or cyan LED on the Command key.
+- **Don't** pixelate photos or frames, or add scanlines and CRT overlays.
 - **Don't** use generic purple gradients, pulsing dots, equal-weight card grids, or vague marketing headlines.
 - **Don't** nest cards in cards or sprinkle chip soup.
 - **Don't** render `paperRef` or a Paper iframe.
-- **Don't** configure live sethjenks.com DNS in v1.
+- **Don't** configure live sethjenks.com DNS.

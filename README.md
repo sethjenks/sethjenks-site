@@ -1,12 +1,12 @@
 # Seth Jenks
 
-Minimal chronological log. Product truth lives in `PRODUCT.md`. Visual language is locked in `DESIGN.md` (our brand, not an Impeccable sample theme). The UI is designed in code. Paper is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
+Minimal chronological log on a near-white page. Product truth lives in `PRODUCT.md`. Visual language is locked in `DESIGN.md` (our brand, not an Impeccable sample theme). The UI is designed in code. Paper is only for optional media exports (PNG/JPG/SVG/MP4 into `public/media/`, referenced by `media.src`). There is no Paper iframe.
 
 Impeccable is installed for this project (`npx impeccable detect`, skills under `.cursor/skills/impeccable`). Run `npx impeccable detect http://127.0.0.1:43127/` before calling a UI pass done.
 
-Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist/font/mono` for day stamps, tags, and tech labels. Geist Pixel Square via `geist/font/pixel` as a sparse accent (day-group eyebrow, tiny labels, occasional wordmark — never body or long titles). Family is Sans / Mono / Pixel only — there is no Geist Serif; do not invent one. No Inter.
+Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist/font/mono` for day stamps, tags, and tech labels. Geist Pixel Square via `geist/font/pixel` as a sparse accent (`DAY` beside the stamp, an inline `SJ` wordmark — never body or long titles). Family is Sans / Mono / Pixel only — there is no Geist Serif; do not invent one. No Inter.
 
-Eight-bit is a wink: Pixel type plus one 1px / 2×2-dithered cyan ember and hard focus edges. Glass and aluminum stay the chrome. No scanlines, CRT, chiptune, or pixelated photos.
+The page is ground `#fafafa`, ink `#111111`, muted `#6b6b6b`. Whitespace separates days. A hairline shows up on the footer and on media. The command key is light aluminum with an unlit well — no LED. No dark void, frosted panels, scanlines, CRT, or pixelated photos.
 
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
 

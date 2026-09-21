@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { EntryMediaFigure } from "@/components/entry-media";
 import { formatDayHeading, type DayGroup, type Entry } from "@/lib/entries";
 
@@ -10,7 +9,7 @@ function EntryArticle({
   priorityMedia: boolean;
 }) {
   return (
-    <article className="rounded-sm px-1 py-3 transition-colors duration-150 hover:bg-glass motion-reduce:transition-none sm:px-2">
+    <article className="py-1">
       <div className="space-y-4">
         {entry.media ? (
           <EntryMediaFigure media={entry.media} priority={priorityMedia} />
@@ -18,19 +17,17 @@ function EntryArticle({
         <h3 className="text-xl leading-snug tracking-tight text-ink sm:text-[1.35rem]">
           {entry.title}
         </h3>
-        <p className="text-sm leading-6 text-quiet sm:text-[0.95rem] sm:leading-7">
+        <p className="max-w-[65ch] text-sm leading-7 text-quiet sm:text-[0.95rem]">
           {entry.summary}
         </p>
         {entry.tags && entry.tags.length > 0 ? (
-          <ul className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
             {entry.tags.map((tag) => (
-              <li key={tag}>
-                <Badge
-                  variant="outline"
-                  className="h-auto rounded-sm border-glass-border bg-glass px-2 py-0.5 font-mono text-[11px] font-normal text-aluminum"
-                >
-                  {tag}
-                </Badge>
+              <li
+                key={tag}
+                className="font-mono text-[11px] tracking-[0.08em] text-quiet"
+              >
+                {tag}
               </li>
             ))}
           </ul>
@@ -43,32 +40,28 @@ function EntryArticle({
 export function Feed({ groups }: { groups: DayGroup[] }) {
   if (groups.length === 0) {
     return (
-      <p className="text-sm text-quiet">
+      <p className="text-sm leading-7 text-quiet">
         Nothing published yet. Add a JSON file under{" "}
-        <code className="font-mono text-aluminum">content/entries</code> to
-        start the log.
+        <code className="font-mono text-ink">content/entries</code> to start
+        the log.
       </p>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-24">
       {groups.map((group, groupIndex) => (
-        <section
-          key={group.date}
-          aria-labelledby={`day-${group.date}`}
-          className="glass-panel px-4 py-5 sm:px-5 sm:py-6"
-        >
+        <section key={group.date} aria-labelledby={`day-${group.date}`}>
           <h2
             id={`day-${group.date}`}
-            className={`mb-5 text-[11px] tracking-[0.16em] text-aluminum ${
-              groupIndex === 0 ? "day-stamp-active" : ""
+            className={`mb-10 text-[11px] tracking-[0.16em] ${
+              groupIndex === 0 ? "text-ink" : "text-quiet"
             }`}
           >
-            <span className="font-pixel mr-2 tracking-[0.18em]">DAY</span>
+            <span className="font-pixel mr-3 tracking-[0.18em]">DAY</span>
             <span className="font-mono">{formatDayHeading(group.date)}</span>
           </h2>
-          <div className="space-y-8">
+          <div className="space-y-16">
             {group.entries.map((entry, entryIndex) => (
               <EntryArticle
                 key={entry.id}

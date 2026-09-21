@@ -1,73 +1,165 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-16T01:31:00.000Z",
+  "generatedAt": "2026-09-21T19:20:00.000Z",
   "title": "Design System: Seth Jenks",
   "extensions": {
     "colorMeta": {
-      "ground": { "role": "neutral", "displayName": "Void Ground", "canonical": "#0c0d10" },
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#e8eaed" },
-      "accent": { "role": "primary", "displayName": "Signal Cyan", "canonical": "#6ec8ff" },
-      "aluminum": { "role": "neutral", "displayName": "Aluminum", "canonical": "#8a9199" }
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#fafafa",
+        "tonalRamp": ["#1a1a1a", "#333333", "#4d4d4d", "#666666", "#8a8a8a", "#b3b3b3", "#d9d9d9", "#fafafa"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#1c1c1c", "#383838", "#545454", "#707070", "#8c8c8c", "#b4b4b4", "#dcdcdc", "#ffffff"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#111111",
+        "tonalRamp": ["#111111", "#2a2a2a", "#444444", "#5c5c5c", "#767676", "#9a9a9a", "#c4c4c4", "#ececec"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#6b6b6b",
+        "tonalRamp": ["#1c1c1c", "#333333", "#4a4a4a", "#6b6b6b", "#858585", "#a3a3a3", "#c7c7c7", "#ededed"]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e6e6e6",
+        "tonalRamp": ["#2e2e2e", "#4a4a4a", "#666666", "#858585", "#a8a8a8", "#c4c4c4", "#e6e6e6", "#f7f7f7"]
+      },
+      "aluminum": {
+        "role": "neutral",
+        "displayName": "Aluminum",
+        "canonical": "#d0d0d0",
+        "tonalRamp": ["#3a3a3a", "#555555", "#707070", "#8c8c8c", "#a8a8a8", "#c0c0c0", "#d0d0d0", "#f2f2f2"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The name only." },
+      "title": { "displayName": "Title", "purpose": "Entry titles." },
+      "body": { "displayName": "Body", "purpose": "Bio and summaries." },
+      "label": { "displayName": "Label", "purpose": "Day stamps, tags, key captions, footer." },
+      "pixel": { "displayName": "Pixel", "purpose": "DAY stamp and the SJ wordmark. Never body." }
     },
     "shadows": [
       {
-        "name": "aluminum-frame",
-        "value": "1px solid #8a9199",
-        "purpose": "Media frames. The edge is the elevation; no wide diffuse shadow."
+        "name": "hairline",
+        "value": "1px solid #e6e6e6",
+        "purpose": "Footer rule and media edge. The edge is the only elevation."
+      },
+      {
+        "name": "key-recess",
+        "value": "inset 0 1px 0 #ffffff, inset 0 -2px 3px rgba(0,0,0,0.06)",
+        "purpose": "Command-key face only. Not used on the page."
+      }
+    ],
+    "motion": [
+      {
+        "name": "key-press",
+        "value": "translateY(1px)",
+        "purpose": "Command key face shifts 1px on press. Removed under prefers-reduced-motion."
       }
     ],
     "breakpoints": [{ "name": "column", "value": "42rem" }]
   },
+  "components": [
+    {
+      "name": "Command Key",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Header jump to the log. Light aluminum key, unlit well, no LED.",
+      "html": "<a class=\"ds-key\" href=\"#log\"><span class=\"ds-key-face\"><span class=\"ds-key-well\"></span><span class=\"ds-key-label\">Log</span></span></a>",
+      "css": ".ds-key{display:inline-flex;padding:5px;border-radius:13px;background:linear-gradient(180deg,#ececec 0%,#d4d4d4 100%);text-decoration:none;color:#111}.ds-key-face{position:relative;display:inline-flex;min-width:3.25rem;align-items:center;justify-content:center;border-radius:9px;padding:0.55rem 0.85rem 0.6rem;background:linear-gradient(180deg,#fff 0%,#ececec 48%,#d8d8d8 100%);box-shadow:inset 0 1px 0 #fff,inset 0 -2px 3px rgba(0,0,0,0.06)}.ds-key-well{position:absolute;top:7px;left:8px;width:6px;height:6px;border-radius:999px;background:radial-gradient(circle at 50% 35%,#6e6e6e,#2a2a2a 72%)}.ds-key-label{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#111}.ds-key:hover{text-decoration:none}.ds-key:focus-visible{outline:1px solid #111;outline-offset:3px}.ds-key:active .ds-key-face{transform:translateY(1px)}"
+    },
+    {
+      "name": "Day Stamp",
+      "kind": "custom",
+      "description": "Machine date with a Pixel DAY mark. Newest day is ink; older days are muted.",
+      "html": "<p class=\"ds-day\"><span class=\"ds-day-pixel\">DAY</span><span>2026.09.15</span></p>",
+      "css": ".ds-day{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.16em;color:#111}.ds-day-pixel{margin-right:0.75rem;letter-spacing:0.18em}"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "description": "Muted mono word. No fill and no border.",
+      "html": "<span class=\"ds-tag\">personal</span>",
+      "css": ".ds-tag{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.08em;color:#6b6b6b}"
+    }
+  ],
   "narrative": {
-    "northStar": "Anodized night log",
-    "overview": "A dark, narrow chronological log. The page is machined: frosted glass panels, matte aluminum edges, Geist Sans for reading, Geist Mono for stamps, Geist Pixel Square as a sparse 8-bit accent.",
+    "northStar": "Open column",
+    "overview": "A near-white chronological log. The page is mostly ground and type: generous space, a single reading column, machine day stamps, and almost no chrome. Hairlines appear only where a rule earns its place. The command key is a small light-aluminum object with an unlit well. Geist Pixel Square is a rare stamp, not a theme. This supersedes the anodized night log.",
     "keyCharacteristics": [
-      "Ground #0c0d10, ink #e8eaed, one accent #6ec8ff",
-      "Frosted glass used sparingly",
+      "Ground #fafafa, paper #ffffff, ink #111111, muted #6b6b6b",
+      "Whitespace carries the groups; hairlines only at the footer and media edge",
       "Machine day stamps 2026.09.15",
-      "Command-key primary controls with no LED on the key",
-      "One dithered cyan chassis ember; 1px hard focus edges"
+      "Command-key primary control, light aluminum, unlit well, no LED",
+      "Sparse Pixel accents: DAY beside the stamp, an inline SJ wordmark"
     ],
     "rules": [
       {
-        "name": "The One Signal Rule",
-        "body": "#6ec8ff is the only chromatic accent.",
+        "name": "The Quiet Field Rule",
+        "body": "The page stays inside #fafafa–#ffffff with #111111 type. Do not reintroduce a dark void, frosted panels, or a cyan wash.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Signal Rule",
+        "body": "There is no chromatic accent. Focus is a 1px ink outline. Do not add cyan, blue LEDs, beige, terracotta, or a second neon.",
         "section": "colors"
       },
       {
         "name": "The Pixel Budget Rule",
-        "body": "Pixel Square is a fun display accent. Day-group eyebrow, tiny labels, occasional wordmark. Never body or long titles.",
+        "body": "Pixel Square is a fun display accent. A few uses per page: DAY beside the machine stamp, an inline SJ wordmark. If a sentence needs it, use Sans instead.",
         "section": "typography"
       },
       {
         "name": "The Geist Load Rule",
-        "body": "Load Geist through geist/font/sans, geist/font/mono, and geist/font/pixel (GeistPixelSquare). Titles, body, and UI are Geist Sans. Geist Mono is for day stamps, tags, and technical labels. Pixel is a sparse accent. No Geist Serif. Never Inter.",
+        "body": "Titles, body, and UI are Geist Sans via geist/font/sans. Geist Mono via geist/font/mono is for machine stamps, tags, and technical labels. Geist Pixel Square via geist/font/pixel is the sparse accent. No Geist Serif. No Inter.",
         "section": "typography"
       },
       {
-        "name": "The Eight-Bit Wink Rule",
-        "body": "8-bit is an accent, not a retro skin. Pixel type plus 1px edges or 2x2 dither on cyan embers and focus dots only. No scanlines, CRT, chiptune, sprite backgrounds, or pixelated photos/frames.",
+        "name": "The Flat Page Rule",
+        "body": "Do not put glass, blur, or inset color catches behind the header or day groups. If a region needs separation, use space first and a hairline second.",
         "section": "elevation"
       },
       {
         "name": "The No Halo Rule",
-        "body": "Do not paint zero-offset chromatic glows on type or cards. Cyan lives in color, 1px outlines, the glass catch, and one chassis ember — never as an LED on the Command key.",
+        "body": "Do not paint chromatic glows on type, cards, or the command key. The well on the key stays unlit.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Eight-Bit Wink Rule",
+        "body": "8-bit is type only. Allowed: Geist Pixel Square on DAY and the SJ wordmark. Forbidden: scanlines, CRT overlays, chiptune, sprite backgrounds, pixelated photos, dithered embers, and pixelated frames.",
         "section": "elevation"
       }
     ],
     "dos": [
       "Do keep the column near 42rem and group by day.",
-      "Do write 1–2 curated sentences. Never raw chat."
+      "Do leave more space between days than inside an entry.",
+      "Do write 1–2 curated sentences. Never raw chat.",
+      "Do honor prefers-reduced-motion.",
+      "Do treat Paper as media export only.",
+      "Do keep the command key unlit, and Pixel marks rare."
     ],
     "donts": [
-      "Don't use beige grounds, italic-serif decoration, or rubber-stamp dates.",
+      "Don't use a dark void ground, frosted glass panels, or a cyan chassis ember.",
+      "Don't use warm cream, beige, italic-serif decoration, Polaroids, or rubber-stamp dates.",
       "Don't default type to Inter or load it from next/font/google.",
       "Don't invent a Geist Serif.",
       "Don't set body copy or long titles in Geist Pixel.",
-      "Don't put a cyan LED on the Command key.",
-      "Don't pixelate photos or card frames, or add scanlines and CRT overlays.",
-      "Don't use generic purple gradients, pulsing dots, or chip soup.",
-      "Don't render paperRef or a Paper iframe."
+      "Don't put a blue or cyan LED on the Command key.",
+      "Don't pixelate photos or frames, or add scanlines and CRT overlays.",
+      "Don't use generic purple gradients, pulsing dots, equal-weight card grids, or vague marketing headlines.",
+      "Don't nest cards in cards or sprinkle chip soup.",
+      "Don't render paperRef or a Paper iframe.",
+      "Don't configure live sethjenks.com DNS."
     ]
   }
 }

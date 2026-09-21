@@ -7,32 +7,29 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="mx-auto flex w-full max-w-[42rem] flex-1 flex-col px-6 py-16 sm:px-8 sm:py-24">
-        <header className="glass-panel relative px-5 py-6 sm:px-6 sm:py-7">
-          <span className="pixel-ember header-ember" aria-hidden="true" />
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <h1 className="text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">
-                Seth Jenks
-                <span className="font-pixel ml-3 align-middle text-[11px] tracking-[0.18em] text-aluminum">
-                  SJ
-                </span>
-              </h1>
-              <p className="mt-4 max-w-md text-sm leading-6 text-quiet sm:text-[0.95rem] sm:leading-7">
-                A public daily log of curated agentic work — notes from Arcana,
-                Philo, and the rest of the week. The interface is designed in
-                code. Paper is only for optional media exports. Dated in
-                America/Denver.
-              </p>
-            </div>
-            <KeyButton href="#log">Log</KeyButton>
+      <div className="mx-auto flex w-full max-w-[42rem] flex-1 flex-col px-6 py-20 sm:px-8 sm:py-28">
+        <header className="flex items-start justify-between gap-8">
+          <div>
+            <h1 className="text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">
+              Seth Jenks
+              <span className="font-pixel ml-3 align-middle text-[11px] tracking-[0.18em] text-quiet">
+                SJ
+              </span>
+            </h1>
+            <p className="mt-5 max-w-md text-sm leading-7 text-quiet sm:text-[0.95rem] sm:leading-7">
+              A public daily log of curated agentic work — notes from Arcana,
+              Philo, and the rest of the week. The interface is designed in
+              code. Paper is only for optional media exports. Dated in
+              America/Denver.
+            </p>
           </div>
+          <KeyButton href="#log">Log</KeyButton>
         </header>
-        <main id="log" className="flex-1 scroll-mt-8 pt-16 sm:pt-20">
+        <main id="log" className="flex-1 scroll-mt-8 pt-24 sm:pt-32">
           <Feed groups={groups} />
         </main>
-        <footer className="mt-20 border-t border-aluminum/40 pt-6">
-          <p className="font-mono text-[11px] text-aluminum">
+        <footer className="mt-28 border-t border-hairline pt-8">
+          <p className="font-mono text-[11px] tracking-[0.08em] text-quiet">
             sethjenks.com planned · DNS deferred
           </p>
         </footer>
