@@ -14,7 +14,7 @@ function EntryArticle({
         {entry.media ? (
           <EntryMediaFigure media={entry.media} priority={priorityMedia} />
         ) : null}
-        <h3 className="text-xl leading-snug tracking-tight text-ink sm:text-[1.35rem]">
+        <h3 className="text-xl leading-snug tracking-tight text-ink">
           {entry.title}
         </h3>
         <p className="max-w-[65ch] text-sm leading-7 text-quiet sm:text-[0.95rem]">

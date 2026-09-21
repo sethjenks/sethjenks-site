@@ -42,6 +42,7 @@ rounded:
   md: "8px"
   key: "9px"
   tray: "13px"
+  well: "999px"
 spacing:
   sm: "8px"
   md: "16px"
