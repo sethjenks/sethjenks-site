@@ -1,0 +1,177 @@
+[
+  {
+    "id": "level-hardscapes",
+    "title": "Level Hardscapes",
+    "year": "2026",
+    "role": "Landing",
+    "src": "/media/work/level-hardscapes.jpg",
+    "width": 1440,
+    "height": 767,
+    "summary": "A client landing for a premium outdoor-living studio. Dark field, architectural type, material photography — not a SaaS product shot.",
+    "sections": [
+      {
+        "heading": "The field",
+        "body": [
+          "Every line on the page points at hardscape. The palette, the do and don’t, and a single CTA sit on a black field so the photography can carry the claim."
+        ]
+      },
+      {
+        "heading": "What stays out",
+        "body": [
+          "I kept serif out of the public log, but this still is the client piece as designed: craft first, then whitespace, then one decisive ask."
+        ]
+      }
+    ],
+    "tags": ["Philo", "landing"]
+  },
+  {
+    "id": "intermission",
+    "title": "Intermission",
+    "year": "2026",
+    "role": "Product",
+    "src": "/media/work/intermission.jpg",
+    "width": 390,
+    "height": 852,
+    "summary": "A health dashboard that treats labs as a quiet grid — hormone, metabolic, cardio, reproductive, sleep — instead of a portal dump.",
+    "sections": [
+      {
+        "heading": "The view",
+        "body": [
+          "The still is Nadia’s view: a name, an age, and six scores that can be read in a glance. Color stays in the tiles. The chrome stays out."
+        ]
+      },
+      {
+        "heading": "Range and watch",
+        "body": [
+          "I designed it so a marker that needs a look sits next to one that is already in range, without turning the phone into a clinic clipboard."
+        ]
+      }
+    ],
+    "tags": ["personal", "product"]
+  },
+  {
+    "id": "boardwalk-bots",
+    "title": "Boardwalk Bots",
+    "year": "2026",
+    "role": "Product",
+    "src": "/media/work/boardwalk-bots.jpg",
+    "width": 1120,
+    "height": 1064,
+    "summary": "An agent workspace for a construction BD team. Meridian writes the morning digest, scores call-today projects, and only spends enrichment credits after you approve a record.",
+    "sections": [
+      {
+        "heading": "The desk",
+        "body": [
+          "Westland Construction is the sample desk. The left rail is the stack — call today, enrich, CRM — and the center is one project at a time, with a reason it matched."
+        ]
+      },
+      {
+        "heading": "Credits after you ask",
+        "body": [
+          "Routines on the right run the market scan and the CRM write. Contact lookup stays locked until someone asks. Empty lookups are not charged."
+        ]
+      }
+    ],
+    "tags": ["Philo", "product"]
+  },
+  {
+    "id": "food-passport",
+    "title": "Food Passport",
+    "year": "2026",
+    "role": "Print",
+    "src": "/media/work/food-passport.jpg",
+    "width": 1650,
+    "height": 2550,
+    "summary": "A junior field-series passport. Kids log foods; the cover line is stay curious, not finish the plate.",
+    "sections": [
+      {
+        "heading": "The cover",
+        "body": [
+          "Food Explorer Passport is a blank name line, a yellow explorer stamp, and a lot of paper. It is a field guide, not a chore chart."
+        ]
+      },
+      {
+        "heading": "The line",
+        "body": [
+          "The cover type is stacked and plain on purpose. The only color is the stamp. You do not have to like every food."
+        ]
+      }
+    ],
+    "tags": ["personal", "print"]
+  },
+  {
+    "id": "offramp",
+    "title": "Offramp",
+    "year": "2026",
+    "role": "Product",
+    "src": "/media/work/offramp.jpg",
+    "width": 1440,
+    "height": 1024,
+    "summary": "A seven-question diagnostic that turns what an owner already knows into a picture of exit readiness. The still is Hudson Mechanical mid-assessment.",
+    "sections": [
+      {
+        "heading": "The map",
+        "body": [
+          "The map around “your business” is the whole product: exit target, earnings, customer risk, owner dependence, records, revenue trend, timeline."
+        ]
+      },
+      {
+        "heading": "Resume",
+        "body": [
+          "Completed diagnostics stay on the right so an owner can compare later. Resume picks up at the step they left — here, owner dependence, step three of seven."
+        ]
+      }
+    ],
+    "tags": ["Philo", "product"]
+  },
+  {
+    "id": "philo-shirt",
+    "title": "Philo Shirt",
+    "year": "2026",
+    "role": "Merch",
+    "src": "/media/work/philo-shirt.jpg",
+    "width": 720,
+    "height": 900,
+    "summary": "A Philo merch frame — CONNECTLECT, builders backing builders. Cream center stack, black ink, cassette-deck geometry.",
+    "sections": [
+      {
+        "heading": "The print",
+        "body": [
+          "The tee is a center print: two reels, a signal line, and a DIN jack. It is a schematic, not a logo lockup."
+        ]
+      },
+      {
+        "heading": "One ink",
+        "body": [
+          "Cream on black, one ink, no extra marks. The caption is the thesis — find the signal, sharpen it."
+        ]
+      }
+    ],
+    "tags": ["Philo", "merch"]
+  },
+  {
+    "id": "brand-brand",
+    "title": "brand.brand",
+    "year": "2026",
+    "role": "Product",
+    "src": "/media/work/brand-brand.jpg",
+    "width": 1440,
+    "height": 2164,
+    "summary": "A product for agencies and in-house teams: one brand guide humans and agents can both read. Edit free; pay when you publish.",
+    "sections": [
+      {
+        "heading": "The page",
+        "body": [
+          "The marketing page is the product: a guide with a Brand Agent, a voice panel, and a publish price. Citrus Pear is the sample workspace."
+        ]
+      },
+      {
+        "heading": "Publish",
+        "body": [
+          "Structured brand data, a generated URL, and a brand.json token for external agents. I designed the page so the free plan and the publish license sit in the same column."
+        ]
+      }
+    ],
+    "tags": ["Arcana", "product"]
+  }
+]

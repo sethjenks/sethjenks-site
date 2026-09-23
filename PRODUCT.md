@@ -32,11 +32,13 @@ Dates are America/Denver calendar days. Intended production domain is sethjenks.
 - Fields: `id`, `date`, `title`, `summary` (1–2 curated sentences), optional `tags`, optional `media`, optional `paperRef`.
 - `paperRef` is agents-only and is never rendered publicly.
 - No auth, no database, no Paper iframe.
-- [inferred from locked brief] v1 is a single home feed.
+- Home feed plus one project page per `content/work.json` item at `/work/[id]`.
+- Work fields: `id`, `title`, `year`, `role`, `src`, `width`, `height`, `summary` (1–2 sentences), `sections` (`heading` + short paragraphs), optional `tags`.
+- Project pages are case studies: large title and lede, framed still, sections, related work.
 
 ## Brand Commitments
 
-Binding visual lock (see DESIGN.md): near-white ground `#fafafa`, ink `#111111`, muted meta `#6b6b6b`, hairline chrome only. Geist Sans (UI/titles/body), Geist Mono (stamps/tags/labels), Geist Pixel Square as a sparse accent (`DAY`, `SJ`). The command key is light aluminum with an unlit well — no LED. Glass and aluminum are touches on the key and media edge, not the page. No Geist Serif. Machine day stamps. Voice is first-person, specific, short. Not SaaS marketing.
+Binding visual lock (see DESIGN.md): near-white ground `#fafafa`, ink `#111111`, muted meta `#6b6b6b`, hairline chrome only. Geist Sans (UI/titles/body), Geist Mono (stamps/tags/labels), Geist Pixel Square as a sparse accent (`DAY`). The header control is a pale blue glass cap with a navy label — no LED. Glass is a touch on that control and on the media edge, not the page. No Geist Serif. Machine day stamps. Voice is first-person, specific, short. Not SaaS marketing.
 
 ## Evidence on Hand
 

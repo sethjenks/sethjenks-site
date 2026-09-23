@@ -4,9 +4,9 @@ Minimal chronological log on a near-white page. Product truth lives in `PRODUCT.
 
 Impeccable is installed for this project (`npx impeccable detect`, skills under `.cursor/skills/impeccable`). Run `npx impeccable detect http://127.0.0.1:43127/` before calling a UI pass done.
 
-Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist/font/mono` for day stamps, tags, and tech labels. Geist Pixel Square via `geist/font/pixel` as a sparse accent (`DAY` beside the stamp, an inline `SJ` wordmark — never body or long titles). Family is Sans / Mono / Pixel only — there is no Geist Serif; do not invent one. No Inter.
+Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist/font/mono` for day stamps, tags, and tech labels. Geist Pixel Square via `geist/font/pixel` as a sparse accent (`DAY` beside the stamp — never body or long titles). Family is Sans / Mono / Pixel only — there is no Geist Serif; do not invent one. No Inter.
 
-The page is ground `#fafafa`, ink `#111111`, muted `#6b6b6b`. Whitespace separates days. A hairline shows up on the footer and on media. The command key is light aluminum with an unlit well — no LED. No dark void, frosted panels, scanlines, CRT, or pixelated photos.
+The page is ground `#fafafa`, ink `#111111`, muted `#6b6b6b`. Whitespace separates days. A hairline shows up on the footer and on media. The header control is a pale blue glass cap with a navy label — no LED. No dark void, frosted panels, scanlines, CRT, or pixelated photos.
 
 Intended production domain later: **sethjenks.com**. DNS is deferred — this repo does not configure live custom-domain records.
 
@@ -54,6 +54,8 @@ pnpm build
 - `paperRef` is agents-only. The public page does not render it.
 
 The site reads every `content/entries/*.json` file, sorts by date descending then `id`, and groups by day (newest day first). Cards render media → title → summary → tags.
+
+The header-to-feed strip reads `content/work.json`. Put stills in `public/media/work/` and add `{ id, title, year, role, src, width, height, summary, sections, tags }`. Each `id` becomes `/work/[id]`. `sections` is `{ heading, body[] }`.
 
 ## Deploy
 
