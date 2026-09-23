@@ -451,11 +451,16 @@
   }
 
   .work-carousel-fade {
+    /* Margin vignette only. Left falloff ends inside the 1.5rem track
+       padding so the resting still is fully opaque. Right falloff is
+       shorter so it does not wash in across the frame. */
+    --carousel-fade-left: 1.15rem;
+    --carousel-fade-right: 0.75rem;
     mask-image: linear-gradient(
       90deg,
       transparent 0,
-      #000 6rem,
-      #000 calc(100% - 6rem),
+      #000 var(--carousel-fade-left),
+      #000 calc(100% - var(--carousel-fade-right)),
       transparent 100%
     );
   }
@@ -713,6 +718,11 @@
   @media (min-width: 640px) {
     .work-carousel {
       margin-top: 4.5rem;
+    }
+
+    .work-carousel-fade {
+      --carousel-fade-left: 1.5rem;
+      --carousel-fade-right: 1rem;
     }
 
     .work-carousel-track {

@@ -163,7 +163,7 @@ Full-bleed in the column, 1px hairline, paper well. The edge is the only elevati
 ### Work strip
 Full-viewport horizontal carousel of design-work stills, between the header and the log.
 
-- **Width:** `100vw`. Much wider than the 42rem column. The track fades to ground at both screen edges.
+- **Width:** `100vw`. Much wider than the 42rem column. The track fades to ground in a thin strip at the screen edges — a soft margin vignette. The resting still stays clear; the right falloff does not wash across the frame.
 - **Frames:** `16px` radius, 1px hairline, paper well. Mixed aspect ratios at one shared height. Width stays with the still.
 - **Caption:** left-aligned under the frame — Geist Sans title, Geist Mono work type. No chips. The caption wraps inside the still’s width.
 - **Motion:** user-driven only — drag, swipe, or arrow keys. No auto-advance. A drag does not follow the project link.
