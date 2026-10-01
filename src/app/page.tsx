@@ -1,8 +1,8 @@
 import { Feed } from "@/components/feed";
-import { KeyButton } from "@/components/key-button";
-import { WorkCarousel } from "@/components/work-carousel";
+import { WorkRows } from "@/components/work-rows";
 import { getEntryDayGroups } from "@/lib/entries";
-import { getWorkItems } from "@/lib/work";
+import { INTRO_COPY, ROLE_LINE } from "@/lib/site";
+import { getWorkItems, groupWorkBands } from "@/lib/work";
 
 export default async function Home() {
   const [groups, work] = await Promise.all([
@@ -11,34 +11,15 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-[42rem] px-6 pt-20 sm:px-8 sm:pt-28">
-        <header className="flex items-start justify-between gap-8">
-          <div>
-            <h1 className="text-[1.75rem] leading-none tracking-tight text-ink sm:text-3xl">
-              Seth Jenks
-            </h1>
-            <p className="mt-5 max-w-md text-sm leading-7 text-quiet sm:text-[0.95rem] sm:leading-7">
-              A public daily log of curated agentic work — notes from Arcana,
-              Philo, and the rest of the week. The interface is designed in
-              code. Paper is only for optional media exports. Dated in
-              America/Denver.
-            </p>
-          </div>
-          <KeyButton href="#log">Log</KeyButton>
-        </header>
+    <div className="home-page flex flex-1 flex-col">
+      <div className="mx-auto w-full max-w-[42rem] px-6 pt-8 sm:px-8 sm:pt-10">
+        <p className="role-line">{ROLE_LINE}</p>
+        <p className="intro-copy">{INTRO_COPY}</p>
       </div>
-      <WorkCarousel id="work" items={work} />
-      <div className="mx-auto flex w-full max-w-[42rem] flex-1 flex-col px-6 pb-20 sm:px-8 sm:pb-28">
-        <main id="log" className="flex-1 scroll-mt-8 pt-20 sm:pt-28">
-          <Feed groups={groups} />
-        </main>
-        <footer className="mt-28 border-t border-hairline pt-8">
-          <p className="font-mono text-[11px] tracking-[0.08em] text-quiet">
-            sethjenks.com planned · DNS deferred
-          </p>
-        </footer>
-      </div>
+      <WorkRows id="work" heading="Work" bands={groupWorkBands(work)} />
+      <main id="log" className="log-main">
+        <Feed groups={groups} />
+      </main>
     </div>
   );
 }

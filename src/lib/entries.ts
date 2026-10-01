@@ -25,6 +25,10 @@ export type Entry = {
   media?: EntryMedia;
 };
 
+type ParsedEntry = Entry & {
+  hidden: boolean;
+};
+
 export type DayGroup = {
   date: string;
   entries: Entry[];
@@ -79,7 +83,7 @@ function toPublicEntry(entry: Entry): Entry {
   };
 }
 
-function parseEntry(raw: unknown, filename: string): Entry {
+function parseEntry(raw: unknown, filename: string): ParsedEntry {
   const match = FILENAME_PATTERN.exec(filename);
 
   if (!match) {
@@ -94,8 +98,9 @@ function parseEntry(raw: unknown, filename: string): Entry {
     throw new Error(`Entry "${filename}" must be a JSON object.`);
   }
 
-  const { id, date, title, summary, tags, media } = raw;
+  const { id, date, title, summary, tags, media, hidden } = raw;
   // paperRef is agents-only and is intentionally unread for the public model.
+  // hidden keeps a file on disk without rendering it in the public feed.
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
     throw new Error(
@@ -140,14 +145,21 @@ function parseEntry(raw: unknown, filename: string): Entry {
     }
   }
 
-  return toPublicEntry({
-    id,
-    date,
-    title: title.trim(),
-    summary: summary.trim(),
-    ...(tags ? { tags: tags.map((tag) => String(tag).trim()) } : {}),
-    ...(media !== undefined ? { media: parseMedia(media, filename) } : {}),
-  });
+  if (hidden !== undefined && typeof hidden !== "boolean") {
+    throw new Error(`Entry "${filename}" hidden must be a boolean.`);
+  }
+
+  return {
+    ...toPublicEntry({
+      id,
+      date,
+      title: title.trim(),
+      summary: summary.trim(),
+      ...(tags ? { tags: tags.map((tag) => String(tag).trim()) } : {}),
+      ...(media !== undefined ? { media: parseMedia(media, filename) } : {}),
+    }),
+    hidden: hidden === true,
+  };
 }
 
 export function sortEntries(entries: Entry[]): Entry[] {
@@ -205,7 +217,13 @@ export async function getEntries(): Promise<Entry[]> {
     seenIds.add(entry.id);
   }
 
-  return sortEntries(entries);
+  return sortEntries(
+    entries.filter((entry) => !entry.hidden).map(toPublicEntry),
+  );
+}
+
+export function normalizeTag(tag: string): string {
+  return tag.trim().toLowerCase();
 }
 
 export async function getEntryDayGroups(): Promise<DayGroup[]> {

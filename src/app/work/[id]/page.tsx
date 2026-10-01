@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { WorkStudy } from "@/components/work-study";
-import { getRelatedWork, getWorkItem, getWorkItems } from "@/lib/work";
+import {
+  getNextWorkItem,
+  getRelatedWork,
+  getWorkItem,
+  getWorkItems,
+} from "@/lib/work";
 
 export async function generateStaticParams() {
   const items = await getWorkItems();
@@ -21,8 +26,18 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${item.title} · Seth Jenks`,
+    title: item.title,
     description: item.summary,
+    openGraph: {
+      title: item.title,
+      description: item.summary,
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: item.title,
+      description: item.summary,
+    },
   };
 }
 
@@ -38,7 +53,16 @@ export default async function WorkPage({
     notFound();
   }
 
-  const related = await getRelatedWork(item.id);
+  const [related, all] = await Promise.all([
+    getRelatedWork(item.id),
+    getWorkItems(),
+  ]);
 
-  return <WorkStudy item={item} related={related} />;
+  return (
+    <WorkStudy
+      item={item}
+      related={related}
+      next={getNextWorkItem(all, item.id)}
+    />
+  );
 }

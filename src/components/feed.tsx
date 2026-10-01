@@ -1,5 +1,15 @@
+import Link from "next/link";
 import { EntryMediaFigure } from "@/components/entry-media";
-import { formatDayHeading, type DayGroup, type Entry } from "@/lib/entries";
+import {
+  formatDayHeading,
+  normalizeTag,
+  type DayGroup,
+  type Entry,
+} from "@/lib/entries";
+
+function dayOfMonth(date: string): string {
+  return String(Number(date.slice(8, 10)));
+}
 
 function EntryArticle({
   entry,
@@ -9,27 +19,25 @@ function EntryArticle({
   priorityMedia: boolean;
 }) {
   return (
-    <article className="py-1">
-      <div className="space-y-4">
+    <article id={entry.id} className="log-entry">
+      <div className="log-entry-stack">
         {entry.media ? (
           <EntryMediaFigure media={entry.media} priority={priorityMedia} />
         ) : null}
-        <h3 className="text-xl leading-snug tracking-tight text-ink">
-          {entry.title}
+        <h3 className="log-title">
+          <Link href={`/log/${entry.date}#${entry.id}`}>{entry.title}</Link>
         </h3>
-        <p className="max-w-[65ch] text-sm leading-7 text-quiet sm:text-[0.95rem]">
-          {entry.summary}
-        </p>
+        <p className="log-summary">{entry.summary}</p>
         {entry.tags && entry.tags.length > 0 ? (
-          <ul className="flex flex-wrap gap-x-4 gap-y-1">
-            {entry.tags.map((tag) => (
-              <li
-                key={tag}
-                className="font-mono text-[11px] tracking-[0.08em] text-quiet"
-              >
-                {tag}
-              </li>
-            ))}
+          <ul className="log-tags">
+            {entry.tags.map((tag) => {
+              const label = normalizeTag(tag);
+              return (
+                <li key={label}>
+                  <Link href={`/log?tag=${encodeURIComponent(label)}`}>{label}</Link>
+                </li>
+              );
+            })}
           </ul>
         ) : null}
       </div>
@@ -37,39 +45,49 @@ function EntryArticle({
   );
 }
 
-export function Feed({ groups }: { groups: DayGroup[] }) {
+export function Feed({
+  groups,
+  empty = "No notes in the log yet.",
+}: {
+  groups: DayGroup[];
+  empty?: string;
+}) {
   if (groups.length === 0) {
-    return (
-      <p className="text-sm leading-7 text-quiet">
-        Nothing published yet. Add a JSON file under{" "}
-        <code className="font-mono text-ink">content/entries</code> to start
-        the log.
-      </p>
-    );
+    return <p className="log-summary">{empty}</p>;
   }
 
   return (
-    <div className="space-y-24">
+    <div className="log-days">
       {groups.map((group, groupIndex) => (
-        <section key={group.date} aria-labelledby={`day-${group.date}`}>
-          <h2
-            id={`day-${group.date}`}
-            className={`mb-10 text-[11px] tracking-[0.16em] ${
-              groupIndex === 0 ? "text-ink" : "text-quiet"
-            }`}
-          >
-            <span className="font-pixel mr-3 tracking-[0.18em]">DAY</span>
-            <span className="font-mono">{formatDayHeading(group.date)}</span>
-          </h2>
-          <div className="space-y-16">
+        <section
+          key={group.date}
+          className="day-group"
+          aria-labelledby={`day-${group.date}`}
+        >
+          <div className="day-rail">
+            <p className="day-kicker">Day</p>
+            <p className="day-numeral" aria-hidden="true">
+              {dayOfMonth(group.date)}
+            </p>
+            <h2 id={`day-${group.date}`} className="day-stamp">
+              <Link href={`/log/${group.date}`} className="day-link">
+                <time
+                  dateTime={group.date}
+                  className={groupIndex === 0 ? "is-newest" : undefined}
+                >
+                  {formatDayHeading(group.date)}
+                </time>
+              </Link>
+            </h2>
+          </div>
+          <div className="day-entries">
             {group.entries.map((entry, entryIndex) => (
               <EntryArticle
                 key={entry.id}
                 entry={entry}
                 priorityMedia={
                   groupIndex === 0 &&
-                  entryIndex ===
-                    group.entries.findIndex((item) => item.media)
+                  entryIndex === group.entries.findIndex((item) => item.media)
                 }
               />
             ))}

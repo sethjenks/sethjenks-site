@@ -20,7 +20,7 @@ Publish a chronological public log of curated agentic work. Success is a readabl
 
 ## Positioning
 
-A personal visual log designed in code. Paper is only for optional media exports. The mechanism is file-based entries (`content/entries/YYYY-MM-DD-<slug>.json`) rendered as a reverse-chronological day-grouped feed.
+A personal visual log designed in code. The mechanism is file-based entries (`content/entries/YYYY-MM-DD-<slug>.json`) rendered as a reverse-chronological day-grouped feed. `paperRef` is never rendered.
 
 ## Operating Context
 
@@ -29,12 +29,13 @@ Dates are America/Denver calendar days. Intended production domain is sethjenks.
 ## Capabilities and Constraints
 
 - Read all `content/entries/*.json`, sort by date descending then `id`, group by day.
-- Fields: `id`, `date`, `title`, `summary` (1–2 curated sentences), optional `tags`, optional `media`, optional `paperRef`.
+- Fields: `id`, `date`, `title`, `summary` (1–2 curated sentences), optional `tags`, optional `media`, optional `paperRef`, optional `hidden`.
 - `paperRef` is agents-only and is never rendered publicly.
-- No auth, no database, no Paper iframe.
+- `hidden: true` keeps the file but removes it from the public feed and day pages.
+- No auth, no database, no Paper iframe, no contact form. Contact is X and LinkedIn.
 - Home feed plus one project page per `content/work.json` item at `/work/[id]`.
-- Work fields: `id`, `title`, `year`, `role`, `src`, `width`, `height`, `summary` (1–2 sentences), `sections` (`heading` + short paragraphs), optional `tags`.
-- Project pages are case studies: large title and lede, framed still, sections, related work.
+- Work fields: `id`, `title`, `year`, `role` (the type), `src`, `width`, `height`, `summary` (1–2 sentences), `sections` (`heading` + short paragraphs), optional `tags`, optional `alt`.
+- Project pages are case studies: large title and lede, Year and Type, framed still, sections, next case, related work.
 
 ## Brand Commitments
 
@@ -55,4 +56,4 @@ Binding visual lock (see DESIGN.md): near-white ground `#fafafa`, ink `#111111`,
 
 ## Accessibility & Inclusion
 
-WCAG 2.1 AA for text and controls. `prefers-reduced-motion` is required. Functional UI text stays at or above 11px.
+WCAG 2.1 AA for text and controls. `prefers-reduced-motion` is required. Functional UI text stays at or above 12px. Primary tap targets are at least 44px.

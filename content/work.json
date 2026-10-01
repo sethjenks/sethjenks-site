@@ -7,7 +7,8 @@
     "src": "/media/work/level-hardscapes.jpg",
     "width": 1440,
     "height": 767,
-    "summary": "A client landing for a premium outdoor-living studio. Dark field, architectural type, material photography — not a SaaS product shot.",
+    "summary": "A client landing for a premium outdoor-living studio. Dark field, architectural type, material photography, not a SaaS product shot.",
+    "alt": "Brand board for Level Hardscapes on a black field, with the wordmark, color swatches, and a do and don't list.",
     "sections": [
       {
         "heading": "The field",
@@ -18,7 +19,7 @@
       {
         "heading": "What stays out",
         "body": [
-          "I kept serif out of the public log, but this still is the client piece as designed: craft first, then whitespace, then one decisive ask."
+          "The board is the client piece: palette, type, and a do and don't list on a black field, with one ask. Anything that does not point at the hardscape stays off the page so the photography can carry it."
         ]
       }
     ],
@@ -32,7 +33,8 @@
     "src": "/media/work/intermission.jpg",
     "width": 390,
     "height": 852,
-    "summary": "A health dashboard that treats labs as a quiet grid — hormone, metabolic, cardio, reproductive, sleep — instead of a portal dump.",
+    "summary": "A health dashboard that treats labs as a quiet grid of hormone, metabolic, cardio, reproductive, and sleep scores, instead of a portal dump.",
+    "alt": "Phone screen of the Intermission dashboard for Nadia, age 34, with six health scores in a quiet grid.",
     "sections": [
       {
         "heading": "The view",
@@ -58,11 +60,12 @@
     "width": 1120,
     "height": 1064,
     "summary": "An agent workspace for a construction BD team. Meridian writes the morning digest, scores call-today projects, and only spends enrichment credits after you approve a record.",
+    "alt": "Boardwalk Bots desk for Westland Construction, with a call-today list, the Meridian project in the center, and routines on the right.",
     "sections": [
       {
         "heading": "The desk",
         "body": [
-          "Westland Construction is the sample desk. The left rail is the stack — call today, enrich, CRM — and the center is one project at a time, with a reason it matched."
+          "Westland Construction is the sample desk. The left rail is the stack: call today, enrich, CRM. The center is one project at a time, with a reason it matched."
         ]
       },
       {
@@ -83,6 +86,7 @@
     "width": 1650,
     "height": 2550,
     "summary": "A junior field-series passport. Kids log foods; the cover line is stay curious, not finish the plate.",
+    "alt": "Food Explorer Passport cover with a yellow explorer stamp, a blank name line, and the line stay curious.",
     "sections": [
       {
         "heading": "The cover",
@@ -108,6 +112,7 @@
     "width": 1440,
     "height": 1024,
     "summary": "A seven-question diagnostic that turns what an owner already knows into a picture of exit readiness. The still is Hudson Mechanical mid-assessment.",
+    "alt": "Offramp diagnostic for Hudson Mechanical, with an exit-readiness map around the business and completed diagnostics on the right.",
     "sections": [
       {
         "heading": "The map",
@@ -118,7 +123,7 @@
       {
         "heading": "Resume",
         "body": [
-          "Completed diagnostics stay on the right so an owner can compare later. Resume picks up at the step they left — here, owner dependence, step three of seven."
+          "Completed diagnostics stay on the right so an owner can compare later. Resume picks up at the step they left, here owner dependence, step three of seven."
         ]
       }
     ],
@@ -132,7 +137,8 @@
     "src": "/media/work/philo-shirt.jpg",
     "width": 720,
     "height": 900,
-    "summary": "A Philo merch frame — CONNECTLECT, builders backing builders. Cream center stack, black ink, cassette-deck geometry.",
+    "summary": "A Philo merch frame. CONNECTLECT, builders backing builders. Cream center stack, black ink, cassette-deck geometry.",
+    "alt": "Philo shirt graphic on black, cream center stack with two reels, a signal line, and a DIN jack.",
     "sections": [
       {
         "heading": "The print",
@@ -143,7 +149,7 @@
       {
         "heading": "One ink",
         "body": [
-          "Cream on black, one ink, no extra marks. The caption is the thesis — find the signal, sharpen it."
+          "Cream on black, one ink, no extra marks. The caption is the thesis: find the signal, sharpen it."
         ]
       }
     ],
@@ -158,6 +164,7 @@
     "width": 1440,
     "height": 2164,
     "summary": "A product for agencies and in-house teams: one brand guide humans and agents can both read. Edit free; pay when you publish.",
+    "alt": "brand.brand page for the Citrus Pear workspace, with a brand guide, a voice panel, and a publish price.",
     "sections": [
       {
         "heading": "The page",

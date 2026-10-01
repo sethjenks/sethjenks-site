@@ -3,5 +3,6 @@
   "date": "2026-09-15",
   "title": "Claire Vo’s notebook as a reference",
   "summary": "Reviewed clairevo.com as a sparse chronological AI notebook. We’re taking the day-grouped spine and whitespace, keeping entries to curated one-to-two sentence summaries instead of full workflow writeups.",
-  "tags": ["personal"]
+  "tags": ["personal"],
+  "hidden": true
 }

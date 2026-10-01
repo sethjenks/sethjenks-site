@@ -9,5 +9,6 @@
     "alt": "Geometric scaffold diagram on a dark field with an aluminum grid.",
     "type": "image"
   },
-  "paperRef": "paper://entries/domain-and-scaffold"
+  "paperRef": "paper://entries/domain-and-scaffold",
+  "hidden": true
 }

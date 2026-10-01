@@ -91,7 +91,7 @@ Neutral field, near-black type, one muted gray. No chromatic signal.
 
 **The Quiet Field Rule.** The page stays inside `#fafafa`–`#ffffff` with `#111111` type. Do not reintroduce a dark void, frosted panels, or a cyan wash.
 
-**The No Signal Rule.** The page stays ink on ground. The glass cap is the only chromatic object. Focus is a 1px ink outline. Do not add cyan LEDs, beige, terracotta, or a second neon.
+**The No Signal Rule.** The page stays ink on ground. The glass cap is the only chromatic object. Focus is a 2px ink outline with a 3px offset. Do not add cyan LEDs, beige, terracotta, or a second neon.
 
 ## Typography
 
@@ -99,27 +99,27 @@ Neutral field, near-black type, one muted gray. No chromatic signal.
 **Label / Stamp Font:** Geist Mono  
 **Accent Font:** Geist Pixel Square  
 
-**Load:** the `geist` package (`geist/font/sans`, `geist/font/mono`, `geist/font/pixel`). Default Pixel face is `GeistPixelSquare`. That is next/font. Apply `GeistSans.className` on `<html>` plus the CSS variables so titles, body, and UI inherit Geist Sans. Never `next/font/google` Inter. Never list Inter in a fallback stack.
+**Load:** Geist Sans and Geist Mono from the `geist` package (`geist/font/sans`, `geist/font/mono`). Geist Pixel Square only, via `next/font/local` in `src/lib/pixel-font.ts`. Do not import `geist/font/pixel`; that barrel also preloads Grid, Line, Circle, and Triangle. Apply `GeistSans.className` on `<html>` plus the CSS variables so titles, body, and UI inherit Geist Sans. Never `next/font/google` Inter. Never list Inter in a fallback stack.
 
 **Family:** Geist is Sans / Mono / Pixel only. There is no Geist Serif — do not invent one, do not load a serif, do not map `--font-serif` to a serif face.
 
 **Character:** Geometric and quiet. Pixel is a stamp, not a voice.
 
 ### Hierarchy
-- **Display** (500, 1.75–1.9rem, line-height 1): the name on the home log. Geist Sans.
-- **Study title** (500, clamp 2.75–5.5rem, line-height 0.95): the project name on a case-study page only. Geist Sans. `text-wrap: balance`.
-- **Title** (500, 1.25–1.35rem): entry titles. Geist Sans.
-- **Body** (400, 0.95rem / 1.7): bio and summaries. Geist Sans. Measure stays inside ~42rem and near 65ch.
-- **Label** (Geist Mono, ≥11px, tracked): day stamps `2026.09.15`, tags, key captions, footer.
-- **Pixel** (Geist Pixel Square, ≥11px): `DAY` beside the machine stamp. Never body. Never long titles.
+- **Display** (500, `clamp(2rem, 4vw, 3rem)`, tracking `-0.03em`): the name on the home log. Geist Sans. On other routes the same word is a 16px/500 link back home.
+- **Study title** (500, clamp 2.75rem to 5.5rem): the project name on a case-study page only. Geist Sans. `text-wrap: balance`.
+- **Title** (500, 20px, line-height 1.3, tracking `-0.01em`): entry titles. Geist Sans.
+- **Body** (400, 16px / 1.6, `#595959`): intro and summaries. Geist Sans. Measure stays inside 42rem and near 65ch.
+- **Label** (Geist Mono, 12px minimum, tracking `0.08em`, `#6b6b6b`): tags, work type, footer. Day stamps stay 13px with `0.16em` tracking, format `2026.09.15`.
+- **Pixel** (Geist Pixel Square, 48px): the day-of-month numeral in the log rail. Never body. Never long titles.
 
-**The Pixel Budget Rule.** Pixel Square is a fun display accent. One use per page: `DAY` beside the machine stamp. If a sentence needs it, use Sans instead.
+**The Pixel Budget Rule.** Pixel Square is a display accent. One use: the day numeral. If a sentence needs it, use Sans instead.
 
-**The Geist Load Rule.** Titles, body, and UI are Geist Sans via `geist/font/sans`. Geist Mono via `geist/font/mono` is for machine stamps, tags, and technical labels. Geist Pixel Square via `geist/font/pixel` is the sparse accent. No Geist Serif. No Inter. No italic-serif decoration.
+**The Geist Load Rule.** Titles, body, and UI are Geist Sans via `geist/font/sans`. Geist Mono via `geist/font/mono` is for machine stamps, tags, and technical labels. Geist Pixel Square is the sparse accent, loaded alone. No Geist Serif. No Inter. No italic-serif decoration.
 
 ## Layout
 
-Single reading column (`max-width: 42rem`) for the home header, log, and footer. Between the header and the feed, a full-viewport work strip breaks that measure: horizontal, user-scrolled, faded at the screen edges. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a large frame, then a 42rem reading measure for sections. Large vertical gaps between days and between entries. Order inside an entry is fixed: media → title → summary → tags. No panels around the header or the day. No heavy nav. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted.
+Single reading column (`max-width: 42rem`) for the intro, log, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card aligned to the column. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a framed still, then a 42rem reading measure for sections. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. Nav is Work, Log, X, and LinkedIn. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
 
 ## Elevation & Depth
 
@@ -152,7 +152,7 @@ Pale blue glass-cap primary control, HTML/CSS only. One in the header.
 - **Use:** the header jump to the log. Not every text link.
 
 ### Tags
-Geist Mono, ≥11px, muted. No fill, no border. Two tags is a note; a row of many is chip soup.
+Geist Mono, 12px minimum, muted `#6b6b6b`. No fill, no border. Two tags is a note; a row of many is chip soup.
 
 ### Entries
 Day groups are sections of type, not cards. Entries inside are not nested cards. Media, when present, uses a hairline frame on paper.
@@ -160,23 +160,23 @@ Day groups are sections of type, not cards. Entries inside are not nested cards.
 ### Media
 Full-bleed in the column, 1px hairline, paper well. The edge is the only elevation. Optional. `type` is `image` or `video`.
 
-### Work strip
-Full-viewport horizontal carousel of design-work stills, between the header and the log.
+### Work rows
+Labeled horizontal rows of stills, between the intro and the log. A row exists only when a type has at least three pieces. Smaller types fold into a neighboring row.
 
-- **Width:** `100vw`. Much wider than the 42rem column. The track fades to ground in a thin strip at the screen edges — a soft margin vignette. The resting still stays clear; the right falloff does not wash across the frame.
-- **Frames:** `16px` radius, 1px hairline, paper well. Mixed aspect ratios at one shared height. Width stays with the still.
-- **Caption:** left-aligned under the frame — Geist Sans title, Geist Mono work type. No chips. The caption wraps inside the still’s width.
-- **Motion:** user-driven only — drag, swipe, or arrow keys. No auto-advance. A drag does not follow the project link.
-- **Links:** each frame goes to `/work/[id]`.
+- **Start:** `max(24px, calc((100% - 42rem) / 2 + 32px))`. The first card lines up with the text column and the row still bleeds right. Use `100%`, not `100vw`.
+- **Tiles:** one 4:3 frame, `object-fit: cover`, 16px radius, 1px hairline, paper well.
+- **Header:** a visible "Work" heading plus a mono count. Each band has a 12px mono caps label, a count, and 44px prev/next controls.
+- **Motion:** drag, swipe, or arrow keys. `touch-action: pan-x pan-y` so a vertical swipe still scrolls the page. No auto-advance.
+- **Links:** each tile goes to `/work/[id]`.
 
 ### Work study
-Case-study page for one `content/work.json` item. Patterned after a studio case study (large title, lede, then the work) — not a 42rem blog post.
+Case-study page for one `content/work.json` item. Large title, lede, then the work. The body stays in the 42rem measure.
 
-- **Intro:** crumb `Home / Work / Title`, mono `#ROLE`, a large Geist study title, then the summary as a standfirst.
-- **Frame:** the still, large, `16px` radius, so the real crop is readable.
-- **Sections:** `heading` + short paragraphs in the 42rem measure. First-person. No invented impact.
-- **Related:** the work strip again, other items only.
-- **Type:** Geist Sans only for title and lede. No serif. No Inter. No Pixel on this page.
+- **Intro:** crumb `Home / Work / Title`, a large Geist study title, the summary as a standfirst, then Year and Type. The content `role` field is the type. Do not invent a job title.
+- **Frame:** wide stills fill a 1px hairline frame. Phone and other narrow stills sit centered in that frame at their native width or smaller.
+- **Sections:** `heading` plus short paragraphs. First person. No invented impact. A next-case link follows.
+- **Related:** one more-work row, other items only.
+- **Type:** Geist Sans for title and lede. No serif. No Inter. No Pixel on this page.
 - **Source:** `content/work.json` plus files in `public/media/work/`.
 
 ## Do's and Don'ts
