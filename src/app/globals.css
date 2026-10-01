@@ -472,12 +472,8 @@
     gap: 12px;
     min-height: 48px;
     margin-bottom: 8px;
-    padding-left: max(24px, calc((100% - 42rem) / 2 + 32px));
-    padding-right: max(24px, calc((100% - 42rem) / 2 + 32px));
-  }
-
-  .work-section-solo .work-section-head {
-    padding-right: 140px;
+    padding-left: 24px;
+    padding-right: 24px;
   }
 
   .work-section-title {
@@ -489,6 +485,10 @@
     color: var(--ink);
   }
 
+  .work-section-title-spacer {
+    visibility: hidden;
+  }
+
   .work-count {
     font-family: var(--font-mono);
     font-size: 12px;
@@ -497,73 +497,15 @@
     color: var(--quiet);
   }
 
-  .work-band-header,
-  .work-band-controls-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    height: 48px;
-    padding-left: max(24px, calc((100% - 42rem) / 2 + 32px));
-    padding-right: 24px;
-    background: var(--background);
-  }
-
-  .work-band-header {
-    border-top: 1px solid var(--hairline);
-  }
-
-  .work-band-controls-row {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    justify-content: flex-end;
-    padding-left: 0;
-    background: transparent;
-    pointer-events: none;
-  }
-
-  .work-band-controls {
-    display: flex;
-    gap: 8px;
-    margin-left: auto;
-    pointer-events: auto;
-  }
-
-  .work-band-label {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    line-height: 1.4;
-    text-transform: uppercase;
-    color: var(--quiet);
-  }
-
-  .work-nav-button {
-    display: inline-flex;
-    width: 44px;
-    height: 44px;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--hairline);
-    border-radius: 999px;
-    background: var(--background);
-    color: var(--ink);
-  }
-
-  .work-nav-button:disabled {
-    color: var(--quiet);
-    opacity: 0.45;
+  .work-band + .work-band {
+    margin-top: 4rem;
   }
 
   .work-track-fade {
     /* Margin vignette only. The falloff stays inside the screen gutter
        so a resting card stays fully opaque. Width is 100%, not 100vw,
        so the bleed does not add a horizontal page scroll. */
-    --work-fade-left: 1.15rem;
+    --work-fade-left: 24px;
     --work-fade-right: 0.75rem;
     width: 100%;
     max-width: 100%;
@@ -586,11 +528,9 @@
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x proximity;
-    scroll-padding-inline-start: max(24px, calc((100% - 42rem) / 2 + 32px));
-    scroll-padding-inline-end: 24px;
+    scroll-padding-inline: 24px;
     scrollbar-width: none;
-    padding-inline-start: max(24px, calc((100% - 42rem) / 2 + 32px));
-    padding-inline-end: 24px;
+    padding-inline: 24px;
     padding-block: 4px 8px;
     cursor: grab;
     touch-action: pan-x pan-y;
@@ -686,6 +626,40 @@
     line-height: 1.4;
     text-transform: uppercase;
     color: var(--quiet);
+  }
+
+  .logo-section {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 3.5rem;
+  }
+
+  .logo-track {
+    align-items: center;
+  }
+
+  .logo-card {
+    width: min(21rem, calc(100% - 48px));
+    flex: 0 0 auto;
+    margin: 0;
+    scroll-snap-align: start;
+  }
+
+  .logo-card-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 5 / 3;
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    background: var(--paper);
+  }
+
+  .logo-card-image {
+    object-fit: contain;
+    padding: 2.3rem 2.4rem;
+    box-sizing: border-box;
   }
 
   .work-study {
@@ -926,9 +900,7 @@
   .site-header-bar {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "brand key"
-      "nav nav";
+    grid-template-areas: "brand key";
     align-items: center;
     column-gap: 16px;
     row-gap: 4px;
@@ -968,32 +940,6 @@
 
   .site-wordmark:hover {
     text-decoration: none;
-  }
-
-  .site-nav {
-    display: flex;
-    grid-area: nav;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0 4px;
-  }
-
-  .site-nav a {
-    display: inline-flex;
-    min-width: 44px;
-    min-height: 44px;
-    align-items: center;
-    justify-content: center;
-    padding-inline: 8px;
-    font-size: 14px;
-    line-height: 1;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .site-nav a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 
   .site-header .key-button {
@@ -1054,12 +1000,69 @@
     margin-top: 1rem;
   }
 
+  .project-list,
+  .people-list {
+    width: 100%;
+    max-width: 42rem;
+    margin-inline: auto;
+    padding: 4.5rem 1.5rem 0;
+  }
+
+  .project-list ul,
+  .people-list ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    margin: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-list a.project-row:hover .project-name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .project-list a.project-row:focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .project-name,
+  .people-row {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .people-row {
+    margin: 0;
+  }
+
+  .project-line {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--quiet);
+  }
+
   .log-main {
     width: 100%;
     max-width: 42rem;
     margin-inline: auto;
     flex: 1;
-    padding: 8rem 1.5rem 4rem;
+    padding: 4rem 1.5rem 4rem;
     scroll-margin-top: 32px;
   }
 
@@ -1229,6 +1232,8 @@
   @media (min-width: 640px) {
     .work-study-intro,
     .work-study-sections,
+    .project-list,
+    .people-list,
     .log-main,
     .not-found,
     .site-footer-inner {
@@ -1244,7 +1249,6 @@
     }
 
     .work-track-fade {
-      --work-fade-left: 1.5rem;
       --work-fade-right: 1rem;
     }
   }
@@ -1267,29 +1271,7 @@
     }
   }
 
-  @media (min-width: 960px) {
-    .site-header-bar {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      grid-template-areas: "brand nav key";
-    }
-
-    .site-nav {
-      justify-self: end;
-    }
-
-    .work-band-header,
-    .work-band-controls-row {
-      padding-right: 48px;
-    }
-  }
-
   @media (min-width: 1024px) {
-    .work-band-header {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
     .day-group {
       display: grid;
       grid-template-columns: 160px minmax(0, 1fr);

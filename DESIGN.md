@@ -119,7 +119,7 @@ Neutral field, near-black type, one muted gray. No chromatic signal.
 
 ## Layout
 
-Single reading column (`max-width: 42rem`) for the intro, log, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card aligned to the column. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a framed still, then a 42rem reading measure for sections. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. Nav is Work, Log, X, and LinkedIn. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
+Single reading column (`max-width: 42rem`) for the intro, project list, people list, log, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card near the screen edge. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a framed still, then a 42rem reading measure for sections. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. The header is the name and the Log key. X and LinkedIn sit in the footer. There is no Work link. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
 
 ## Elevation & Depth
 
@@ -161,12 +161,13 @@ Day groups are sections of type, not cards. Entries inside are not nested cards.
 Full-bleed in the column, 1px hairline, paper well. The edge is the only elevation. Optional. `type` is `image` or `video`.
 
 ### Work rows
-Labeled horizontal rows of stills, between the intro and the log. A row exists only when a type has at least three pieces. Smaller types fold into a neighboring row.
+Labeled horizontal rows of stills, between the intro and the log. One row per year. The newest year is first. Within a year, stills run left to right in display order.
 
-- **Track:** full viewport width (`100%`, not `100vw`). Leading padding and scroll-padding are `max(24px, calc((100% - 42rem) / 2 + 32px))`, so the first card starts on the text column. Trailing padding is 24px, so cards scroll off both screen edges. A short mask fades only the screen margin.
+- **Track:** full viewport width (`100%`, not `100vw`). Leading and trailing padding are 24px, so the first card sits near the screen edge and cards can scroll off both edges. A short mask fades only that gutter.
 - **Tiles:** one 4:3 frame, `object-fit: cover`, 16px radius, 1px hairline, paper well.
-- **Header:** a visible "Work" heading plus a mono count. Each band has a 12px mono caps label, a count, and 44px prev/next controls.
-- **Motion:** drag, swipe, or arrow keys. `touch-action: pan-x pan-y` so a vertical swipe still scrolls the page. No auto-advance.
+- **Header:** a visible "Work" heading plus the year in mono, aligned to the left edge of the first still. Later years keep the year in that same column. No count. No pager.
+- **Logos:** one horizontal row under the work stills, same drag and scroll as the work track. Cards are 21rem wide. Same heading treatment: "Logos" plus the newest year in mono. Marks run newest first, left to right, in black on paper.
+- **Motion:** drag, swipe, or arrow keys on the row. `touch-action: pan-x pan-y` so a vertical swipe still scrolls the page. No auto-advance. No prev/next buttons.
 - **Links:** each tile goes to `/work/[id]`.
 
 ### Work study

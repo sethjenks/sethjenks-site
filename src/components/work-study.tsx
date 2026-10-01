@@ -3,10 +3,10 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { WorkRows } from "@/components/work-rows";
 import {
+  groupWorkBands,
   heroAlt,
   isDenseDesktopStill,
   isPhoneStill,
-  sortWorkForDisplay,
   type WorkItem,
 } from "@/lib/work";
 import { normalizeTag } from "@/lib/entries";
@@ -111,13 +111,7 @@ export function WorkStudy({ item, related, next }: WorkStudyProps) {
           <WorkRows
             id="more-work"
             heading="More work"
-            bands={[
-              {
-                id: "more",
-                label: "More work",
-                items: sortWorkForDisplay(related),
-              },
-            ]}
+            bands={groupWorkBands(related)}
           />
         </aside>
       ) : null}

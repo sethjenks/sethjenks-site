@@ -1,0 +1,35 @@
+[
+  {
+    "id": "chia-friends",
+    "title": "Chia Friends",
+    "line": "10,000 pixel-art characters for the Chia NFT1 release."
+  },
+  {
+    "id": "paper-tips",
+    "title": "Paper.tips",
+    "line": "An unofficial field guide to Paper.",
+    "href": "https://github.com/sethjenks/paper-tips"
+  },
+  {
+    "id": "batgan",
+    "title": "Batgan"
+  },
+  {
+    "id": "weirdness-engine",
+    "title": "Weirdness Engine",
+    "line": "Five directions, then one of them lands on the page.",
+    "href": "https://github.com/sethjenks/weirdness-engine"
+  },
+  {
+    "id": "offramp",
+    "title": "Offramp",
+    "line": "A seven-question diagnostic of exit readiness.",
+    "href": "/work/offramp"
+  },
+  {
+    "id": "brand-brand",
+    "title": "brand.brand",
+    "line": "One brand guide humans and agents can both read.",
+    "href": "/work/brand-brand"
+  }
+]

@@ -39,15 +39,6 @@ const DISPLAY_ORDER = [
   "level-hardscapes",
 ];
 
-const BAND_SPECS: { id: string; label: string; roles: string[] }[] = [
-  { id: "product", label: "Product", roles: ["Product"] },
-  {
-    id: "brand-and-print",
-    label: "Brand and print",
-    roles: ["Landing", "Print", "Merch"],
-  },
-];
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -147,10 +138,27 @@ function toWorkItem(item: WorkItem): WorkItem {
   };
 }
 
+function compareYearDesc(a: string, b: string): number {
+  const aNum = Number(a);
+  const bNum = Number(b);
+
+  if (Number.isFinite(aNum) && Number.isFinite(bNum) && aNum !== bNum) {
+    return bNum - aNum;
+  }
+
+  return b.localeCompare(a);
+}
+
 export function sortWorkForDisplay(items: WorkItem[]): WorkItem[] {
   const rank = new Map(DISPLAY_ORDER.map((id, index) => [id, index]));
 
   return [...items].sort((a, b) => {
+    const yearDelta = compareYearDesc(a.year, b.year);
+
+    if (yearDelta !== 0) {
+      return yearDelta;
+    }
+
     const aRank = rank.get(a.id) ?? 1000;
     const bRank = rank.get(b.id) ?? 1000;
 
@@ -163,39 +171,17 @@ export function sortWorkForDisplay(items: WorkItem[]): WorkItem[] {
 }
 
 export function groupWorkBands(items: WorkItem[]): WorkBand[] {
-  const ordered = sortWorkForDisplay(items);
-  const used = new Set<string>();
   const bands: WorkBand[] = [];
-  const small: WorkItem[] = [];
 
-  for (const spec of BAND_SPECS) {
-    const group = ordered.filter((item) => spec.roles.includes(item.role));
-    for (const item of group) {
-      used.add(item.id);
+  for (const item of sortWorkForDisplay(items)) {
+    const current = bands[bands.length - 1];
+
+    if (current && current.id === item.year) {
+      current.items.push(item);
+      continue;
     }
 
-    if (group.length >= 3) {
-      bands.push({ id: spec.id, label: spec.label, items: group });
-    } else {
-      small.push(...group);
-    }
-  }
-
-  const folded = [
-    ...small,
-    ...ordered.filter((item) => !used.has(item.id)),
-  ];
-
-  if (folded.length >= 3) {
-    bands.push({ id: "work", label: "Work", items: folded });
-  } else if (folded.length > 0) {
-    const host = bands[bands.length - 1];
-
-    if (host) {
-      host.items = sortWorkForDisplay([...host.items, ...folded]);
-    } else {
-      bands.push({ id: "work", label: "Work", items: folded });
-    }
+    bands.push({ id: item.year, label: item.year, items: [item] });
   }
 
   return bands;

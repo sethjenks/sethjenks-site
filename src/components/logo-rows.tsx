@@ -1,40 +1,18 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import {
-  useCallback,
-  useRef,
-  type KeyboardEvent,
-  type MouseEvent,
-  type PointerEvent,
-} from "react";
-import type { WorkBand, WorkItem } from "@/lib/work";
+import { useCallback, useRef, type KeyboardEvent, type PointerEvent } from "react";
+import type { LogoBand, LogoItem } from "@/lib/logos";
 
 const DRAG_THRESHOLD_PX = 8;
 
-const OBJECT_POSITION: Record<string, string> = {
-  intermission: "center top",
-  "boardwalk-bots": "center top",
-  offramp: "center center",
-  "brand-brand": "center top",
-  "food-passport": "center center",
-  "philo-shirt": "center center",
-  "level-hardscapes": "center center",
-};
-
-function objectPositionFor(id: string): string {
-  return OBJECT_POSITION[id] ?? "center top";
-}
-
-type WorkRowsProps = {
-  bands: WorkBand[];
+type LogoRowsProps = {
+  bands: LogoBand[];
   heading?: string;
   id?: string;
 };
 
-export function WorkRows({ bands, heading = "Work", id = "work" }: WorkRowsProps) {
+export function LogoRows({ bands, heading = "Logos", id = "logos" }: LogoRowsProps) {
   const headingId = `${id}-heading`;
   const total = bands.reduce((count, band) => count + band.items.length, 0);
 
@@ -42,30 +20,22 @@ export function WorkRows({ bands, heading = "Work", id = "work" }: WorkRowsProps
     return null;
   }
 
+  const items = bands.flatMap((band) => band.items);
+
   return (
-    <section id={id} className="work-section" aria-labelledby={headingId}>
-      {bands.map((band, index) => (
-        <div key={band.id} className="work-band">
-          <div className="work-section-head">
-            {index === 0 ? (
-              <h2 id={headingId} className="work-section-title">
-                {heading}
-              </h2>
-            ) : (
-              <span className="work-section-title work-section-title-spacer" aria-hidden="true">
-                {heading}
-              </span>
-            )}
-            <span className="work-count">{band.label}</span>
-          </div>
-          <WorkTrack band={band} />
-        </div>
-      ))}
+    <section id={id} className="logo-section" aria-labelledby={headingId}>
+      <div className="work-section-head">
+        <h2 id={headingId} className="work-section-title">
+          {heading}
+        </h2>
+        <span className="work-count">{bands[0]?.label}</span>
+      </div>
+      <LogoTrack items={items} label={heading} />
     </section>
   );
 }
 
-function WorkTrack({ band }: { band: WorkBand }) {
+function LogoTrack({ items, label }: { items: LogoItem[]; label: string }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     pointerId: number;
@@ -73,7 +43,6 @@ function WorkTrack({ band }: { band: WorkBand }) {
     startLeft: number;
     distance: number;
   } | null>(null);
-  const suppressClickRef = useRef(false);
 
   const step = useCallback((direction: -1 | 1) => {
     const node = scrollerRef.current;
@@ -81,16 +50,14 @@ function WorkTrack({ band }: { band: WorkBand }) {
       return;
     }
 
-    const cards = [...node.querySelectorAll<HTMLElement>(".work-card")];
+    const cards = [...node.querySelectorAll<HTMLElement>(".logo-card")];
     if (cards.length === 0) {
       return;
     }
 
     const origin = cards[0].offsetLeft;
     const current = node.scrollLeft;
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const behavior: ScrollBehavior = reducedMotion ? "auto" : "smooth";
 
     if (direction === 1) {
@@ -121,7 +88,6 @@ function WorkTrack({ band }: { band: WorkBand }) {
       return;
     }
 
-    suppressClickRef.current = false;
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -145,7 +111,6 @@ function WorkTrack({ band }: { band: WorkBand }) {
       return;
     }
 
-    suppressClickRef.current = true;
     node.dataset.dragging = "";
     node.scrollLeft = drag.startLeft - deltaX;
   }, []);
@@ -161,13 +126,6 @@ function WorkTrack({ band }: { band: WorkBand }) {
     delete node.dataset.dragging;
     if (node.hasPointerCapture(event.pointerId)) {
       node.releasePointerCapture(event.pointerId);
-    }
-  }, []);
-
-  const onItemClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
-    if (suppressClickRef.current) {
-      event.preventDefault();
-      suppressClickRef.current = false;
     }
   }, []);
 
@@ -191,9 +149,9 @@ function WorkTrack({ band }: { band: WorkBand }) {
     <div className="work-track-fade">
       <div
         ref={scrollerRef}
-        className="work-track"
+        className="work-track logo-track"
         role="region"
-        aria-label={band.label}
+        aria-label={label}
         tabIndex={0}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -201,55 +159,27 @@ function WorkTrack({ band }: { band: WorkBand }) {
         onPointerCancel={endDrag}
         onKeyDown={onKeyDown}
       >
-        {band.items.map((item, index) => (
-          <WorkCard
-            key={item.id}
-            item={item}
-            priority={index < 2}
-            onClick={onItemClick}
-          />
+        {items.map((item) => (
+          <LogoCard key={item.id} item={item} />
         ))}
       </div>
     </div>
   );
 }
 
-function WorkCard({
-  item,
-  priority,
-  onClick,
-}: {
-  item: WorkItem;
-  priority: boolean;
-  onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
-}) {
+function LogoCard({ item }: { item: LogoItem }) {
   return (
-    <Link
-      href={`/work/${item.id}`}
-      className="work-card"
-      onClick={onClick}
-      draggable={false}
-    >
-      <span className="work-card-frame">
+    <figure className="logo-card">
+      <span className="logo-card-frame">
         <Image
           src={item.src}
-          alt=""
+          alt={item.alt}
           fill
-          sizes="(max-width: 767px) calc(100vw - 48px), 480px"
-          priority={priority}
-          className="work-card-image"
-          style={{ objectPosition: objectPositionFor(item.id) }}
+          sizes="(max-width: 767px) calc(100vw - 48px), 336px"
+          className="logo-card-image"
           draggable={false}
         />
-        <span className="work-card-verb">
-          Read
-          <ChevronRight aria-hidden="true" size={12} strokeWidth={1.5} />
-        </span>
       </span>
-      <span className="work-card-meta">
-        <span className="work-card-title">{item.title}</span>
-        <span className="work-card-type">{item.role}</span>
-      </span>
-    </Link>
+    </figure>
   );
 }

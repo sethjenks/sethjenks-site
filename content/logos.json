@@ -1,0 +1,30 @@
+[
+  {
+    "id": "awesom",
+    "name": "Awesom",
+    "year": "2025",
+    "src": "/media/logos/awesom.png",
+    "alt": "Awesom wordmark"
+  },
+  {
+    "id": "sunset",
+    "name": "Sunset",
+    "year": "2025",
+    "src": "/media/logos/sunset.png",
+    "alt": "Sunset wordmark"
+  },
+  {
+    "id": "chia",
+    "name": "Chia",
+    "year": "2024",
+    "src": "/media/logos/chia.png",
+    "alt": "Chia wordmark"
+  },
+  {
+    "id": "jump",
+    "name": "Jump",
+    "year": "2019",
+    "src": "/media/logos/jump.png",
+    "alt": "Jump wordmark"
+  }
+]
