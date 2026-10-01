@@ -254,26 +254,28 @@ function WorkTrack({ band, showLabel }: { band: WorkBand; showLabel: boolean }) 
           </button>
         </div>
       </div>
-      <div
-        ref={scrollerRef}
-        className="work-track"
-        role="region"
-        aria-label={band.label}
-        tabIndex={0}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        onKeyDown={onKeyDown}
-      >
-        {band.items.map((item, index) => (
-          <WorkCard
-            key={item.id}
-            item={item}
-            priority={index < 2}
-            onClick={onItemClick}
-          />
-        ))}
+      <div className="work-track-fade">
+        <div
+          ref={scrollerRef}
+          className="work-track"
+          role="region"
+          aria-label={band.label}
+          tabIndex={0}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onKeyDown={onKeyDown}
+        >
+          {band.items.map((item, index) => (
+            <WorkCard
+              key={item.id}
+              item={item}
+              priority={index < 2}
+              onClick={onItemClick}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

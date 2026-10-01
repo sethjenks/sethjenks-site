@@ -163,7 +163,7 @@ Full-bleed in the column, 1px hairline, paper well. The edge is the only elevati
 ### Work rows
 Labeled horizontal rows of stills, between the intro and the log. A row exists only when a type has at least three pieces. Smaller types fold into a neighboring row.
 
-- **Start:** `max(24px, calc((100% - 42rem) / 2 + 32px))`. The first card lines up with the text column and the row still bleeds right. Use `100%`, not `100vw`.
+- **Track:** full viewport width (`100%`, not `100vw`). Leading padding and scroll-padding are `max(24px, calc((100% - 42rem) / 2 + 32px))`, so the first card starts on the text column. Trailing padding is 24px, so cards scroll off both screen edges. A short mask fades only the screen margin.
 - **Tiles:** one 4:3 frame, `object-fit: cover`, 16px radius, 1px hairline, paper well.
 - **Header:** a visible "Work" heading plus a mono count. Each band has a 12px mono caps label, a count, and 44px prev/next controls.
 - **Motion:** drag, swipe, or arrow keys. `touch-action: pan-x pan-y` so a vertical swipe still scrolls the page. No auto-advance.
