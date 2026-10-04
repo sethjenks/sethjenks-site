@@ -8,22 +8,25 @@
     "width": 1440,
     "height": 767,
     "summary": "A client landing for a premium outdoor-living studio. Dark field, architectural type, material photography, not a SaaS product shot.",
-    "alt": "Brand board for Level Hardscapes on a black field, with the wordmark, color swatches, and a do and don't list.",
+    "alt": "Brand board for Level Hardscapes on a black field, with the wordmark, color swatches, and a do and don’t list.",
     "sections": [
       {
         "heading": "The field",
         "body": [
-          "Every line on the page points at hardscape. The palette, the do and don’t, and a single CTA sit on a black field so the photography can carry the claim."
+          "Every line on the page points at hardscape. The palette, the do and don\u2019t, and a single CTA sit on a black field so the photography can carry the claim."
         ]
       },
       {
         "heading": "What stays out",
         "body": [
-          "The board is the client piece: palette, type, and a do and don't list on a black field, with one ask. Anything that does not point at the hardscape stays off the page so the photography can carry it."
+          "The board is the client piece: palette, type, and a do and don’t list on a black field, with one ask. Anything that does not point at the hardscape stays off the page so the photography can carry it."
         ]
       }
     ],
-    "tags": ["Philo", "landing"]
+    "tags": [
+      "Philo",
+      "landing"
+    ]
   },
   {
     "id": "intermission",
@@ -39,7 +42,7 @@
       {
         "heading": "The view",
         "body": [
-          "The still is Nadia’s view: a name, an age, and six scores that can be read in a glance. Color stays in the tiles. The chrome stays out."
+          "The still is Nadia\u2019s view: a name, an age, and six scores that can be read in a glance. Color stays in the tiles. The chrome stays out."
         ]
       },
       {
@@ -49,7 +52,10 @@
         ]
       }
     ],
-    "tags": ["personal", "product"]
+    "tags": [
+      "personal",
+      "product"
+    ]
   },
   {
     "id": "boardwalk-bots",
@@ -75,7 +81,10 @@
         ]
       }
     ],
-    "tags": ["Philo", "product"]
+    "tags": [
+      "Philo",
+      "product"
+    ]
   },
   {
     "id": "food-passport",
@@ -101,7 +110,10 @@
         ]
       }
     ],
-    "tags": ["personal", "print"]
+    "tags": [
+      "personal",
+      "print"
+    ]
   },
   {
     "id": "offramp",
@@ -117,7 +129,7 @@
       {
         "heading": "The map",
         "body": [
-          "The map around “your business” is the whole product: exit target, earnings, customer risk, owner dependence, records, revenue trend, timeline."
+          "The map around \u201cyour business\u201d is the whole product: exit target, earnings, customer risk, owner dependence, records, revenue trend, timeline."
         ]
       },
       {
@@ -127,7 +139,10 @@
         ]
       }
     ],
-    "tags": ["Philo", "product"]
+    "tags": [
+      "Philo",
+      "product"
+    ]
   },
   {
     "id": "philo-shirt",
@@ -153,7 +168,10 @@
         ]
       }
     ],
-    "tags": ["Philo", "merch"]
+    "tags": [
+      "Philo",
+      "merch"
+    ]
   },
   {
     "id": "brand-brand",
@@ -179,6 +197,510 @@
         ]
       }
     ],
-    "tags": ["Arcana", "product"]
+    "tags": [
+      "Arcana",
+      "product"
+    ]
+  },
+  {
+    "id": "offer-builder",
+    "title": "Chia Offer Builder",
+    "year": "2023",
+    "role": "UI/UX",
+    "src": "/media/work/offer-builder-hero.jpg",
+    "width": 2200,
+    "height": 1369,
+    "summary": "How do you create an intuitive interface for a new way of trading digital assets?",
+    "alt": "Offer Builder in the Seedling Wallet, with Offering and Requesting columns for XCH, tokens, NFTs, and fees.",
+    "tags": [
+      "Chia"
+    ],
+    "sections": [
+      {
+        "heading": "Two interfaces, then NFTs",
+        "body": [
+          "In the Chia Wallet, there were two different interfaces for offers \u2014 one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work. We needed an interface allowing any combination of assets to be traded for any other combination of assets that was also future-proof and intuitive to use."
+        ]
+      },
+      {
+        "heading": "A proposal, not a payment",
+        "body": [
+          "I took a first principles approach with Offer Builder. Offers are different from transactions in that you are only creating a proposal for a transaction. This needs to be evident in the interface design. The solution we came up with needed to be intuitive, instructive, and durable."
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "bleed",
+        "frame": {
+          "src": "/media/work/offer-builder-hero.jpg",
+          "width": 2200,
+          "height": 1369,
+          "alt": "Offer Builder in the Seedling Wallet, with Offering and Requesting columns for XCH, tokens, NFTs, and fees."
+        }
+      },
+      {
+        "type": "statement",
+        "label": "The challenge",
+        "text": "We needed an interface allowing any combination of assets to be traded for any other combination of assets that was also future-proof and intuitive to use."
+      },
+      {
+        "type": "essay",
+        "heading": "A proposal, not a payment",
+        "body": [
+          "In the Chia Wallet, there were two different interfaces for offers \u2014 one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work.",
+          "I took a first principles approach with Offer Builder. Offers are different from transactions in that you are only creating a proposal for a transaction. This needs to be evident in the interface design. The solution we came up with needed to be intuitive, instructive, and durable."
+        ]
+      },
+      {
+        "type": "essay",
+        "heading": "The problem Chia Offers solves",
+        "body": [
+          "Counterparty risk is a common concern in transactions, involving the potential for attackers to take your assets. Traditional finance relies on trusted intermediaries like escrow services, which hold assets until transaction conditions are met. However, on the internet, an attacker may also control the escrow service. This common attack leads to significant asset losses.",
+          "Blockchain, specifically the Chia blockchain, addresses this issue effectively. Using a UTXO-style architecture and aggregatable BLS signatures, Chia enables users to propose transactions (\"Offers\") that others can accept. The blockchain executes these zero-trust transactions, delivering assets to respective wallets. This allows individuals and institutions to conduct counterparty risk-free transactions.",
+          "Creating an offer as quickly as possible was my north star for this feature."
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-early.jpg",
+          "width": 2200,
+          "height": 1276,
+          "alt": "Early concept for NFT offers, with a dense token-style trading layout.",
+          "caption": "Early concepts for NFT offers were based on token trading interfaces and seemed overly complex. The established interface pattern broke when trying to trade multiple NFTs or groups of assets for groups of other assets."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-columns.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Two-column offer concept, one side for assets you own and one for assets you want.",
+          "caption": "An offer sets the conditions for both sides of a transaction, so I chose to create two columns. One for items you own and want to trade, and another for items you would like to trade for."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-categories.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Offer builder with XCH, tokens, and NFTs visible at the top level instead of inside a menu.",
+          "caption": "This new paradigm for trading is unfamiliar, so it’s essential we make the user think as little as possible. Hiding asset types under a dropdown menu might be more minimal looking, but it complicates the mental decision-making needed to create a trade. Placing all asset categories at the top level allows users to immediately see their options and construct an offer."
+        }
+      },
+      {
+        "type": "frame",
+        "narrow": true,
+        "frame": {
+          "src": "/media/work/offer-builder-logic.jpg",
+          "width": 2200,
+          "height": 4062,
+          "alt": "Offer Builder with an OR operator between two possible requested assets.",
+          "caption": "The Offer Builder interface allows for multiple assets to be traded and could include logic. In this case an OR operator (in black) could execute the trade if either of the conditions are met."
+        }
+      },
+      {
+        "type": "facts",
+        "items": [
+          {
+            "label": "Year",
+            "lines": [
+              "2023"
+            ]
+          },
+          {
+            "label": "Timeframe",
+            "lines": [
+              "6 weeks"
+            ]
+          },
+          {
+            "label": "Tools",
+            "lines": [
+              "Figma"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-iterations.jpg",
+          "width": 2200,
+          "height": 1324,
+          "alt": "A wall of earlier offer interface iterations.",
+          "caption": "Offers went through dozens and dozens of iterations before we came to the conclusion that the current way of thinking about offers wouldn’t work with NFT or multi-asset offers."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-expire.jpg",
+          "width": 2200,
+          "height": 1451,
+          "alt": "Offer Builder with a seven-day expiration on the offer.",
+          "caption": "The most recent offers interface (as of Chia Wallet 2.1.1) allows offers to expire after a period of time."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-compare.jpg",
+          "width": 2200,
+          "height": 1591,
+          "alt": "The original offers interface beside the updated Offer Builder.",
+          "caption": "The original offers interface and the updated Offer Builder."
+        }
+      }
+    ]
+  },
+  {
+    "id": "chia-signer",
+    "title": "Chia Transaction Signer",
+    "year": "2023",
+    "role": "UI/UX",
+    "src": "/media/work/chia-signer-hero.jpg",
+    "width": 2200,
+    "height": 1650,
+    "summary": "A better way to secure blockchain assets for enterprises and consumers.",
+    "alt": "Chia Signer phone screens for keys, a signature request, QR codes, and the Secure Enclave.",
+    "tags": [
+      "Chia"
+    ],
+    "sections": [
+      {
+        "heading": "Keys off the paper",
+        "body": [
+          "Secure custody of digital assets is one of the biggest unsolved technology and UX problems in the blockchain space. Seed phrases are often misplaced, lost, or stolen by attackers. This leads to billions of dollars worth of crypto assets each year being stolen or lost. This kind of asymmetric risk is a major obstacle to adoption for average users and enterprises.",
+          "At Chia Network Inc., we approached this problem by separating the keys needed to sign and submit a transaction from the creation of a transaction. Securing the keys inside the Secure Enclave of an Apple device instead of on a piece of paper or metal presents a much better interface for securing and managing keys."
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "bleed",
+        "frame": {
+          "src": "/media/work/chia-signer-hero.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Chia Signer phone screens for keys, a signature request, QR codes, and the Secure Enclave."
+        }
+      },
+      {
+        "type": "statement",
+        "label": "The challenge",
+        "text": "Secure custody of digital assets is one of the biggest unsolved technology and UX problems in the blockchain space."
+      },
+      {
+        "type": "essay",
+        "heading": "Keys off the paper",
+        "body": [
+          "Seed phrases are often misplaced, lost, or stolen by attackers. This leads to billions of dollars worth of crypto assets each year being stolen or lost. This kind of asymmetric risk is a major obstacle to adoption for average users and enterprises.",
+          "At Chia Network Inc., we approached this problem by separating the keys needed to sign and submit a transaction from the creation of a transaction. Securing the keys inside the Secure Enclave of an Apple device instead of on a piece of paper or metal presents a much better interface for securing and managing keys.",
+          "Chia Signer is a mobile application specifically designed for the secure facilitation of blockchain transactions. The Chia blockchain enables the use of the Secure Enclave on Apple devices, making every iPhone a hardware wallet. With a much better interface, this application lets users sign, manage, and oversee blockchain transactions. It is designed to work with the Chia Vault and Chia Enterprise Wallet Service.",
+          "I created all of the UI/UX and branding elements for this project."
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-signer-mark.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Chia Signer app icon, a split green mark on a dark rounded square."
+        }
+      },
+      {
+        "type": "facts",
+        "items": [
+          {
+            "label": "Year",
+            "lines": [
+              "2023"
+            ]
+          },
+          {
+            "label": "Timeframe",
+            "lines": [
+              "90 days"
+            ]
+          },
+          {
+            "label": "Tools",
+            "lines": [
+              "Figma"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-signer-brand.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Chia Signer wordmark studies using the Chia leaf with the product name.",
+          "caption": "I worked with Brian Collier on the brand architecture for products like this, using the Chia wordmark and making it work with the product branding system going forward."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-signer-keys.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Chia Signer screens listing hot, recovery, and cold keys beside a transaction history.",
+          "caption": "Users can see a list of keys and dive deeper into transactions with a key, as well as individual completed transactions."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-signer-qr.jpg",
+          "width": 2200,
+          "height": 1650,
+          "alt": "Chia Signer scanning a QR code from an air-gapped machine to accept a spend request.",
+          "caption": "The most secure workflow allows users to accept spend requests from an air-gapped machine using QR codes."
+        }
+      }
+    ]
+  },
+  {
+    "id": "chia-wallet",
+    "title": "Chia Reference Wallet",
+    "year": "2022\u20132023",
+    "role": "UI/UX",
+    "src": "/media/work/chia-wallet-hero.jpg",
+    "width": 2200,
+    "height": 1433,
+    "summary": "A showcase of the feature primitives enabled by the Chia blockchain and Chialisp.",
+    "alt": "Chia reference wallet on macOS, showing a token balance, a chart, and pending clawback transactions.",
+    "tags": [
+      "Chia"
+    ],
+    "sections": [
+      {
+        "heading": "A reference, not a pitch",
+        "body": [
+          "In order for developers to understand what is possible in a new programming environment and open-source blockchain ecosystem, there needs to be a reference implementation of features and primitives that developers can use as a guide in creating their own applications.",
+          "The Chia Reference Wallet is a reference implementation of almost all of the primitives on the Chia blockchain, including farming, plotting, pooling, tokens, Chia Offers, NFTs, verifiable credentials, decentralized identifiers, transaction clawback, contacts, and more. I worked on many of these features from zero to one, developing the UI and UX from scratch."
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "bleed",
+        "frame": {
+          "src": "/media/work/chia-wallet-hero.jpg",
+          "width": 2200,
+          "height": 1433,
+          "alt": "Chia reference wallet on macOS, showing a token balance, a chart, and pending clawback transactions."
+        }
+      },
+      {
+        "type": "statement",
+        "label": "The challenge",
+        "text": "In order for developers to understand what is possible in a new programming environment and open-source blockchain ecosystem, there needs to be a reference implementation of features and primitives."
+      },
+      {
+        "type": "essay",
+        "heading": "From zero to one",
+        "body": [
+          "In order for developers to understand what is possible in a new programming environment and open-source blockchain ecosystem, there needs to be a reference implementation of features and primitives that developers can use as a guide in creating their own applications.",
+          "The Chia Reference Wallet is a reference implementation of almost all of the primitives on the Chia blockchain, including farming, plotting, pooling, tokens, Chia Offers, NFTs, verifiable credentials, decentralized identifiers, transaction clawback, contacts, and more. I worked on many of these features from zero to one, developing the UI and UX from scratch."
+        ]
+      },
+      {
+        "type": "essay",
+        "heading": "Already in the wallet",
+        "body": [
+          "In the future, your crypto wallet will hold your identity, access to your certificates, diplomas, and other credentials, connect to your bank account, and hold any crypto assets you might have, including digital collectibles, tickets, securities, and investments.",
+          "The Chia Reference Wallet already has several of these advanced capabilities."
+        ],
+        "list": [
+          "Offers. Zero-trust multi-asset trading between peers without marketplaces.",
+          "Asset undo. Set a time window to undo a transaction and claw back the funds.",
+          "Verifiable credentials. Unique on-chain assets that can verify data about a person without revealing their identity.",
+          "NFTs. Unique digital assets that can represent unique real-world assets or verifiably unique digital assets."
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-wallet-nfts.jpg",
+          "width": 2200,
+          "height": 1365,
+          "alt": "Chia Friends displayed in the Seedling Wallet NFT gallery."
+        }
+      },
+      {
+        "type": "facts",
+        "items": [
+          {
+            "label": "Year",
+            "lines": [
+              "2022\u20132023"
+            ]
+          },
+          {
+            "label": "Timeframe",
+            "lines": [
+              "Ongoing"
+            ]
+          },
+          {
+            "label": "Tools",
+            "lines": [
+              "Figma",
+              "React"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-wallet-clawback.jpg",
+          "width": 2200,
+          "height": 1369,
+          "alt": "Wallet transaction list with a pending clawback.",
+          "caption": "Transactions can have a time period in which the creator can revoke a transaction."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/offer-builder-expire.jpg",
+          "width": 2200,
+          "height": 1451,
+          "alt": "The Offer Builder inside the Chia wallet.",
+          "caption": "The Chia Offer Builder that I designed. You can trade assets with anyone without having to trust who they are. This technology has the potential to completely revolutionize markets."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-wallet-nft-grid.jpg",
+          "width": 2200,
+          "height": 1602,
+          "alt": "A grid of Chia Friends in the wallet NFT view.",
+          "caption": "You can trade NFTs directly with other people without a marketplace using the Chia wallet."
+        }
+      }
+    ]
+  },
+  {
+    "id": "chia-friends",
+    "title": "Chia Friends",
+    "year": "2022",
+    "role": "UI/UX",
+    "src": "/media/work/chia-friends-hero.jpg",
+    "width": 2200,
+    "height": 1256,
+    "summary": "10,000 pixel-art characters created as part of the Chia Network Inc. NFT1 release.",
+    "alt": "A grid of Chia Friends pixel-art characters in rounded profile tiles.",
+    "tags": [
+      "Chia"
+    ],
+    "sections": [
+      {
+        "heading": "Twenty-three days",
+        "body": [
+          "CNI wanted to do something special for the Chia community as part of the official release of the NFT1 standard.",
+          "I worked nonstop for 23 days to develop and design a collection of 10,000 PFPs that would stand up with the best NFT projects in web3."
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "bleed",
+        "frame": {
+          "src": "/media/work/chia-friends-hero.jpg",
+          "width": 2200,
+          "height": 1256,
+          "alt": "A grid of Chia Friends pixel-art characters in rounded profile tiles."
+        }
+      },
+      {
+        "type": "statement",
+        "label": "The challenge",
+        "text": "CNI wanted to do something special for the Chia community as part of the official release of the NFT1 standard."
+      },
+      {
+        "type": "essay",
+        "heading": "Twenty-three days",
+        "body": [
+          "I worked nonstop for 23 days to develop and design a collection of 10,000 PFPs that would stand up with the best NFT projects in web3."
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-friends-sketches.jpg",
+          "width": 2200,
+          "height": 1274,
+          "alt": "Pencil sketches of Chia Friends characters, including Timelord, Lord Asic, and Fly Trap."
+        }
+      },
+      {
+        "type": "facts",
+        "items": [
+          {
+            "label": "Year",
+            "lines": [
+              "2022"
+            ]
+          },
+          {
+            "label": "Timeframe",
+            "lines": [
+              "23 days"
+            ]
+          },
+          {
+            "label": "Tools",
+            "lines": [
+              "Aseprite",
+              "Figma",
+              "Photoshop",
+              "Bueno"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-friends-logo.jpg",
+          "width": 2200,
+          "height": 1362,
+          "alt": "Chia Friends logo set in a custom 8-bit font beside pixel characters.",
+          "caption": "The Chia Friends logo with a custom 8-bit font."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-friends-profiles.jpg",
+          "width": 2200,
+          "height": 1260,
+          "alt": "Chia Friends arranged as rounded profile pictures.",
+          "caption": "Another view of the set showing how they look in a rounded profile picture format."
+        }
+      },
+      {
+        "type": "frame",
+        "frame": {
+          "src": "/media/work/chia-friends-k32.jpg",
+          "width": 2200,
+          "height": 1362,
+          "alt": "Progression from sketch to finished variants of the K32 character.",
+          "caption": "Progression from sketch to finished variants of the K32 character."
+        }
+      }
+    ]
   }
 ]

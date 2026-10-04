@@ -8,7 +8,7 @@ import { getEntryDayGroups } from "@/lib/entries";
 import { getLogoItems, groupLogoBands } from "@/lib/logos";
 import { getPeople } from "@/lib/people";
 import { getProjectItems } from "@/lib/projects";
-import { INTRO_COPY, ROLE_LINE } from "@/lib/site";
+import { INTRO } from "@/lib/intro";
 import { getWorkItems, groupWorkBands } from "@/lib/work";
 
 export default async function Home() {
@@ -22,7 +22,12 @@ export default async function Home() {
 
   return (
     <div className="home-page flex flex-1 flex-col">
-      <HomePlayfield role={ROLE_LINE} intro={INTRO_COPY} />
+      <HomePlayfield
+        name={INTRO.name}
+        role={INTRO.role}
+        paragraphs={INTRO.paragraphs}
+        links={INTRO.links}
+      />
       <WorkRows id="work" heading="Work" bands={groupWorkBands(work)} />
       <LogoRows id="logos" heading="Brands" bands={groupLogoBands(logos)} />
       <ProjectList items={projects} />

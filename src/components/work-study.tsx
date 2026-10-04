@@ -1,123 +1,232 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
-import { WorkRows } from "@/components/work-rows";
-import {
-  groupWorkBands,
-  heroAlt,
-  isDenseDesktopStill,
-  isPhoneStill,
-  type WorkItem,
-} from "@/lib/work";
-import { isMobileScreen } from "@/lib/work-shape";
+import { heroAlt, isPhoneStill, sortWorkForDisplay, type WorkBlock, type WorkFrame, type WorkItem } from "@/lib/work";
 import { normalizeTag } from "@/lib/entries";
 
 type WorkStudyProps = {
   item: WorkItem;
   related: WorkItem[];
-  next: WorkItem | undefined;
 };
 
-export function WorkStudy({ item, related, next }: WorkStudyProps) {
-  const alt = heroAlt(item);
-  const phone = isPhoneStill(item);
-  const canvas = isMobileScreen(item);
-  const narrow = item.width < 1280;
-  const dense = isDenseDesktopStill(item);
+export function WorkStudy({ item, related }: WorkStudyProps) {
+  const blocks = item.blocks ?? fallbackBlocks(item);
   const extraTags = (item.tags ?? []).filter(
     (tag) => normalizeTag(tag) !== item.role.toLowerCase(),
   );
+  const more = nextWorks(item, related);
 
   return (
-    <article className="work-study">
-      <header className="work-study-intro">
-        <nav className="work-study-crumb" aria-label="Breadcrumb">
-          <ol>
-            <li>
-              <Link href="/">Home</Link>
-            </li>
-            <li>
-              <Link href="/#work">Work</Link>
-            </li>
-            <li aria-current="page">{item.title}</li>
-          </ol>
-        </nav>
-        <h1 className="work-study-title">{item.title}</h1>
-        <p className="work-study-lede">{item.summary}</p>
-        <dl className="case-meta">
-          <div>
-            <dt>Year</dt>
-            <dd>{item.year}</dd>
-          </div>
-          <div>
-            <dt>Type</dt>
-            <dd>{item.role}</dd>
-          </div>
-        </dl>
+    <article className="study">
+      <header className="study-intro">
+        <h1 className="study-title">{item.title}</h1>
+        <div className="study-meta">
+          <nav className="study-crumb" aria-label="Breadcrumb">
+            <ol>
+              <li>
+                <Link href="/">Home</Link>
+              </li>
+              <li>
+                <Link href="/#work">Work</Link>
+              </li>
+              <li aria-current="page">{item.title}</li>
+            </ol>
+          </nav>
+          <p className="study-role">{item.role}</p>
+        </div>
+        <p className="study-lede">{item.summary}</p>
       </header>
 
-      <figure
-        className={
-          narrow || phone ? "work-hero work-hero-panel" : "work-hero"
-        }
-        data-canvas={canvas ? "phone" : undefined}
-        data-dense={dense ? "" : undefined}
-      >
-        <Image
-          src={item.src}
-          alt={alt}
-          width={item.width}
-          height={item.height}
-          priority
-          sizes={
-            dense
-              ? `(max-width: 767px) min(720px, ${item.width}px), ${Math.min(item.width, 1280)}px`
-              : narrow
-                ? `${item.width}px`
-                : `(min-width: 1280px) ${Math.min(item.width, 1280)}px, 100vw`
-          }
-          className="work-hero-image"
-          style={{ "--still-w": `${item.width}px` } as CSSProperties}
-        />
-      </figure>
+      {blocks.map((block, index) => (
+        <StudyBlock key={blockKey(block, index)} block={block} />
+      ))}
 
-      <div className="work-study-sections">
-        {item.sections.map((section) => (
-          <section key={section.heading} className="work-study-section">
-            <h2 className="work-study-heading">{section.heading}</h2>
-            {section.body.map((paragraph) => (
-              <p key={paragraph} className="work-study-copy">
-                {paragraph}
-              </p>
-            ))}
-          </section>
-        ))}
-        {extraTags.length > 0 ? (
-          <ul className="work-study-tags">
-            {extraTags.map((tag) => (
-              <li key={tag}>{normalizeTag(tag)}</li>
-            ))}
-          </ul>
-        ) : null}
-        {next ? (
-          <nav className="next-case" aria-label="Next case">
-            <Link href={`/work/${next.id}`}>
-              <span className="next-case-label">Next case</span>
-              <span className="next-case-title">{next.title}</span>
-            </Link>
-          </nav>
-        ) : null}
-      </div>
+      {extraTags.length > 0 ? (
+        <ul className="study-tags">
+          {extraTags.map((tag) => (
+            <li key={tag}>{normalizeTag(tag)}</li>
+          ))}
+        </ul>
+      ) : null}
 
-      {related.length > 0 ? (
-        <aside className="work-study-related" aria-label="More work">
-          <WorkRows
-            id="more-work"
-            heading="More work"
-            bands={groupWorkBands(related)}
-          />
+      {more.length > 0 ? (
+        <aside className="study-related" aria-label="More work">
+          <h2>More work</h2>
+          <div className="study-related-row">
+            {more.map((entry) => (
+              <Link key={entry.id} href={`/work/${entry.id}`}>
+                <span
+                  className="study-related-frame"
+                  data-canvas={isPhoneStill(entry) ? "phone" : undefined}
+                >
+                  <Image
+                    src={entry.src}
+                    alt=""
+                    width={entry.width}
+                    height={entry.height}
+                    sizes="(max-width: 900px) 46vw, 318px"
+                    className="study-related-image"
+                  />
+                </span>
+                <span className="study-related-title">{entry.title}</span>
+                <span className="study-related-role">{entry.role}</span>
+              </Link>
+            ))}
+          </div>
         </aside>
       ) : null}
     </article>
   );
+}
+
+function StudyBlock({ block }: { block: WorkBlock }) {
+  switch (block.type) {
+    case "statement":
+      return (
+        <section className="study-statement">
+          <p className="study-kicker">{block.label}</p>
+          <p>{block.text}</p>
+        </section>
+      );
+    case "essay":
+      return (
+        <section className="study-essay">
+          <h2>{block.heading}</h2>
+          {block.body.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+          {block.list ? (
+            <ul>
+              {block.list.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      );
+    case "bleed":
+      return <StudyFigure frame={block.frame} bleed />;
+    case "frame":
+      return <StudyFigure frame={block.frame} narrow={block.narrow} />;
+    case "facts":
+      return (
+        <dl className="study-facts">
+          {block.items.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>
+                {fact.lines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      );
+    default: {
+      const unknownBlock: never = block;
+      return unknownBlock;
+    }
+  }
+}
+
+function StudyFigure({
+  frame,
+  bleed = false,
+  narrow = false,
+}: {
+  frame: WorkFrame;
+  bleed?: boolean;
+  narrow?: boolean;
+}) {
+  const className = bleed
+    ? "study-bleed"
+    : narrow
+      ? "study-frame study-frame-narrow"
+      : "study-frame";
+
+  return (
+    <figure className={className}>
+      <div className="study-still">
+        <Image
+          src={frame.src}
+          alt={frame.alt}
+          width={frame.width}
+          height={frame.height}
+          sizes={
+            narrow
+              ? "(max-width: 767px) 100vw, 720px"
+              : bleed
+                ? "100vw"
+                : "(max-width: 1400px) 100vw, 1344px"
+          }
+          className="study-image"
+        />
+      </div>
+      {frame.caption ? <figcaption>{frame.caption}</figcaption> : null}
+    </figure>
+  );
+}
+
+function nextWorks(item: WorkItem, related: WorkItem[]): WorkItem[] {
+  const ordered = sortWorkForDisplay([item, ...related]);
+  const index = ordered.findIndex((entry) => entry.id === item.id);
+
+  if (index === -1 || ordered.length < 2) {
+    return [];
+  }
+
+  const count = Math.min(4, ordered.length - 1);
+  return Array.from({ length: count }, (_, offset) => {
+    return ordered[(index + offset + 1) % ordered.length];
+  });
+}
+
+function fallbackBlocks(item: WorkItem): WorkBlock[] {
+  const frame: WorkFrame = {
+    src: item.src,
+    width: item.width,
+    height: item.height,
+    alt: heroAlt(item),
+  };
+  const ratio = item.width / item.height;
+  const hero: WorkBlock =
+    isPhoneStill(item) || ratio < 1.2
+      ? { type: "frame", frame, narrow: isPhoneStill(item) || ratio < 0.9 }
+      : { type: "bleed", frame };
+
+  return [
+    hero,
+    ...item.sections.map(
+      (section): WorkBlock => ({
+        type: "essay",
+        heading: section.heading,
+        body: section.body,
+      }),
+    ),
+    {
+      type: "facts",
+      items: [
+        { label: "Year", lines: [item.year] },
+        { label: "Type", lines: [item.role] },
+      ],
+    },
+  ];
+}
+
+function blockKey(block: WorkBlock, index: number): string {
+  switch (block.type) {
+    case "statement":
+      return `statement-${block.label}`;
+    case "essay":
+      return `essay-${block.heading}`;
+    case "bleed":
+    case "frame":
+      return `${block.type}-${block.frame.src}`;
+    case "facts":
+      return `facts-${index}`;
+    default: {
+      const unknownBlock: never = block;
+      return unknownBlock;
+    }
+  }
 }

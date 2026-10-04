@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { WorkStudy } from "@/components/work-study";
-import {
-  getNextWorkItem,
-  getRelatedWork,
-  getWorkItem,
-  getWorkItems,
-} from "@/lib/work";
+import { getRelatedWork, getWorkItem, getWorkItems } from "@/lib/work";
 
 export async function generateStaticParams() {
   const items = await getWorkItems();
@@ -53,16 +48,7 @@ export default async function WorkPage({
     notFound();
   }
 
-  const [related, all] = await Promise.all([
-    getRelatedWork(item.id),
-    getWorkItems(),
-  ]);
+  const related = await getRelatedWork(item.id);
 
-  return (
-    <WorkStudy
-      item={item}
-      related={related}
-      next={getNextWorkItem(all, item.id)}
-    />
-  );
+  return <WorkStudy item={item} related={related} />;
 }

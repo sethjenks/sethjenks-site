@@ -119,7 +119,7 @@ Neutral field, near-black type, one muted gray. No chromatic signal.
 
 ## Layout
 
-Single reading column (`max-width: 42rem`) for the intro, project list, people list, journal, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card near the screen edge. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a framed still, then a 42rem reading measure for sections. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. The header is the name and the Journal key. X, LinkedIn, and GitHub sit on the left of the footer. The Arcana wordmark sits on the right and links to arcana.agency. There is no Work link. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
+Single reading column (`max-width: 42rem`) for the intro, project list, people list, journal, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card near the screen edge. Each still links to `/work/[id]`. Project pages leave the column on purpose: a 72px title, a lede, full-bleed and inset stills, and a 672px essay measure. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. The header is the name and the Journal key. X, LinkedIn, and GitHub sit on the left of the footer. The Arcana wordmark sits on the right and links to arcana.agency. There is no Work link. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
 
 ## Elevation & Depth
 
@@ -161,23 +161,23 @@ Day groups are sections of type, not cards. Entries inside are not nested cards.
 Full-bleed in the column, 1px hairline, paper well, plus a 1px inset stroke of ink at 5% opacity on the image itself. The edge is the only elevation. Optional. `type` is `image` or `video`.
 
 ### Work rows
-Labeled horizontal rows of stills, between the intro and the journal. One row per year. The newest year is first. Within a year, stills run left to right in display order.
+One horizontal row of stills, between the intro and the journal. Newest first, then older portfolio studies in the same track. The mono label is the year, or the span when the row mixes years.
 
 - **Track:** full viewport width (`100%`, not `100vw`). Leading and trailing padding are 24px, so the first card sits near the screen edge and cards can scroll off both edges. A short mask fades only that gutter.
 - **Tiles:** one 4:3 frame, `object-fit: cover`, 16px radius, 1px hairline, paper well. A 1px inset stroke, ink at 5% opacity, sits on the image. A phone UI still (about 9:16 or taller) is `object-fit: contain` on an off-white canvas (`#f0f0ee`) with 16px of inset, so the whole screen stays visible.
-- **Header:** a visible "Work" heading plus the year in mono, aligned to the left edge of the first still. Later years keep the year in that same column. No count. No pager.
+- **Header:** a visible "Work" heading plus the year span in mono, aligned to the left edge of the first still. No count. No pager.
 - **Brands:** one horizontal row under the work stills, same drag and scroll as the work track. Cards are 21rem wide. Same heading treatment: "Brands" plus the newest year in mono. Marks run newest first, left to right, in black on paper.
 - **Motion:** drag, swipe, or arrow keys on the row. `touch-action: pan-x pan-y` so a vertical swipe still scrolls the page. No auto-advance. No prev/next buttons.
 - **Links:** each tile goes to `/work/[id]`.
 
 ### Work study
-Case-study page for one `content/work.json` item. Large title, lede, then the work. The body stays in the 42rem measure.
+Case-study page for one `content/work.json` item, following the Paper case-study template. The page is a 1344px content width on a 1440px field. Essays stay in a 672px measure.
 
-- **Intro:** crumb `Home / Work / Title`, a large Geist study title, the summary as a standfirst, then Year and Type. The content `role` field is the type. Do not invent a job title.
-- **Frame:** wide stills fill a 1px hairline frame. Phone and other narrow stills sit centered in that frame at their native width or smaller.
-- **Sections:** `heading` plus short paragraphs. First person. No invented impact. A next-case link follows.
-- **Related:** one more-work row, other items only.
-- **Type:** Geist Sans for title and lede. No serif. No Inter. No Pixel on this page.
+- **Intro:** Geist study title (72px, weight 500, tracking `-0.03em`), then a meta row: crumb `Home / Work / Title` on the left and the type on the right, both Geist Mono 12px tracking `0.14em`. The summary is the lede at 22px. The content `role` field is the type. Do not invent a job title.
+- **Stills:** `blocks` when present. A bleed still is full viewport width, square corners, hairline on the top and bottom edges. An inset still is at most 1344px wide, 16px radius, hairline, on `#eeeeee`. A narrow still is capped at 720px. Images keep their own aspect. Captions sit under the frame at 15px.
+- **Copy:** a mono label plus a 36px statement, then essays (20px heading, 16px / 27px body). First person. No invented impact. Optional `facts` are Year, Timeframe, and Tools, or Year and Type when a post has no `blocks`.
+- **Related:** up to four other works, square still, title, type.
+- **Type:** Geist Sans for title, lede, statements, and essays. Geist Mono for crumbs, labels, and facts. No serif. No Inter. No Pixel on this page.
 - **Source:** `content/work.json` plus files in `public/media/work/`.
 
 ## Do's and Don'ts

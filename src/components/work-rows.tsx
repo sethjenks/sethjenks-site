@@ -23,6 +23,10 @@ const OBJECT_POSITION: Record<string, string> = {
   "food-passport": "center center",
   "philo-shirt": "center center",
   "level-hardscapes": "center center",
+  "offer-builder": "center center",
+  "chia-signer": "center center",
+  "chia-wallet": "center center",
+  "chia-friends": "center center",
 };
 
 function objectPositionFor(id: string): string {

@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
-import { ROLE_LINE } from "@/lib/site";
+import { INTRO } from "@/lib/intro";
 import type { WorkItem } from "@/lib/work";
 
 export const ogSize = { width: 1200, height: 630 };
@@ -33,7 +33,7 @@ export function renderHomeCard() {
             maxWidth: "760px",
           }}
         >
-          {ROLE_LINE}
+          {INTRO.role}
         </div>
       </div>
     ),

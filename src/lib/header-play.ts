@@ -51,6 +51,7 @@ export type HeaderCamera = {
   updateProjectionMatrix: () => void;
   updateMatrixWorld?: () => void;
   fov?: number;
+  far?: number;
 };
 
 export function compactHeaderPlay(homeMs = COMPACT_HOME_MS): HeaderPlayConfig {
@@ -135,12 +136,14 @@ export function applyHeaderCamera(
   if (camera.fov != null) {
     camera.fov = home ? HOME_FOV : 35;
   }
+  const eyeZ = play.camZ * scale;
   camera.position.set(
     1.55 * scale,
     home ? play.lookY - shift : play.camY * scale + play.camLift - shift,
-    play.camZ * scale,
+    eyeZ,
   );
   camera.lookAt(0, play.lookY - shift, 0);
+  camera.far = Math.max(120, eyeZ + 48);
   camera.updateProjectionMatrix();
   camera.updateMatrixWorld?.();
 }
@@ -252,7 +255,8 @@ export function syncSoftBody(play: HeaderPlayConfig) {
   if (play.camZ > COMPACT_CAM_Z + 0.01 && height >= 32) {
     const topY = restTopY(body);
     const bottomY = restBottomY(body);
-    frameHeadTop(handle?.ctx?.camera, play, width, height, topY, rect.top);
+    const canvasPageTop = rect.top + window.scrollY;
+    frameHeadTop(handle?.ctx?.camera, play, width, height, topY, canvasPageTop);
     fitHeadAboveText(
       handle?.ctx?.camera,
       play,
@@ -260,7 +264,7 @@ export function syncSoftBody(play: HeaderPlayConfig) {
       height,
       topY,
       bottomY,
-      rect.top,
+      canvasPageTop,
     );
     fitPlayfieldFloor(handle?.ctx?.camera, play, width, height, bottomY);
   }

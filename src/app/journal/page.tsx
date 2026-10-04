@@ -31,7 +31,16 @@ export default async function JournalPage({
       <Feed
         groups={filtered}
         empty={
-          filter ? `No notes tagged ${filter}.` : "No notes in the journal yet."
+          filter
+            ? {
+                title: "No notes with that tag.",
+                body: `Nothing is tagged ${filter}.`,
+                action: { href: "/journal", label: "All notes" },
+              }
+            : {
+                title: "No notes yet.",
+                body: "Notes show up here as they’re written.",
+              }
         }
       />
     </main>

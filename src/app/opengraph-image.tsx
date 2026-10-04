@@ -1,7 +1,7 @@
 import { renderHomeCard, ogSize } from "@/lib/og-card";
-import { ROLE_LINE } from "@/lib/site";
+import { INTRO } from "@/lib/intro";
 
-export const alt = `Seth Jenks. ${ROLE_LINE}`;
+export const alt = `Seth Jenks. ${INTRO.role}`;
 export const size = ogSize;
 export const contentType = "image/png";
 

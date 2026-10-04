@@ -1,5 +1,19 @@
 [
   {
+    "id": "pomifer",
+    "name": "Pomifer",
+    "year": "2026",
+    "src": "/media/logos/pomifer.png",
+    "alt": "Pomifer logomark"
+  },
+  {
+    "id": "faultline",
+    "name": "Faultline",
+    "year": "2026",
+    "src": "/media/logos/faultline.png",
+    "alt": "Faultline logomark"
+  },
+  {
     "id": "awesom",
     "name": "Awesom",
     "year": "2025",
@@ -12,19 +26,5 @@
     "year": "2025",
     "src": "/media/logos/sunset.png",
     "alt": "Sunset wordmark"
-  },
-  {
-    "id": "chia",
-    "name": "Chia",
-    "year": "2024",
-    "src": "/media/logos/chia.png",
-    "alt": "Chia wordmark"
-  },
-  {
-    "id": "jump",
-    "name": "Jump",
-    "year": "2019",
-    "src": "/media/logos/jump.png",
-    "alt": "Jump wordmark"
   }
 ]

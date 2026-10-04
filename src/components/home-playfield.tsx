@@ -13,7 +13,6 @@ import {
   HOME_ENTER_SHIFT,
   HOME_RETURN_MS,
   pinSoftBodyRest,
-  PLAY_HOME_MS,
   snapshotSoftBody,
   syncSoftBody,
 } from "@/lib/header-play";
@@ -31,16 +30,38 @@ import {
   type PlayBounds,
   type PlayRest,
 } from "@/lib/playfield-physics";
-import { scrambleText, voicePhraseAt } from "@/lib/play-voice";
+import {
+  createVoiceDeck,
+  scrambleText,
+  VOICE_MESSAGES,
+  voiceHoldMs,
+  type VoiceMessage,
+} from "@/lib/play-voice";
 
-const IDLE_MS = PLAY_HOME_MS;
-const VOICE_HOLD_MS = 2000;
+// const IDLE_MS = PLAY_HOME_MS;
+const GRAB_HOME_MS = 5_000;
 const VOICE_SCRAMBLE_S = 0.9;
 const SCRAMBLE_EASE = [0.32, 0.72, 0, 1] as const;
 const TEXT_MS = 0.38;
 const TEXT_STAGGER_S = 0.09;
 const HEAD_DELAY_S = TEXT_MS + TEXT_STAGGER_S + 0.08;
 const HEAD_S = 1.15;
+const JOURNAL_ENTER_MS = 400;
+const ENTER_FALLBACK_MS = 3200;
+
+function releasePlayEnter() {
+  delete document.documentElement.dataset.playEnter;
+}
+
+function revealStuckCopy(root: HTMLElement | null) {
+  releasePlayEnter();
+  root?.querySelectorAll<HTMLElement>(".intro-name, .role-line, .intro-copy").forEach((node) => {
+    if (getComputedStyle(node).opacity === "0") {
+      node.style.opacity = "1";
+      node.style.transform = "none";
+    }
+  });
+}
 const ENTER_EASE = [0.32, 0.72, 0, 1] as const;
 
 const introList = {
@@ -68,14 +89,19 @@ type VoiceFlyer = {
   toX: number;
   toY: number;
   fade: boolean;
+  nextText: string;
+  swapped: boolean;
 };
 
 type VoiceFlight = {
+  category: string;
   phrase: string;
   line: HTMLElement;
   visual: HTMLElement;
   measure: HTMLElement;
   flyers: VoiceFlyer[];
+  fromHeight: number;
+  toHeight: number;
 };
 
 type VoicePhase = "flight" | "hold" | "scramble";
@@ -89,11 +115,13 @@ type VoiceRun = {
 };
 
 type HomePlayfieldProps = {
+  name: string;
   role: string;
-  intro: string;
+  paragraphs: readonly string[];
+  links: Readonly<Record<string, string>>;
 };
 
-export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
+export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const bodiesRef = useRef<PlayBody[]>([]);
   const nodesRef = useRef<Map<string, HTMLElement>>(new Map());
@@ -103,6 +131,7 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
   const armedRef = useRef(false);
   const reducedRef = useRef(false);
   const enteredRef = useRef(false);
+  const journalSettledRef = useRef(false);
   const headEnterRef = useRef<{ stop: () => void } | null>(null);
   const homeAnimRef = useRef<{ stop: () => void } | null>(null);
   const homeFromHeadRef = useRef<Float64Array | null>(null);
@@ -110,7 +139,7 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
   const voiceRef = useRef<VoiceRun | null>(null);
   const voiceActiveRef = useRef(false);
   const voiceGenRef = useRef(0);
-  const phraseIndexRef = useRef(0);
+  const deckRef = useRef(createVoiceDeck(VOICE_MESSAGES));
   const roleRef = useRef(role);
   const prefersReduced = useReducedMotion() === true;
   roleRef.current = role;
@@ -118,18 +147,36 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
   useLayoutEffect(() => {
     const reduced = prefersReduced;
     reducedRef.current = reduced;
+    const button = document.querySelector<HTMLElement>("[data-play-button]");
     if (reduced) {
+      releasePlayEnter();
       window.__headerEnterShift = 0;
       window.__headerEntering = false;
       enteredRef.current = true;
+      journalSettledRef.current = true;
+      if (button) {
+        button.inert = false;
+        delete button.dataset.journalIn;
+        button.dataset.journalSettled = "";
+      }
       return;
     }
 
+    journalSettledRef.current = false;
+    if (button) {
+      button.inert = true;
+      delete button.dataset.journalSettled;
+      delete button.dataset.journalIn;
+    }
     window.__headerEnterShift = HOME_ENTER_SHIFT;
     window.__headerEntering = true;
 
     const root = rootRef.current;
     if (!root) {
+      releasePlayEnter();
+      if (button) {
+        button.inert = false;
+      }
       return;
     }
 
@@ -146,11 +193,16 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
         COMPACT_HEADER_PX,
         Math.round(end.getBoundingClientRect().top + window.scrollY - gap),
       );
-      const role = root.querySelector(".role-line");
-      const textTop = role?.getBoundingClientRect().top ?? COMPACT_HEADER_PX + 32;
+      const role = root.querySelector(".intro-name") ?? root.querySelector(".role-line");
+      const textShift = window.innerHeight * 0.05;
+      const roleTop = role?.getBoundingClientRect().top;
+      const textTop =
+        (roleTop == null ? COMPACT_HEADER_PX + 32 + textShift : roleTop + window.scrollY) -
+        textShift;
       const play = headerPlayForHeight(height, window.innerWidth, textTop);
       applyHeaderPlay(play);
       syncSoftBody(play);
+      alignJournalToHead(bodiesRef.current);
 
       document.documentElement.dataset.playfield = "home";
       document.documentElement.style.setProperty("--playfield-height", `${height}px`);
@@ -168,7 +220,7 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
     const observer = new ResizeObserver(() => {
       applyHeight();
       if (enteredRef.current && !voiceActiveRef.current) {
-        collectBodies(root, bodiesRef.current, nodesRef.current);
+        collectBodies(root, bodiesRef.current, nodesRef.current, journalSettledRef.current);
       }
     });
     observer.observe(root);
@@ -182,12 +234,15 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
     const onResize = () => {
       applyHeight();
       if (enteredRef.current && !voiceActiveRef.current) {
-        collectBodies(root, bodiesRef.current, nodesRef.current);
+        collectBodies(root, bodiesRef.current, nodesRef.current, journalSettledRef.current);
       }
     };
     window.addEventListener("resize", onResize);
 
     return () => {
+      if (button) {
+        button.inert = false;
+      }
       observer.disconnect();
       window.removeEventListener("resize", onResize);
       window.__headerEnterShift = 0;
@@ -206,17 +261,24 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
 
   useEffect(() => {
     if (reducedRef.current) {
+      releasePlayEnter();
       enteredRef.current = true;
+      journalSettledRef.current = true;
       const root = rootRef.current;
       if (root) {
-        collectBodies(root, bodiesRef.current, nodesRef.current);
+        collectBodies(root, bodiesRef.current, nodesRef.current, true);
       }
       return;
     }
 
     window.__headerEnterShift = HOME_ENTER_SHIFT;
     window.__headerEntering = true;
+    let cancelJournalEnter = () => {};
     const finishEnter = () => {
+      if (enteredRef.current) {
+        return;
+      }
+
       window.__headerEnterShift = 0;
       window.__headerEntering = false;
       enteredRef.current = true;
@@ -236,8 +298,59 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
       startSpin();
       const root = rootRef.current;
       if (root) {
-        collectBodies(root, bodiesRef.current, nodesRef.current);
+        collectBodies(root, bodiesRef.current, nodesRef.current, false);
       }
+      revealJournal();
+    };
+
+    const revealJournal = () => {
+      const journalButton = document.querySelector<HTMLElement>("[data-play-button]");
+      let settled = false;
+      let timer = 0;
+
+      const settle = () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        window.clearTimeout(timer);
+        journalButton?.removeEventListener("animationend", onEnd);
+        journalSettledRef.current = true;
+        if (journalButton) {
+          journalButton.inert = false;
+          journalButton.dataset.journalSettled = "";
+          delete journalButton.dataset.journalIn;
+        }
+        const liveRoot = rootRef.current;
+        if (liveRoot) {
+          collectBodies(liveRoot, bodiesRef.current, nodesRef.current, true);
+        }
+      };
+
+      const onEnd = (event: AnimationEvent) => {
+        if (event.animationName !== "journal-enter") {
+          return;
+        }
+        settle();
+      };
+
+      cancelJournalEnter = () => {
+        window.clearTimeout(timer);
+        journalButton?.removeEventListener("animationend", onEnd);
+      };
+
+      releasePlayEnter();
+
+      if (!journalButton) {
+        settle();
+        return;
+      }
+
+      journalButton.inert = false;
+      journalButton.addEventListener("animationend", onEnd);
+      journalButton.dataset.journalIn = "";
+      timer = window.setTimeout(settle, JOURNAL_ENTER_MS + 120);
     };
     const headEnter = animate(HOME_ENTER_SHIFT, 0, {
       type: "spring",
@@ -256,10 +369,18 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
       onComplete: finishEnter,
     });
     headEnterRef.current = headEnter;
+    const enterFallback = window.setTimeout(() => {
+      if (!enteredRef.current) {
+        headEnter.stop();
+        finishEnter();
+      }
+      revealStuckCopy(rootRef.current);
+    }, ENTER_FALLBACK_MS);
 
     let frame = 0;
     let last = performance.now();
     let homeToken = 0;
+    let grabbedAt = 0;
     const button = document.querySelector<HTMLElement>("[data-play-button]");
     const drag = { active: false, id: 0, x: 0, y: 0, lastX: 0, lastY: 0 };
     let wasGrabbing = false;
@@ -287,8 +408,9 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
         return;
       }
 
+      showIntroAside(root);
       releaseRoleVoice(root, roleRef.current);
-      collectBodies(root, bodiesRef.current, nodesRef.current);
+      collectBodies(root, bodiesRef.current, nodesRef.current, journalSettledRef.current);
     };
 
     const stopHome = (cancelVoice = true) => {
@@ -347,14 +469,17 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
       const root = rootRef.current;
       const roleLoose = bodiesRef.current.some((body) => isRoleBody(body) && body.loose);
       if (roleLoose && root) {
-        const flight = beginRoleVoice(
-          root,
-          voicePhraseAt(phraseIndexRef.current),
-          bodiesRef.current,
-          nodesRef.current,
-        );
+        const flight =
+          VOICE_MESSAGES.length > 0
+            ? beginRoleVoice(
+                root,
+                deckRef.current.next(),
+                bodiesRef.current,
+                nodesRef.current,
+              )
+            : null;
         if (flight) {
-          phraseIndexRef.current += 1;
+          hideIntroAside(root);
           const generation = voiceGenRef.current + 1;
           voiceGenRef.current = generation;
           voiceActiveRef.current = true;
@@ -417,6 +542,7 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
           homeFromHeadRef.current = null;
           homeAnimRef.current = null;
           homingRef.current = false;
+          grabbedAt = 0;
           window.__headerHoming = false;
           window.__headerHomeT = 0;
           window.__headerHomeFrom = null;
@@ -428,7 +554,7 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
           run.phase = "hold";
           run.holdTimer = window.setTimeout(() => {
             startScramble(generation);
-          }, VOICE_HOLD_MS);
+          }, voiceHoldMs({ category: "", text: run.flight.phrase }));
         },
       });
       homeAnimRef.current = homeAnim;
@@ -470,7 +596,11 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
         return;
       }
 
+      const starting = !body.loose;
       body.loose = true;
+      if (starting) {
+        armGrabClock(performance.now());
+      }
       body.x = event.clientX - origin.left - body.rest.w / 2;
       body.y = event.clientY - origin.top - body.rest.h / 2;
       body.vx = (event.clientX - drag.lastX) * 45;
@@ -498,12 +628,19 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
     window.addEventListener("pointerup", onButtonUp);
     window.addEventListener("pointercancel", onButtonUp);
 
+    const armGrabClock = (now: number) => {
+      if (grabbedAt === 0 || now - grabbedAt >= GRAB_HOME_MS) {
+        grabbedAt = now;
+      }
+    };
+
     const tick = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
       if (window.__headerPlay) {
         syncSoftBody(window.__headerPlay);
       }
+      alignJournalToHead(bodiesRef.current);
       if (!enteredRef.current) {
         pinSoftBodyRest(window.__headerSoftBody);
       }
@@ -514,7 +651,7 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
         !voiceActiveRef.current &&
         bodiesRef.current.length === 0
       ) {
-        collectBodies(root, bodiesRef.current, nodesRef.current);
+        collectBodies(root, bodiesRef.current, nodesRef.current, journalSettledRef.current);
       }
 
       const header = document.querySelector(".site-header-bar");
@@ -539,6 +676,10 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
       }
       const liveBust = bust && armedRef.current ? bust : null;
 
+      const holding = Boolean(bust?.grabbing) || drag.active;
+      if (bust?.grabbing && !wasGrabbing) {
+        armGrabClock(now);
+      }
       if (bust?.grabbing) {
         lastMotionRef.current = now;
         stopHome();
@@ -548,14 +689,16 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
       }
       wasGrabbing = Boolean(bust?.grabbing);
 
-      const idleFor = now - lastMotionRef.current;
-      const anyLoose = bodiesRef.current.some((body) => body.loose);
+      const grabElapsed = grabbedAt > 0 && now - grabbedAt >= GRAB_HOME_MS;
+      // 5s stillness timer, off while we try the grab clock.
+      // const idleFor = now - lastMotionRef.current;
+      // const anyLoose = bodiesRef.current.some((body) => body.loose);
+      // const idleElapsed = anyLoose && lastMotionRef.current > 0 && idleFor >= IDLE_MS;
       if (
         !homingRef.current &&
         !voiceActiveRef.current &&
-        anyLoose &&
-        lastMotionRef.current > 0 &&
-        idleFor >= IDLE_MS
+        !holding &&
+        grabElapsed
       ) {
         startHome();
       }
@@ -570,7 +713,10 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
 
       if (struck) {
         lastMotionRef.current = now;
-        stopHome(voiceRef.current?.phase === "flight");
+        const grabStillOpen = grabbedAt > 0 && now - grabbedAt < GRAB_HOME_MS;
+        if (grabStillOpen || grabbedAt === 0) {
+          stopHome(voiceRef.current?.phase === "flight");
+        }
       }
 
       if (homingRef.current) {
@@ -580,11 +726,9 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
           applySoftBodyHome(body, homeFromHeadRef.current, homeTRef.current);
         }
       } else if (window.__headerSoftBody && !bust?.grabbing) {
-        if (lastMotionRef.current === 0) {
-          window.__headerSoftBody.homeAt = 0;
-        } else {
-          window.__headerSoftBody.homeAt = lastMotionRef.current + IDLE_MS;
-        }
+        // 5s stillness timer, off while we try the grab clock.
+        // window.__headerSoftBody.homeAt = lastMotionRef.current + IDLE_MS;
+        window.__headerSoftBody.homeAt = 0;
       }
 
       paintBodies(bodiesRef.current, nodesRef.current);
@@ -593,6 +737,12 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
 
     frame = requestAnimationFrame(tick);
     return () => {
+      window.clearTimeout(enterFallback);
+      cancelJournalEnter();
+      if (button) {
+        button.inert = false;
+        delete button.dataset.journalIn;
+      }
       headEnter.stop();
       headEnterRef.current = null;
       stopHome();
@@ -608,16 +758,36 @@ export function HomePlayfield({ role, intro }: HomePlayfieldProps) {
     };
   }, []);
 
+  const lines = Array.isArray(paragraphs) ? paragraphs : [];
+  const copyKey = [name, role, ...lines].join("\n");
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !enteredRef.current || voiceActiveRef.current) {
+      return;
+    }
+
+    collectBodies(root, bodiesRef.current, nodesRef.current, journalSettledRef.current);
+  }, [copyKey]);
+
   return (
     <div ref={rootRef} className="home-playfield">
       <motion.div
-        className="mx-auto w-full max-w-[42rem] px-6 pt-8 sm:px-8 sm:pt-10 home-intro"
+        className="mx-auto mt-[5vh] w-full max-w-[42rem] px-6 pt-8 sm:px-8 sm:pt-10 home-intro"
         variants={introList}
         initial={prefersReduced ? "show" : "hide"}
         animate="show"
       >
-        <PlayLine className="role-line" text={role} lineId="role" />
-        <PlayLine className="intro-copy" text={intro} lineId="intro" />
+        <PlayLine className="intro-name" text={name} lineId="name" links={links} />
+        <PlayLine className="role-line" text={role} lineId="role" links={links} />
+        {lines.map((text, index) => (
+          <PlayLine
+            key={text}
+            className="intro-copy"
+            text={text}
+            lineId={`intro-${index}`}
+            links={links}
+          />
+        ))}
       </motion.div>
       <div className="playfield-end" aria-hidden="true" />
     </div>
@@ -628,10 +798,12 @@ function PlayLine({
   className,
   text,
   lineId,
+  links,
 }: {
   className: string;
   text: string;
   lineId: string;
+  links?: Readonly<Record<string, string>>;
 }) {
   return (
     <motion.p className={className} variants={introPiece}>
@@ -646,13 +818,25 @@ function PlayLine({
             );
           }
 
+          const bare = token.value.replace(/[.,]$/, "");
+          const punct = token.value.slice(bare.length);
+          const href = links?.[bare];
           return (
             <span
               key={`${lineId}-w${index}`}
               className="play-word"
               data-play-word={`${lineId}-${index}`}
             >
-              {token.value}
+              {href ? (
+                <>
+                  <a className="intro-link" href={href} rel="noreferrer" target="_blank" tabIndex={-1}>
+                    {bare}
+                  </a>
+                  {punct}
+                </>
+              ) : (
+                token.value
+              )}
             </span>
           );
         })}
@@ -679,6 +863,39 @@ function splitPlayTokens(text: string): PlayToken[] {
   }
 
   return tokens;
+}
+
+const ASIDE_FADE_MS = 450;
+
+function hideIntroAside(root: HTMLElement) {
+  const intro = root.querySelector<HTMLElement>(".home-intro");
+  if (!intro) {
+    return;
+  }
+
+  intro.removeAttribute("data-voice-aside-out");
+  intro.setAttribute("data-voice-aside", "");
+  intro.querySelectorAll<HTMLElement>(".intro-copy").forEach((node) => {
+    node.setAttribute("aria-hidden", "true");
+  });
+}
+
+function showIntroAside(root: HTMLElement) {
+  const intro = root.querySelector<HTMLElement>(".home-intro");
+  if (!intro?.hasAttribute("data-voice-aside")) {
+    return;
+  }
+
+  intro.setAttribute("data-voice-aside-out", "");
+  intro.removeAttribute("data-voice-aside");
+  intro.querySelectorAll<HTMLElement>(".intro-copy").forEach((node) => {
+    node.removeAttribute("aria-hidden");
+  });
+  window.setTimeout(() => {
+    if (!intro.hasAttribute("data-voice-aside")) {
+      intro.removeAttribute("data-voice-aside-out");
+    }
+  }, ASIDE_FADE_MS + 40);
 }
 
 function isRoleBody(body: PlayBody) {
@@ -711,12 +928,13 @@ function clearFlyerStyle(node: HTMLElement) {
   node.style.margin = "";
   node.style.transform = "";
   node.style.opacity = "";
+  node.style.color = "";
   delete node.dataset.voiceFly;
 }
 
 function beginRoleVoice(
   root: HTMLElement,
-  phrase: string,
+  message: VoiceMessage,
   bodies: PlayBody[],
   nodes: Map<string, HTMLElement>,
 ): VoiceFlight | null {
@@ -765,6 +983,8 @@ function beginRoleVoice(
       toX: 0,
       toY: 0,
       fade: false,
+      nextText: "",
+      swapped: false,
     });
   }
 
@@ -779,21 +999,7 @@ function beginRoleVoice(
 
   const measure = document.createElement("span");
   measure.className = "play-voice-measure";
-  for (const part of phrase.split(/(\s+)/)) {
-    if (!part) {
-      continue;
-    }
-
-    const span = document.createElement("span");
-    if (/^\s+$/.test(part)) {
-      span.className = "play-space";
-      span.textContent = "\u00A0";
-    } else {
-      span.className = "play-word";
-      span.textContent = part;
-    }
-    measure.appendChild(span);
-  }
+  appendVoiceParts(measure, message.text, "play-word");
   visual.appendChild(measure);
 
   const slots = [...measure.querySelectorAll<HTMLElement>(".play-word")];
@@ -818,7 +1024,7 @@ function beginRoleVoice(
       const rect = slot.getBoundingClientRect();
       flyer.toX = rect.left - baseLeft;
       flyer.toY = rect.top - baseTop;
-      flyer.node.textContent = slot.textContent;
+      flyer.nextText = slot.textContent ?? "";
       return;
     }
 
@@ -827,17 +1033,51 @@ function beginRoleVoice(
     flyer.toY = phraseBox.top + phraseBox.height / 2 - flyer.node.offsetHeight / 2 - baseTop;
   });
 
-  return { phrase, line, visual, measure, flyers };
+  const fromHeight = Math.ceil(Number.parseFloat(line.style.minHeight) || line.getBoundingClientRect().height);
+  const toHeight = Math.ceil(measure.getBoundingClientRect().height);
+  return {
+    category: message.category,
+    phrase: message.text,
+    line,
+    visual,
+    measure,
+    flyers,
+    fromHeight,
+    toHeight,
+  };
 }
+
+function appendVoiceParts(parent: HTMLElement, text: string, wordClass: string) {
+  for (const part of text.split(/(\s+)/)) {
+    if (!part) {
+      continue;
+    }
+
+    const span = document.createElement("span");
+    if (/^\s+$/.test(part)) {
+      span.className = "play-space";
+      span.textContent = "\u00A0";
+    } else {
+      span.className = wordClass;
+      span.textContent = part;
+    }
+    parent.appendChild(span);
+  }
+}
+
+const TEXT_SWAP = 0.46;
+const TEXT_FADE = 0.16;
 
 function paintVoiceFlight(flight: VoiceFlight, t: number) {
   const eased = Math.min(1, Math.max(0, t));
+  const height = flight.fromHeight + (flight.toHeight - flight.fromHeight) * eased;
+  flight.line.style.minHeight = `${Math.ceil(height)}px`;
   for (const flyer of flight.flyers) {
     const x = flyer.fromX + (flyer.toX - flyer.fromX) * eased;
     const y = flyer.fromY + (flyer.toY - flyer.fromY) * eased;
     const rot = flyer.fromRotate * (1 - eased);
     flyer.node.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${rot.toFixed(2)}deg)`;
-    flyer.node.style.opacity = flyer.fade ? (1 - eased).toFixed(3) : "1";
+    flyer.node.style.opacity = voiceGlyphOpacity(flyer, eased).toFixed(3);
     flyer.body.x = flyer.body.rest.x + x;
     flyer.body.y = flyer.body.rest.y + y;
     flyer.body.rotate = rot;
@@ -847,12 +1087,32 @@ function paintVoiceFlight(flight: VoiceFlight, t: number) {
   }
 }
 
+function voiceGlyphOpacity(flyer: VoiceFlyer, eased: number) {
+  if (flyer.fade || !flyer.nextText) {
+    return flyer.fade ? 1 - eased : 1;
+  }
+
+  if (!flyer.swapped && eased >= TEXT_SWAP) {
+    flyer.node.textContent = flyer.nextText;
+    flyer.swapped = true;
+    return 0;
+  }
+
+  const dist = Math.abs(eased - TEXT_SWAP);
+  if (dist >= TEXT_FADE) {
+    return 1;
+  }
+
+  return dist / TEXT_FADE;
+}
+
 function parkRoleLine(run: VoiceRun, bodies: PlayBody[], nodes: Map<string, HTMLElement>) {
   for (const flyer of run.flight.flyers) {
     clearFlyerStyle(flyer.node);
     flyer.node.style.display = "none";
   }
   run.flight.measure.dataset.shown = "";
+  run.flight.line.style.minHeight = "";
   for (let index = bodies.length - 1; index >= 0; index -= 1) {
     const body = bodies[index];
     if (!body || !isRoleBody(body)) {
@@ -887,10 +1147,60 @@ function releaseRoleVoice(root: HTMLElement, text: string) {
   line.style.minHeight = "";
 }
 
+function alignJournalToHead(bodies: PlayBody[]) {
+  const journal = bodies.find((body) => body.id === "journal");
+  if (journal?.loose) {
+    return;
+  }
+
+  const header = document.querySelector<HTMLElement>(".site-header-bar");
+  const button = header?.querySelector<HTMLElement>("[data-play-button]");
+  const canvas = headerStageCanvas(window.__headerSoftHandle);
+  const camera = window.__headerSoftHandle?.ctx?.camera;
+  const body = window.__headerSoftBody;
+  if (!header || !button || !canvas || !camera?.position.clone || !body?.count) {
+    return;
+  }
+
+  const height = canvas.getBoundingClientRect().height;
+  if (height < 32) {
+    return;
+  }
+
+  let crown = -Infinity;
+  let chin = Infinity;
+  for (let index = 0; index < body.count; index += 1) {
+    const y = body.rest[index * 3 + 1];
+    crown = Math.max(crown, y);
+    chin = Math.min(chin, y);
+  }
+
+  const project = (worldY: number) => {
+    const projected = camera.position.clone().set(0, worldY, 0).project(camera);
+    return (-projected.y * 0.5 + 0.5) * height;
+  };
+  const mid = (project(crown) + project(chin)) / 2;
+  if (!Number.isFinite(mid)) {
+    return;
+  }
+
+  const top = Math.round((mid - button.getBoundingClientRect().height / 2) * 10) / 10;
+  const next = `${top}px`;
+  if (header.style.getPropertyValue("--journal-top") === next) {
+    return;
+  }
+
+  header.style.setProperty("--journal-top", next);
+  if (journal) {
+    syncPlayRest(journal, restFromNode(button, header.getBoundingClientRect()));
+  }
+}
+
 function collectBodies(
   root: HTMLElement,
   bodies: PlayBody[],
   nodes: Map<string, HTMLElement>,
+  includeJournal = true,
 ) {
   const header = document.querySelector(".site-header-bar");
   if (!header) {
@@ -912,7 +1222,7 @@ function collectBodies(
   });
 
   const button = document.querySelector<HTMLElement>("[data-play-button]");
-  if (button) {
+  if (button && includeJournal) {
     next.set("journal", restFromNode(button, origin));
     nextNodes.set("journal", button);
   }

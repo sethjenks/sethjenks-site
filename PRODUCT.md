@@ -37,7 +37,7 @@ Dates are America/Denver calendar days. Intended production domain is sethjenks.
 - No auth, no database, no Paper iframe, no contact form. Contact is X, LinkedIn, and GitHub.
 - Home feed plus one project page per `content/work.json` item at `/work/[id]`.
 - Work fields: `id`, `title`, `year`, `role` (the type), `src`, `width`, `height`, `summary` (1–2 sentences), `sections` (`heading` + short paragraphs), optional `tags`, optional `alt`.
-- Project pages are case studies: large title and lede, Year and Type, framed still, sections, next case, related work.
+- Project pages are case studies from the Paper template: title, crumb and type, lede, bleed and inset stills, statements, essays, facts, and up to four related works.
 
 ## Brand Commitments
 

@@ -9,6 +9,26 @@ export type WorkSection = {
   body: string[];
 };
 
+export type WorkFrame = {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+  caption?: string;
+};
+
+export type WorkFact = {
+  label: string;
+  lines: string[];
+};
+
+export type WorkBlock =
+  | { type: "statement"; label: string; text: string }
+  | { type: "essay"; heading: string; body: string[]; list?: string[] }
+  | { type: "bleed"; frame: WorkFrame }
+  | { type: "frame"; frame: WorkFrame; narrow?: boolean }
+  | { type: "facts"; items: WorkFact[] };
+
 export type WorkItem = {
   id: string;
   title: string;
@@ -21,6 +41,7 @@ export type WorkItem = {
   sections: WorkSection[];
   tags?: string[];
   alt?: string;
+  blocks?: WorkBlock[];
 };
 
 export type WorkBand = {
@@ -37,10 +58,89 @@ const DISPLAY_ORDER = [
   "food-passport",
   "philo-shirt",
   "level-hardscapes",
+  "offer-builder",
+  "chia-signer",
+  "chia-wallet",
+  "chia-friends",
 ];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isWorkFrame(value: unknown): value is WorkFrame {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { src, width, height, alt, caption } = value;
+
+  if (
+    !isNonEmptyString(src) ||
+    typeof width !== "number" ||
+    typeof height !== "number" ||
+    !isNonEmptyString(alt)
+  ) {
+    return false;
+  }
+
+  return caption === undefined || isNonEmptyString(caption);
+}
+
+function isWorkFact(value: unknown): value is WorkFact {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { label, lines } = value;
+
+  return (
+    isNonEmptyString(label) &&
+    Array.isArray(lines) &&
+    lines.length > 0 &&
+    lines.every(isNonEmptyString)
+  );
+}
+
+function isWorkBlock(value: unknown): value is WorkBlock {
+  if (!isRecord(value) || typeof value.type !== "string") {
+    return false;
+  }
+
+  switch (value.type) {
+    case "statement":
+      return isNonEmptyString(value.label) && isNonEmptyString(value.text);
+    case "essay":
+      return (
+        isNonEmptyString(value.heading) &&
+        Array.isArray(value.body) &&
+        value.body.length > 0 &&
+        value.body.every(isNonEmptyString) &&
+        (value.list === undefined ||
+          (Array.isArray(value.list) &&
+            value.list.length > 0 &&
+            value.list.every(isNonEmptyString)))
+      );
+    case "bleed":
+      return isWorkFrame(value.frame);
+    case "frame":
+      return (
+        isWorkFrame(value.frame) &&
+        (value.narrow === undefined || typeof value.narrow === "boolean")
+      );
+    case "facts":
+      return (
+        Array.isArray(value.items) &&
+        value.items.length > 0 &&
+        value.items.every(isWorkFact)
+      );
+    default:
+      return false;
+  }
 }
 
 function isWorkSection(value: unknown): value is WorkSection {
@@ -66,7 +166,7 @@ function isWorkItem(value: unknown): value is WorkItem {
     return false;
   }
 
-  const { id, title, year, role, src, width, height, summary, sections, tags, alt } =
+  const { id, title, year, role, src, width, height, summary, sections, tags, alt, blocks } =
     value;
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
@@ -112,7 +212,63 @@ function isWorkItem(value: unknown): value is WorkItem {
     return false;
   }
 
+  if (blocks !== undefined) {
+    if (!Array.isArray(blocks) || blocks.length === 0 || !blocks.every(isWorkBlock)) {
+      return false;
+    }
+  }
+
   return true;
+}
+
+function toWorkFrame(frame: WorkFrame): WorkFrame {
+  return {
+    src: frame.src.trim(),
+    width: frame.width,
+    height: frame.height,
+    alt: frame.alt.trim(),
+    ...(frame.caption ? { caption: frame.caption.trim() } : {}),
+  };
+}
+
+function toWorkBlock(block: WorkBlock): WorkBlock {
+  switch (block.type) {
+    case "statement":
+      return {
+        type: "statement",
+        label: block.label.trim(),
+        text: block.text.trim(),
+      };
+    case "essay":
+      return {
+        type: "essay",
+        heading: block.heading.trim(),
+        body: block.body.map((paragraph) => paragraph.trim()),
+        ...(block.list
+          ? { list: block.list.map((item) => item.trim()) }
+          : {}),
+      };
+    case "bleed":
+      return { type: "bleed", frame: toWorkFrame(block.frame) };
+    case "frame":
+      return {
+        type: "frame",
+        frame: toWorkFrame(block.frame),
+        ...(block.narrow ? { narrow: true } : {}),
+      };
+    case "facts":
+      return {
+        type: "facts",
+        items: block.items.map((item) => ({
+          label: item.label.trim(),
+          lines: item.lines.map((line) => line.trim()),
+        })),
+      };
+    default: {
+      const unknownBlock: never = block;
+      return unknownBlock;
+    }
+  }
 }
 
 function toWorkSection(section: WorkSection): WorkSection {
@@ -135,12 +291,18 @@ function toWorkItem(item: WorkItem): WorkItem {
     sections: item.sections.map(toWorkSection),
     ...(item.tags ? { tags: item.tags.map((tag) => tag.trim()) } : {}),
     ...(item.alt ? { alt: item.alt.trim() } : {}),
+    ...(item.blocks ? { blocks: item.blocks.map(toWorkBlock) } : {}),
   };
 }
 
+function yearRank(year: string): number {
+  const match = year.match(/\d{4}/);
+  return match ? Number(match[0]) : Number.NaN;
+}
+
 function compareYearDesc(a: string, b: string): number {
-  const aNum = Number(a);
-  const bNum = Number(b);
+  const aNum = yearRank(a);
+  const bNum = yearRank(b);
 
   if (Number.isFinite(aNum) && Number.isFinite(bNum) && aNum !== bNum) {
     return bNum - aNum;
@@ -170,21 +332,35 @@ export function sortWorkForDisplay(items: WorkItem[]): WorkItem[] {
   });
 }
 
-export function groupWorkBands(items: WorkItem[]): WorkBand[] {
-  const bands: WorkBand[] = [];
+function workSpanLabel(items: WorkItem[]): string {
+  const years = items
+    .map((item) => yearRank(item.year))
+    .filter((year) => Number.isFinite(year));
 
-  for (const item of sortWorkForDisplay(items)) {
-    const current = bands[bands.length - 1];
-
-    if (current && current.id === item.year) {
-      current.items.push(item);
-      continue;
-    }
-
-    bands.push({ id: item.year, label: item.year, items: [item] });
+  if (years.length === 0) {
+    return "";
   }
 
-  return bands;
+  const newest = Math.max(...years);
+  const oldest = Math.min(...years);
+
+  return oldest === newest ? String(newest) : `${oldest}–${newest}`;
+}
+
+export function groupWorkBands(items: WorkItem[]): WorkBand[] {
+  const ordered = sortWorkForDisplay(items);
+
+  if (ordered.length === 0) {
+    return [];
+  }
+
+  return [
+    {
+      id: "work",
+      label: workSpanLabel(ordered),
+      items: ordered,
+    },
+  ];
 }
 
 export function getNextWorkItem(

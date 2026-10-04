@@ -45,15 +45,34 @@ function EntryArticle({
   );
 }
 
+const DEFAULT_EMPTY = {
+  title: "No notes yet.",
+  body: "Notes show up here as they’re written.",
+};
+
 export function Feed({
   groups,
-  empty = "No notes in the journal yet.",
+  empty = DEFAULT_EMPTY,
 }: {
   groups: DayGroup[];
-  empty?: string;
+  empty?: {
+    title: string;
+    body: string;
+    action?: { href: string; label: string };
+  };
 }) {
   if (groups.length === 0) {
-    return <p className="log-summary">{empty}</p>;
+    return (
+      <div className="log-empty">
+        <h2 className="log-empty-title">{empty.title}</h2>
+        <p className="log-summary">{empty.body}</p>
+        {empty.action ? (
+          <Link className="log-empty-action" href={empty.action.href}>
+            {empty.action.label}
+          </Link>
+        ) : null}
+      </div>
+    );
   }
 
   return (
