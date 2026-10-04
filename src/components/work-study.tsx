@@ -9,6 +9,7 @@ import {
   isPhoneStill,
   type WorkItem,
 } from "@/lib/work";
+import { isMobileScreen } from "@/lib/work-shape";
 import { normalizeTag } from "@/lib/entries";
 
 type WorkStudyProps = {
@@ -20,6 +21,7 @@ type WorkStudyProps = {
 export function WorkStudy({ item, related, next }: WorkStudyProps) {
   const alt = heroAlt(item);
   const phone = isPhoneStill(item);
+  const canvas = isMobileScreen(item);
   const narrow = item.width < 1280;
   const dense = isDenseDesktopStill(item);
   const extraTags = (item.tags ?? []).filter(
@@ -58,6 +60,7 @@ export function WorkStudy({ item, related, next }: WorkStudyProps) {
         className={
           narrow || phone ? "work-hero work-hero-panel" : "work-hero"
         }
+        data-canvas={canvas ? "phone" : undefined}
         data-dense={dense ? "" : undefined}
       >
         <Image

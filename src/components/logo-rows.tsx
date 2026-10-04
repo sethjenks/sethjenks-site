@@ -12,7 +12,7 @@ type LogoRowsProps = {
   id?: string;
 };
 
-export function LogoRows({ bands, heading = "Logos", id = "logos" }: LogoRowsProps) {
+export function LogoRows({ bands, heading = "Brands", id = "logos" }: LogoRowsProps) {
   const headingId = `${id}-heading`;
   const total = bands.reduce((count, band) => count + band.items.length, 0);
 

@@ -1,6 +1,8 @@
 import Image from "next/image";
 import type { EntryMedia, MediaType } from "@/lib/entries";
 
+import { EntryPlateFigure } from "@/components/entry-plate";
+
 function mediaKind(media: EntryMedia): MediaType {
   return media.type ?? "image";
 }
@@ -20,7 +22,7 @@ export function EntryMediaFigure({
     case "image":
       return (
         <figure className="aluminum-frame overflow-hidden">
-          <div className="relative aspect-video w-full">
+          <div className="relative aspect-[2/1] w-full">
             <Image
               src={media.src}
               alt={alt}
@@ -42,10 +44,12 @@ export function EntryMediaFigure({
             playsInline
             preload="metadata"
             aria-label={alt || undefined}
-            className="aspect-video w-full object-cover"
+            className="aspect-[2/1] w-full object-cover"
           />
         </figure>
       );
+    case "plate":
+      return <EntryPlateFigure media={media} priority={priority} />;
     default: {
       const _exhaustive: never = kind;
       throw new Error(`Unhandled media type: ${_exhaustive}`);

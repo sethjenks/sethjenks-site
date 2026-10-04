@@ -25,7 +25,7 @@ function EntryArticle({
           <EntryMediaFigure media={entry.media} priority={priorityMedia} />
         ) : null}
         <h3 className="log-title">
-          <Link href={`/log/${entry.date}#${entry.id}`}>{entry.title}</Link>
+          <Link href={`/journal/${entry.date}#${entry.id}`}>{entry.title}</Link>
         </h3>
         <p className="log-summary">{entry.summary}</p>
         {entry.tags && entry.tags.length > 0 ? (
@@ -34,7 +34,7 @@ function EntryArticle({
               const label = normalizeTag(tag);
               return (
                 <li key={label}>
-                  <Link href={`/log?tag=${encodeURIComponent(label)}`}>{label}</Link>
+                  <Link href={`/journal?tag=${encodeURIComponent(label)}`}>{label}</Link>
                 </li>
               );
             })}
@@ -47,7 +47,7 @@ function EntryArticle({
 
 export function Feed({
   groups,
-  empty = "No notes in the log yet.",
+  empty = "No notes in the journal yet.",
 }: {
   groups: DayGroup[];
   empty?: string;
@@ -70,7 +70,7 @@ export function Feed({
               {dayOfMonth(group.date)}
             </p>
             <h2 id={`day-${group.date}`} className="day-stamp">
-              <Link href={`/log/${group.date}`} className="day-link">
+              <Link href={`/journal/${group.date}`} className="day-link">
                 <time
                   dateTime={group.date}
                   className={groupIndex === 0 ? "is-newest" : undefined}

@@ -1,6 +1,6 @@
 # Seth Jenks
 
-Minimal chronological log on a near-white page. Product truth lives in `PRODUCT.md`. Visual language is locked in `DESIGN.md` (our brand, not an Impeccable sample theme). Media files live in `public/media/` and are referenced by `media.src`. `paperRef` is agents-only and is never rendered. There is no Paper iframe.
+Minimal chronological journal on a near-white page. Product truth lives in `PRODUCT.md`. Visual language is locked in `DESIGN.md` (our brand, not an Impeccable sample theme). Media files live in `public/media/` and are referenced by `media.src`. `paperRef` is agents-only and is never rendered. There is no Paper iframe.
 
 Impeccable is installed for this project (`npx impeccable detect`, skills under `.cursor/skills/impeccable`). Run `npx impeccable detect http://127.0.0.1:43127/` before calling a UI pass done.
 
@@ -8,7 +8,7 @@ Type: Geist Sans via `geist/font/sans` (UI, titles, body). Geist Mono via `geist
 
 The page is ground `#fafafa`, ink `#111111`, muted `#6b6b6b`. Paragraphs read in `#595959`. Whitespace separates days. A hairline shows up on the footer and on media. The header control is a pale blue glass cap with a navy label. No LED. No dark void, frosted panels, scanlines, CRT, or pixelated photos.
 
-Contact is two links only: X `https://twitter.com/sethjenks` and LinkedIn `https://www.linkedin.com/in/sethjenks`. No contact form.
+Contact is three links: X `https://twitter.com/sethjenks`, LinkedIn `https://www.linkedin.com/in/sethjenks`, and GitHub `https://github.com/sethjenks`. No contact form.
 
 Intended production domain later: **sethjenks.com**. DNS stays deferred. This repo does not configure live custom-domain records, and it does not emit a canonical host until that domain is live.
 
@@ -24,6 +24,18 @@ The app listens on [http://127.0.0.1:43127](http://127.0.0.1:43127). `npm instal
 ```bash
 pnpm build
 ```
+
+## ASCII Journal Studio
+
+Run the local-only Toolcraft workspace from the repo root:
+
+```bash
+pnpm studio
+```
+
+Open the printed local URL, then drop or paste an image into **Image**. To bring in a frame from Paper, export it as PNG, JPEG, GIF, SVG, or WebP into `studio/inbox/`, choose it under **Paper inbox**, and select **Load selected**. Use **Refresh list** after adding another file.
+
+Tune the character set, density, Cipher-like marks, field, motion, contrast, polarity, inks, frame, and ground in the live 2:1 plate. Paper stays the journal ground; extra inks remap remaining tones. Drag the plate or the center pin to reframe the source after zooming in. The default canvas is 672×336, matching the journal column (`42rem`) at half that height. The top timeline loops the field for 3 seconds. **Export PNG** follows the selected PNG/JPG format and 2K/4K/8K resolution. **Export Video** writes a timeline-length MP4 or WebM at Current or 4K. To attach the current treatment to an entry, choose the entry, pick **Assign as** (live plate by default, or looping video / still image), write meaningful alt text, and select **Assign to post**. A live plate writes `public/media/<entry-id>.png` plus `<entry-id>.plate.json`. The workspace and its write APIs exist only in the local Vite development server; they are not part of the public Next.js site.
 
 ## Add an entry
 
@@ -52,9 +64,9 @@ pnpm build
 - `date` must match the filename date (`YYYY-MM-DD`).
 - `summary` is curated copy, 1–2 sentences.
 - `tags` is optional. Prefer `Arcana`, `Philo`, or `personal`.
-- `media` is optional. `src` is required when present; `alt` is optional; `type` is `"image"` or `"video"`.
+- `media` is optional. `src` is required when present; `alt` is optional; `type` is `"image"`, `"video"`, or `"plate"`. Plate media also needs `plate` pointing at a `.plate.json` recipe.
 - `paperRef` is agents-only. The public page does not render it.
-- `hidden`, when `true`, keeps the file in the repo but drops it from the public feed, the log index, and day pages. Omit the field (or set it `false`) to publish. The public entry shape stays `id`, `date`, `title`, `summary`, optional `tags`, optional `media`.
+- `hidden`, when `true`, keeps the file in the repo but drops it from the public feed, the journal index, and day pages. Omit the field (or set it `false`) to publish. The public entry shape stays `id`, `date`, `title`, `summary`, optional `tags`, optional `media`.
 
 The site reads every `content/entries/*.json` file, drops hidden entries, sorts by date descending then `id`, and groups by day (newest day first). Cards render media, then title, then summary, then tags.
 

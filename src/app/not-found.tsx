@@ -6,7 +6,7 @@ export default function NotFound() {
       <h1>Nothing here.</h1>
       <nav aria-label="Recover">
         <Link href="/#work">Work</Link>
-        <Link href="/log">Log</Link>
+        <Link href="/journal">Journal</Link>
       </nav>
     </div>
   );

@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/studio/ascii/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -24,6 +25,8 @@
 .DS_Store
 *.pem
 /agent-tools
+/studio/inbox
+/studio/ascii/.toolcraft
 
 # debug
 npm-debug.log*

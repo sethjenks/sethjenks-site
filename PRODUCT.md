@@ -12,15 +12,15 @@ delegated: Next.js App Router, TypeScript, Tailwind, shadcn/ui — already scaff
 
 ## Users
 
-Seth Jenks, and anyone he points at a public daily log. They arrive to read short, curated notes about agentic work, studio, and life — not to operate a product or sign up.
+Seth Jenks, and anyone he points at a public daily journal. They arrive to read short, curated notes about agentic work, studio, and life — not to operate a product or sign up.
 
 ## Product Purpose
 
-Publish a chronological public log of curated agentic work. Success is a readable day-grouped feed with honest summaries and optional media, not a marketing site and not a dump of raw chats.
+Publish a chronological public journal of curated agentic work. Success is a readable day-grouped feed with honest summaries and optional media, not a marketing site and not a dump of raw chats.
 
 ## Positioning
 
-A personal visual log designed in code. The mechanism is file-based entries (`content/entries/YYYY-MM-DD-<slug>.json`) rendered as a reverse-chronological day-grouped feed. `paperRef` is never rendered.
+A personal visual journal designed in code. The mechanism is file-based entries (`content/entries/YYYY-MM-DD-<slug>.json`) rendered as a reverse-chronological day-grouped feed. `paperRef` is never rendered.
 
 ## Operating Context
 
@@ -30,9 +30,11 @@ Dates are America/Denver calendar days. Intended production domain is sethjenks.
 
 - Read all `content/entries/*.json`, sort by date descending then `id`, group by day.
 - Fields: `id`, `date`, `title`, `summary` (1–2 curated sentences), optional `tags`, optional `media`, optional `paperRef`, optional `hidden`.
+- `media.type` may be `image`, `video`, or `plate`. Plate media also has `media.plate` pointing at a `public/media/<id>.plate.json` recipe; the public page paints a live looping canvas from that recipe and keeps `media.src` as the still poster. Recipes may carry extra inks; the journal default remains one ink on paper.
 - `paperRef` is agents-only and is never rendered publicly.
 - `hidden: true` keeps the file but removes it from the public feed and day pages.
-- No auth, no database, no Paper iframe, no contact form. Contact is X and LinkedIn.
+- `studio/ascii` is local authoring tooling for producing and assigning journal media; it is not a public site capability or route.
+- No auth, no database, no Paper iframe, no contact form. Contact is X, LinkedIn, and GitHub.
 - Home feed plus one project page per `content/work.json` item at `/work/[id]`.
 - Work fields: `id`, `title`, `year`, `role` (the type), `src`, `width`, `height`, `summary` (1–2 sentences), `sections` (`heading` + short paragraphs), optional `tags`, optional `alt`.
 - Project pages are case studies: large title and lede, Year and Type, framed still, sections, next case, related work.
@@ -49,7 +51,7 @@ Binding visual lock (see DESIGN.md): near-white ground `#fafafa`, ink `#111111`,
 ## Product Principles
 
 1. Curate after the fact. Never paste raw chat.
-2. One job: read the log.
+2. One job: read the journal.
 3. Design in code; Paper exports media only.
 4. Hierarchy over chrome. The day and the note come first.
 5. Stop before live DNS until Origin ↔ Vercel exists.

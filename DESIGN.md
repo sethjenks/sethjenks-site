@@ -1,6 +1,6 @@
 ---
 name: Seth Jenks
-description: Light, sparse chronological log
+description: Light, sparse chronological journal
 colors:
   ground: "#fafafa"
   paper: "#ffffff"
@@ -63,7 +63,7 @@ components:
 
 **Creative North Star: "Open column"**
 
-A near-white chronological log. The page is mostly ground and type: generous space, a single reading column, machine day stamps, and almost no chrome. Hairlines appear only where a rule earns its place. The primary control is a pale blue glass cap — Paper material `blue rounded`, scaled to the header. Geist Pixel Square is a rare stamp, not a theme.
+A near-white chronological journal. The page is mostly ground and type: generous space, a single reading column, machine day stamps, and almost no chrome. Hairlines appear only where a rule earns its place. The primary control is a pale blue glass cap — Paper material `blue rounded`, scaled to the header. Geist Pixel Square is a rare stamp, not a theme.
 
 This supersedes the anodized night log. Glass is a light touch on the header control and on media edges. It is not the page.
 
@@ -106,12 +106,12 @@ Neutral field, near-black type, one muted gray. No chromatic signal.
 **Character:** Geometric and quiet. Pixel is a stamp, not a voice.
 
 ### Hierarchy
-- **Display** (500, `clamp(2rem, 4vw, 3rem)`, tracking `-0.03em`): the name on the home log. Geist Sans. On other routes the same word is a 16px/500 link back home.
+- **Display** (500, `clamp(2rem, 4vw, 3rem)`, tracking `-0.03em`): the name on the home journal. Geist Sans. On other routes the same word is a 16px/500 link back home.
 - **Study title** (500, clamp 2.75rem to 5.5rem): the project name on a case-study page only. Geist Sans. `text-wrap: balance`.
 - **Title** (500, 20px, line-height 1.3, tracking `-0.01em`): entry titles. Geist Sans.
 - **Body** (400, 16px / 1.6, `#595959`): intro and summaries. Geist Sans. Measure stays inside 42rem and near 65ch.
 - **Label** (Geist Mono, 12px minimum, tracking `0.08em`, `#6b6b6b`): tags, work type, footer. Day stamps stay 13px with `0.16em` tracking, format `2026.09.15`.
-- **Pixel** (Geist Pixel Square, 48px): the day-of-month numeral in the log rail. Never body. Never long titles.
+- **Pixel** (Geist Pixel Square, 48px): the day-of-month numeral in the journal rail. Never body. Never long titles.
 
 **The Pixel Budget Rule.** Pixel Square is a display accent. One use: the day numeral. If a sentence needs it, use Sans instead.
 
@@ -119,7 +119,7 @@ Neutral field, near-black type, one muted gray. No chromatic signal.
 
 ## Layout
 
-Single reading column (`max-width: 42rem`) for the intro, project list, people list, log, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card near the screen edge. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a framed still, then a 42rem reading measure for sections. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. The header is the name and the Log key. X and LinkedIn sit in the footer. There is no Work link. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
+Single reading column (`max-width: 42rem`) for the intro, project list, people list, journal, and footer. The header shares that left edge. Between the intro and the feed, work rows break the measure: horizontal, user-scrolled, first card near the screen edge. Each still links to `/work/[id]`. Project pages leave the column on purpose: a wide title and lede, a framed still, then a 42rem reading measure for sections. Gaps: 40px from a stamp to its entries, 64px between entries, 96px between days. Order inside an entry is fixed: media, title, summary, tags. No panels around the header or the day. The header is the name and the Journal key. X, LinkedIn, and GitHub sit on the left of the footer. The Arcana wordmark sits on the right and links to arcana.agency. There is no Work link. Reverse-chronological day groups. The newest stamp is ink; older stamps are muted. At 1024px and up the day stamp sits in a 160px sticky rail to the left of the column.
 
 ## Elevation & Depth
 
@@ -149,7 +149,7 @@ Pale blue glass-cap primary control, HTML/CSS only. One in the header.
 - **Primary:** ice-blue face, navy `#001A42` Geist Sans 600 label, tracking `-0.035em`.
 - **No well:** no LED socket, no cyan point light.
 - **Hover:** the cap saturates slightly; the under-shadow goes bluer and falls away from the cursor, which acts as a soft light on the glass. Fine pointer only.
-- **Use:** the header jump to the log. Not every text link.
+- **Use:** the header jump to the journal. Not every text link.
 
 ### Tags
 Geist Mono, 12px minimum, muted `#6b6b6b`. No fill, no border. Two tags is a note; a row of many is chip soup.
@@ -158,15 +158,15 @@ Geist Mono, 12px minimum, muted `#6b6b6b`. No fill, no border. Two tags is a not
 Day groups are sections of type, not cards. Entries inside are not nested cards. Media, when present, uses a hairline frame on paper.
 
 ### Media
-Full-bleed in the column, 1px hairline, paper well. The edge is the only elevation. Optional. `type` is `image` or `video`.
+Full-bleed in the column, 1px hairline, paper well, plus a 1px inset stroke of ink at 5% opacity on the image itself. The edge is the only elevation. Optional. `type` is `image` or `video`.
 
 ### Work rows
-Labeled horizontal rows of stills, between the intro and the log. One row per year. The newest year is first. Within a year, stills run left to right in display order.
+Labeled horizontal rows of stills, between the intro and the journal. One row per year. The newest year is first. Within a year, stills run left to right in display order.
 
 - **Track:** full viewport width (`100%`, not `100vw`). Leading and trailing padding are 24px, so the first card sits near the screen edge and cards can scroll off both edges. A short mask fades only that gutter.
-- **Tiles:** one 4:3 frame, `object-fit: cover`, 16px radius, 1px hairline, paper well.
+- **Tiles:** one 4:3 frame, `object-fit: cover`, 16px radius, 1px hairline, paper well. A 1px inset stroke, ink at 5% opacity, sits on the image. A phone UI still (about 9:16 or taller) is `object-fit: contain` on an off-white canvas (`#f0f0ee`) with 16px of inset, so the whole screen stays visible.
 - **Header:** a visible "Work" heading plus the year in mono, aligned to the left edge of the first still. Later years keep the year in that same column. No count. No pager.
-- **Logos:** one horizontal row under the work stills, same drag and scroll as the work track. Cards are 21rem wide. Same heading treatment: "Logos" plus the newest year in mono. Marks run newest first, left to right, in black on paper.
+- **Brands:** one horizontal row under the work stills, same drag and scroll as the work track. Cards are 21rem wide. Same heading treatment: "Brands" plus the newest year in mono. Marks run newest first, left to right, in black on paper.
 - **Motion:** drag, swipe, or arrow keys on the row. `touch-action: pan-x pan-y` so a vertical swipe still scrolls the page. No auto-advance. No prev/next buttons.
 - **Links:** each tile goes to `/work/[id]`.
 

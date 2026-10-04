@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import type { WorkBand, WorkItem } from "@/lib/work";
+import { isMobileScreen } from "@/lib/work-shape";
 
 const DRAG_THRESHOLD_PX = 8;
 
@@ -223,6 +224,8 @@ function WorkCard({
   priority: boolean;
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
+  const canvas = isMobileScreen(item);
+
   return (
     <Link
       href={`/work/${item.id}`}
@@ -230,7 +233,7 @@ function WorkCard({
       onClick={onClick}
       draggable={false}
     >
-      <span className="work-card-frame">
+      <span className="work-card-frame" data-canvas={canvas ? "phone" : undefined}>
         <Image
           src={item.src}
           alt=""
@@ -238,7 +241,7 @@ function WorkCard({
           sizes="(max-width: 767px) calc(100vw - 48px), 480px"
           priority={priority}
           className="work-card-image"
-          style={{ objectPosition: objectPositionFor(item.id) }}
+          style={{ objectPosition: canvas ? "center" : objectPositionFor(item.id) }}
           draggable={false}
         />
         <span className="work-card-verb">

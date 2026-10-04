@@ -1,16 +1,37 @@
 "use client";
 
-import { useCallback, useRef, type PointerEvent } from "react";
+import { useCallback, useRef, type MouseEvent, type PointerEvent } from "react";
+
+const DRAG_THRESHOLD_PX = 8;
 
 type KeyButtonProps = {
   href: string;
   children: string;
+  play?: boolean;
 };
 
-export function KeyButton({ href, children }: KeyButtonProps) {
+export function KeyButton({ href, children, play = false }: KeyButtonProps) {
   const ref = useRef<HTMLAnchorElement>(null);
+  const dragRef = useRef({ startX: 0, startY: 0, dragged: false, armed: false });
+
+  const onPointerDown = useCallback((event: PointerEvent<HTMLAnchorElement>) => {
+    dragRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      dragged: false,
+      armed: true,
+    };
+  }, []);
 
   const onPointerMove = useCallback((event: PointerEvent<HTMLAnchorElement>) => {
+    if (dragRef.current.armed) {
+      const dx = event.clientX - dragRef.current.startX;
+      const dy = event.clientY - dragRef.current.startY;
+      if (Math.hypot(dx, dy) > DRAG_THRESHOLD_PX) {
+        dragRef.current.dragged = true;
+      }
+    }
+
     if (event.pointerType !== "mouse" && event.pointerType !== "pen") {
       return;
     }
@@ -47,13 +68,23 @@ export function KeyButton({ href, children }: KeyButtonProps) {
     node.style.removeProperty("--key-shadow-y");
   }, []);
 
+  const onClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    if (dragRef.current.dragged) {
+      event.preventDefault();
+    }
+    dragRef.current.armed = false;
+  }, []);
+
   return (
     <a
       ref={ref}
       href={href}
       className="key-button"
+      data-play-button={play ? "" : undefined}
+      onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
+      onClick={onClick}
     >
       <span className="key-button-shadow" aria-hidden="true" />
       <span className="key-button-rim" aria-hidden="true" />

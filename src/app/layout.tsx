@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { SiteFooter } from "@/components/site-footer";
@@ -33,6 +34,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
     >
+      <head>
+        <Script src="/soft-matter/runtime.d631aa3ec6122788.js" strategy="beforeInteractive" />
+        <Script src="/soft-matter/effect.b9030f95b969b94d.js" strategy="beforeInteractive" />
+        <Script src="/soft-matter/head-skin.js?v=4" strategy="beforeInteractive" />
+        <Script src="/soft-matter/header-boot.js?v=play19" strategy="beforeInteractive" />
+      </head>
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <SiteHeader />
         <div className="flex flex-1 flex-col">{children}</div>

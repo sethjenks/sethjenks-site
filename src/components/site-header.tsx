@@ -1,26 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { KeyButton } from "@/components/key-button";
+import { SoftMatterMark } from "@/components/soft-matter-mark";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const home = pathname === "/";
-  const onLog = pathname === "/log" || pathname.startsWith("/log/");
-  const keyHref = home || onLog ? "#log" : "/#log";
+  const onJournal = pathname === "/journal" || pathname.startsWith("/journal/");
+  const keyHref = home || onJournal ? "#journal" : "/#journal";
 
   return (
     <header className="site-header">
       <div className="site-header-bar">
-        {home ? (
-          <h1 className="site-title">Seth Jenks</h1>
-        ) : (
-          <Link href="/" className="site-wordmark">
-            Seth Jenks
-          </Link>
-        )}
-        <KeyButton href={keyHref}>Log</KeyButton>
+        <SoftMatterMark home={home} />
+        <KeyButton href={keyHref} play={home}>
+          Journal
+        </KeyButton>
       </div>
     </header>
   );

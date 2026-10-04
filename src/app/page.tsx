@@ -1,4 +1,5 @@
 import { Feed } from "@/components/feed";
+import { HomePlayfield } from "@/components/home-playfield";
 import { LogoRows } from "@/components/logo-rows";
 import { PeopleList } from "@/components/people-list";
 import { ProjectList } from "@/components/project-list";
@@ -21,15 +22,12 @@ export default async function Home() {
 
   return (
     <div className="home-page flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-[42rem] px-6 pt-8 sm:px-8 sm:pt-10">
-        <p className="role-line">{ROLE_LINE}</p>
-        <p className="intro-copy">{INTRO_COPY}</p>
-      </div>
+      <HomePlayfield role={ROLE_LINE} intro={INTRO_COPY} />
       <WorkRows id="work" heading="Work" bands={groupWorkBands(work)} />
-      <LogoRows id="logos" heading="Logos" bands={groupLogoBands(logos)} />
+      <LogoRows id="logos" heading="Brands" bands={groupLogoBands(logos)} />
       <ProjectList items={projects} />
       <PeopleList items={people} />
-      <main id="log" className="log-main">
+      <main id="journal" className="log-main">
         <Feed groups={groups} />
       </main>
     </div>

@@ -8,11 +8,12 @@ const FILENAME_PATTERN = /^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.json$
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export type MediaType = "image" | "video";
+export type MediaType = "image" | "plate" | "video";
 
 export type EntryMedia = {
   src: string;
   alt?: string;
+  plate?: string;
   type?: MediaType;
 };
 
@@ -49,7 +50,7 @@ function parseMedia(raw: unknown, filename: string): EntryMedia | undefined {
     throw new Error(`Entry "${filename}" media must be an object.`);
   }
 
-  const { src, alt, type } = raw;
+  const { src, alt, plate, type } = raw;
 
   if (typeof src !== "string" || src.trim().length === 0) {
     throw new Error(`Entry "${filename}" media.src is required.`);
@@ -59,15 +60,29 @@ function parseMedia(raw: unknown, filename: string): EntryMedia | undefined {
     throw new Error(`Entry "${filename}" media.alt must be a string.`);
   }
 
-  if (type !== undefined && type !== "image" && type !== "video") {
+  if (
+    type !== undefined &&
+    type !== "image" &&
+    type !== "video" &&
+    type !== "plate"
+  ) {
     throw new Error(
-      `Entry "${filename}" media.type must be "image" or "video".`,
+      `Entry "${filename}" media.type must be "image", "video", or "plate".`,
     );
+  }
+
+  if (plate !== undefined && typeof plate !== "string") {
+    throw new Error(`Entry "${filename}" media.plate must be a string.`);
+  }
+
+  if (type === "plate" && (typeof plate !== "string" || plate.trim().length === 0)) {
+    throw new Error(`Entry "${filename}" plate media requires media.plate.`);
   }
 
   return {
     src: src.trim(),
     ...(alt ? { alt: alt.trim() } : {}),
+    ...(plate ? { plate: plate.trim() } : {}),
     ...(type ? { type } : {}),
   };
 }
