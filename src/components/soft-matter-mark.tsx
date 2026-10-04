@@ -33,6 +33,7 @@ type InspolaPayload = {
       reflections?: number;
       ior?: number;
       gravity?: number;
+      damping?: number;
       firmness?: number;
       shape?: string;
       shapeThickness?: number;
