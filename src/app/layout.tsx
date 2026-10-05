@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { geistPixelSquare } from "@/lib/pixel-font";
+import { timelessSans } from "@/lib/timeless-sans";
 import { INTRO } from "@/lib/intro";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
+      className={`${timelessSans.variable} ${GeistSans.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
     >
       <head>
         <script
@@ -45,7 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script src="/soft-matter/runtime.d631aa3ec6122788.js" strategy="beforeInteractive" />
         <Script src="/soft-matter/effect.b9030f95b969b94d.js" strategy="beforeInteractive" />
         <Script src="/soft-matter/head-skin.js?v=4" strategy="beforeInteractive" />
-        <Script src="/soft-matter/header-boot.js?v=play21" strategy="beforeInteractive" />
+        <Script src="/soft-matter/header-boot.js?v=play22" strategy="beforeInteractive" />
       </head>
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <SiteHeader />

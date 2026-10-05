@@ -544,6 +544,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           homeAnimRef.current = null;
           homingRef.current = false;
           grabbedAt = 0;
+          window.__headerTouchOff = false;
           window.__headerHoming = false;
           window.__headerHomeT = 0;
           window.__headerHomeFrom = null;
@@ -713,6 +714,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       );
 
       if (struck) {
+        window.__headerTouchOff = true;
         lastMotionRef.current = now;
         const grabStillOpen = grabbedAt > 0 && now - grabbedAt < GRAB_HOME_MS;
         if (grabStillOpen || grabbedAt === 0) {
@@ -751,6 +753,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       window.__headerEnterShift = 0;
       window.__headerEntering = false;
       window.__headerHoming = false;
+      window.__headerTouchOff = false;
       armedRef.current = false;
       button?.removeEventListener("pointerdown", onButtonDown);
       window.removeEventListener("pointermove", onButtonMove);

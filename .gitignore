@@ -46,3 +46,6 @@ next-env.d.ts
 
 # impeccable
 .impeccable/config.local.json
+
+# Timeless Free Font License 1.2 allows embedding, not a public font repo.
+/src/fonts/*.woff2

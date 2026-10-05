@@ -502,5 +502,7 @@ declare global {
     __headerHomeFrom?: ArrayLike<number> | null;
     __headerSoftBody?: SoftBodyLift;
     __headerSoftHandle?: HeaderSoftHandle;
+    __headerTouchOff?: boolean;
+    __headerGrabKind?: string;
   }
 }

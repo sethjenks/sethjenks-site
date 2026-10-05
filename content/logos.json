@@ -14,6 +14,34 @@
     "alt": "Faultline logomark"
   },
   {
+    "id": "skinner-brothers",
+    "name": "Skinner Brothers",
+    "year": "2026",
+    "src": "/media/logos/skinner-brothers.png",
+    "alt": "Skinner Brothers crown"
+  },
+  {
+    "id": "level",
+    "name": "Level",
+    "year": "2026",
+    "src": "/media/logos/level.png",
+    "alt": "Level logomark"
+  },
+  {
+    "id": "embarc",
+    "name": "Embarc",
+    "year": "2026",
+    "src": "/media/logos/embarc.png",
+    "alt": "Embarc logomark"
+  },
+  {
+    "id": "sam-sulek",
+    "name": "Sam Sulek",
+    "year": "2026",
+    "src": "/media/logos/sam-sulek.png",
+    "alt": "Sam Sulek badge"
+  },
+  {
     "id": "awesom",
     "name": "Awesom",
     "year": "2025",
