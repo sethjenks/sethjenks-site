@@ -28,11 +28,29 @@ export function LogoRows({ bands, heading = "Brands", id = "logos" }: LogoRowsPr
         <h2 id={headingId} className="work-section-title">
           {heading}
         </h2>
-        <span className="work-count">{bands[0]?.label}</span>
+        <span className="work-count">{spanLabel(items)}</span>
       </div>
       <LogoTrack items={items} label={heading} />
     </section>
   );
+}
+
+function spanLabel(items: LogoItem[]): string {
+  const years = items
+    .map((item) => {
+      const match = item.year.match(/\d{4}/);
+      return match ? Number(match[0]) : Number.NaN;
+    })
+    .filter((year) => Number.isFinite(year));
+
+  if (years.length === 0) {
+    return "";
+  }
+
+  const newest = Math.max(...years);
+  const oldest = Math.min(...years);
+
+  return oldest === newest ? String(newest) : `${oldest}–${newest}`;
 }
 
 function LogoTrack({ items, label }: { items: LogoItem[]; label: string }) {

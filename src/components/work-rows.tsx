@@ -41,36 +41,44 @@ type WorkRowsProps = {
 
 export function WorkRows({ bands, heading = "Work", id = "work" }: WorkRowsProps) {
   const headingId = `${id}-heading`;
-  const total = bands.reduce((count, band) => count + band.items.length, 0);
+  const items = bands.flatMap((band) => band.items);
 
-  if (total === 0) {
+  if (items.length === 0) {
     return null;
   }
 
   return (
     <section id={id} className="work-section" aria-labelledby={headingId}>
-      {bands.map((band, index) => (
-        <div key={band.id} className="work-band">
-          <div className="work-section-head">
-            {index === 0 ? (
-              <h2 id={headingId} className="work-section-title">
-                {heading}
-              </h2>
-            ) : (
-              <span className="work-section-title work-section-title-spacer" aria-hidden="true">
-                {heading}
-              </span>
-            )}
-            <span className="work-count">{band.label}</span>
-          </div>
-          <WorkTrack band={band} />
-        </div>
-      ))}
+      <div className="work-section-head">
+        <h2 id={headingId} className="work-section-title">
+          {heading}
+        </h2>
+        <span className="work-count">{spanLabel(items)}</span>
+      </div>
+      <WorkTrack items={items} label={heading} />
     </section>
   );
 }
 
-function WorkTrack({ band }: { band: WorkBand }) {
+function spanLabel(items: WorkItem[]): string {
+  const years = items
+    .map((item) => {
+      const match = item.year.match(/\d{4}/);
+      return match ? Number(match[0]) : Number.NaN;
+    })
+    .filter((year) => Number.isFinite(year));
+
+  if (years.length === 0) {
+    return "";
+  }
+
+  const newest = Math.max(...years);
+  const oldest = Math.min(...years);
+
+  return oldest === newest ? String(newest) : `${oldest}–${newest}`;
+}
+
+function WorkTrack({ items, label }: { items: WorkItem[]; label: string }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     pointerId: number;
@@ -198,7 +206,7 @@ function WorkTrack({ band }: { band: WorkBand }) {
         ref={scrollerRef}
         className="work-track"
         role="region"
-        aria-label={band.label}
+        aria-label={label}
         tabIndex={0}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -206,7 +214,7 @@ function WorkTrack({ band }: { band: WorkBand }) {
         onPointerCancel={endDrag}
         onKeyDown={onKeyDown}
       >
-        {band.items.map((item, index) => (
+        {items.map((item, index) => (
           <WorkCard
             key={item.id}
             item={item}

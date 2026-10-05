@@ -21,7 +21,7 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="home-page flex flex-1 flex-col">
+    <div className="home-page flex min-w-0 flex-1 flex-col">
       <HomePlayfield
         name={INTRO.name}
         role={INTRO.role}

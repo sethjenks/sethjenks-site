@@ -13,6 +13,7 @@ import {
   HOME_ENTER_SHIFT,
   HOME_RETURN_MS,
   pinSoftBodyRest,
+  PLAY_HOME_MS,
   snapshotSoftBody,
   syncSoftBody,
 } from "@/lib/header-play";
@@ -39,7 +40,7 @@ import {
 } from "@/lib/play-voice";
 
 // const IDLE_MS = PLAY_HOME_MS;
-const GRAB_HOME_MS = 5_000;
+const GRAB_HOME_MS = PLAY_HOME_MS;
 const VOICE_SCRAMBLE_S = 0.9;
 const SCRAMBLE_EASE = [0.32, 0.72, 0, 1] as const;
 const TEXT_MS = 0.38;

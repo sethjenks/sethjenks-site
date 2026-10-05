@@ -5,7 +5,7 @@ export const COMPACT_CAM_LIFT = 1.2;
 export const COMPACT_CAM_Z = 3.45;
 export const COMPACT_LOOK_Y = 1.05;
 export const COMPACT_HOME_MS = 5000;
-export const PLAY_HOME_MS = 5000;
+export const PLAY_HOME_MS = 8000;
 export const HOME_RETURN_MS = 2000;
 export const HEAD_REST_Y = 1.2;
 export const HEAD_TOP_OFFSET = 1.2;
@@ -17,6 +17,19 @@ export const HOME_EASE_IN = [0.895, 0.03, 0.685, 0.22] as const;
 const HOME_FOV = 10;
 const VERTICAL_FOV = (HOME_FOV * Math.PI) / 180;
 const FLOOR_INSET_PX = 20;
+const PHONE_HEAD_SCALE = 2;
+const PHONE_HEAD_ROOM_PX = 28;
+
+function phoneHeadBlend(width: number) {
+  const viewport = Math.min(width, window.innerWidth || width);
+  if (viewport >= 720) {
+    return 0;
+  }
+  if (viewport <= 480) {
+    return 1;
+  }
+  return (720 - viewport) / 240;
+}
 
 export type HeaderPlayConfig = {
   yMin: number;
@@ -91,9 +104,13 @@ export function headerPlayForHeight(
 }
 
 function homeHeadPixels(width: number, textTop: number) {
-  const fromText = Math.max(36, textTop - HEAD_TOP_INSET_PX - HEAD_TEXT_GAP_PX);
+  const blend = phoneHeadBlend(width);
+  const fromText = Math.max(
+    36,
+    textTop - HEAD_TOP_INSET_PX - HEAD_TEXT_GAP_PX + PHONE_HEAD_ROOM_PX * blend,
+  );
   const fromWidth = width < 480 ? 48 : width < 720 ? 60 : width < 960 ? 72 : 88;
-  return Math.min(fromText, fromWidth);
+  return Math.min(fromText, fromWidth * (1 + (PHONE_HEAD_SCALE - 1) * blend));
 }
 
 export function applyHeaderPlay(play: HeaderPlayConfig) {
@@ -362,7 +379,8 @@ function fitHeadAboveText(
     return;
   }
 
-  const limit = play.textTop - HEAD_TEXT_GAP_PX - canvasTop;
+  const limit =
+    play.textTop - HEAD_TEXT_GAP_PX - canvasTop + PHONE_HEAD_ROOM_PX * phoneHeadBlend(width);
   if (limit <= HEAD_TOP_INSET_PX + 24) {
     return;
   }

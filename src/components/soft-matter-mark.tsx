@@ -113,8 +113,9 @@ function loadSoftMatter() {
 function flattenPlayfield(compiled: string) {
   const yMax = "window.__headerPlay&&window.__headerPlay.yMax||3.6";
   const yMin = "window.__headerPlay&&window.__headerPlay.yMin||.08";
-  const homeMs = "window.__headerPlay&&window.__headerPlay.homeMs||5e3";
+  const homeMs = "window.__headerPlay&&window.__headerPlay.homeMs||8e3";
   return compiled
+    .replaceAll('e.canvas.style.touchAction="none"', 'e.canvas.style.touchAction="pan-y"')
     .replaceAll(
       "x:Math.max(-3.2,Math.min(3.2,s.x)),y:Math.max(.1,Math.min(4.1,s.y)),z:Math.max(-2.4,Math.min(2.4,s.z))",
       `x:Math.max(-6,Math.min(52,s.x)),y:Math.max(${yMin},Math.min(${yMax},s.y)),z:Math.max(-1.6,Math.min(1.6,s.z))`,
@@ -211,7 +212,7 @@ function stageHost(stage: HTMLElement) {
   if (!host) {
     const style = document.createElement("style");
     style.textContent =
-      ":host{display:block;width:100%;height:100%}[data-stage-host]{position:absolute;inset:0}canvas{display:block;width:100%;height:100%;background:transparent;touch-action:none}";
+      ":host{display:block;width:100%;height:100%}[data-stage-host]{position:absolute;inset:0}canvas{display:block;width:100%;height:100%;background:transparent;touch-action:pan-y}";
     host = document.createElement("div");
     host.dataset.stageHost = "";
     root.append(style, host);
@@ -258,7 +259,9 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
       return;
     }
 
-    if (stageCanvas(stage)) {
+    const existing = stageCanvas(stage);
+    if (existing) {
+      existing.style.touchAction = "pan-y";
       setReady(true);
       return;
     }
@@ -310,6 +313,7 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
 
         handle = mounted;
         window.__headerSoftHandle = mounted;
+        stageCanvas(stage)?.style.setProperty("touch-action", "pan-y");
         if (mounted.ctx?.scene) {
           hideStageFurniture(mounted.ctx.scene);
         }
