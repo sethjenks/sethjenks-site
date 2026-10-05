@@ -95,7 +95,6 @@ type VoiceFlyer = {
 };
 
 type VoiceFlight = {
-  category: string;
   phrase: string;
   line: HTMLElement;
   visual: HTMLElement;
@@ -556,7 +555,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           run.phase = "hold";
           run.holdTimer = window.setTimeout(() => {
             startScramble(generation);
-          }, voiceHoldMs({ category: "", text: run.flight.phrase }));
+          }, voiceHoldMs({ text: run.flight.phrase }));
         },
       });
       homeAnimRef.current = homeAnim;
@@ -1040,7 +1039,6 @@ function beginRoleVoice(
   const fromHeight = Math.ceil(Number.parseFloat(line.style.minHeight) || line.getBoundingClientRect().height);
   const toHeight = Math.ceil(measure.getBoundingClientRect().height);
   return {
-    category: message.category,
     phrase: message.text,
     line,
     visual,

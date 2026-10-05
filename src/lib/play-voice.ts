@@ -1,7 +1,6 @@
 import voiceFile from "../../content/voice.json";
 
 export type VoiceMessage = {
-  category: string;
   text: string;
 };
 
@@ -19,7 +18,7 @@ const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export const VOICE_MESSAGES = parseVoiceMessages(voiceFile);
 
 export function voiceHoldMs(message: VoiceMessage): number {
-  const words = countWords(message.category) + countWords(message.text);
+  const words = countWords(message.text);
   return Math.min(HOLD_MAX_MS, Math.max(HOLD_MIN_MS, words * HOLD_PER_WORD_MS));
 }
 
@@ -118,15 +117,12 @@ function parseVoiceMessages(value: unknown): VoiceMessage[] {
       throw new Error(`content/voice.json[${index}] must be an object.`);
     }
 
-    const { category, text } = item;
-    if (typeof category !== "string" || category.trim().length === 0) {
-      throw new Error(`content/voice.json[${index}].category must be a non-empty string.`);
-    }
+    const { text } = item;
     if (typeof text !== "string" || text.trim().length === 0) {
       throw new Error(`content/voice.json[${index}].text must be a non-empty string.`);
     }
 
-    return { category: category.trim(), text: text.trim() };
+    return { text: text.trim() };
   });
 }
 
@@ -143,7 +139,7 @@ function countWords(text: string): number {
 }
 
 function sameMessage(a: VoiceMessage, b: VoiceMessage): boolean {
-  return a.category === b.category && a.text === b.text;
+  return a.text === b.text;
 }
 
 function shuffle(messages: readonly VoiceMessage[]): VoiceMessage[] {

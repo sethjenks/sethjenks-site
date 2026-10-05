@@ -1235,10 +1235,6 @@
     visibility: visible;
   }
 
-  .play-voice-label {
-    color: var(--quiet);
-  }
-
   .playfield-end {
     height: 0;
   }
