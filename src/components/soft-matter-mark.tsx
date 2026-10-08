@@ -7,7 +7,9 @@ import {
   applyHeaderPlay,
   compactHeaderPlay,
   COMPACT_HOME_MS,
+  headScreenBounds,
   PLAY_HOME_MS,
+  screenToGrabPlane,
   syncSoftBody,
   type HeaderSoftHandle,
 } from "@/lib/header-play";
@@ -145,14 +147,6 @@ function flattenPlayfield(compiled: string) {
       "grab(s){this.homeAt=0,this.spinUntil=0,this.spinStart=0,this.homeFrom=null,this.grabNodes=[],this.moveGrab(s);",
     )
     .replaceAll(
-      'if(a.button!==0||k!==null||W||e.pointer.enabled===!1)return;te(a),u.updateMatrixWorld();const t=I.intersectObject(u,!1)[0];t&&(k=a.pointerId,',
-      'if(a.button!==0||k!==null||W||e.pointer.enabled===!1||window.__headerTouchOff&&a.pointerType==="touch")return;te(a),u.updateMatrixWorld();const t=I.intersectObject(u,!1)[0];t&&(window.__headerGrabKind=a.pointerType,k=a.pointerId,',
-    )
-    .replaceAll(
-      "a.pointer.enabled===!1&&r.grabbing&&D()",
-      '(a.pointer.enabled===!1||window.__headerTouchOff&&window.__headerGrabKind==="touch")&&r.grabbing&&D()',
-    )
-    .replaceAll(
       "release(){this.grabNodes=[]}",
       `release(){const g=this.grabNodes.length;this.grabNodes=[];if(g)this.homeAt=performance.now()+(${homeMs})}`,
     )
@@ -250,9 +244,18 @@ type SoftMatterMarkProps = {
   home: boolean;
 };
 
+const GRAB_SLOP_PX = 16;
+
+type GrabHold = {
+  id: number;
+  plane: { x: number; y: number; z: number };
+};
+
 export function SoftMatterMark({ home }: SoftMatterMarkProps) {
   const router = useRouter();
   const stageRef = useRef<HTMLDivElement>(null);
+  const grabPadRef = useRef<HTMLDivElement>(null);
+  const holdRef = useRef<GrabHold | null>(null);
   const dragRef = useRef({ startX: 0, startY: 0, dragged: false });
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -350,6 +353,99 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
     }
   }, [home]);
 
+  useEffect(() => {
+    const pad = grabPadRef.current;
+    if (!pad) {
+      return;
+    }
+
+    const claimTouch = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+    pad.addEventListener("touchmove", claimTouch, { passive: false });
+
+    const place = () => {
+      const mark = pad.parentElement;
+      if (!mark) {
+        return;
+      }
+
+      const bounds = headScreenBounds(mark.getBoundingClientRect());
+      const root = document.documentElement;
+      if (bounds?.grabbing || holdRef.current) {
+        if (holdRef.current) {
+          root.dataset.headerGrab = "touch";
+        } else if (root.dataset.headerGrab !== "touch") {
+          root.dataset.headerGrab = "";
+        }
+      } else if (root.dataset.headerGrab !== "touch") {
+        delete root.dataset.headerGrab;
+      }
+
+      if (bounds) {
+        const rx = Math.max(32, bounds.rx + GRAB_SLOP_PX);
+        const ry = Math.max(32, bounds.ry + GRAB_SLOP_PX);
+        pad.style.left = `${bounds.x - rx}px`;
+        pad.style.top = `${bounds.y - ry}px`;
+        pad.style.width = `${rx * 2}px`;
+        pad.style.height = `${ry * 2}px`;
+      } else if (!holdRef.current) {
+        pad.style.width = "0px";
+        pad.style.height = "0px";
+      }
+    };
+
+    let frame = requestAnimationFrame(function tick() {
+      place();
+      frame = requestAnimationFrame(tick);
+    });
+
+    const onMove = (event: globalThis.PointerEvent) => {
+      const hold = holdRef.current;
+      if (!hold || event.pointerId !== hold.id) {
+        return;
+      }
+
+      const point = screenToGrabPlane(event.clientX, event.clientY, hold.plane);
+      if (!point) {
+        return;
+      }
+
+      window.__headerSoftBody?.moveGrab?.(point);
+    };
+
+    const onUp = (event: globalThis.PointerEvent) => {
+      const hold = holdRef.current;
+      if (!hold || event.pointerId !== hold.id) {
+        return;
+      }
+
+      holdRef.current = null;
+      window.__headerSoftBody?.release?.();
+      if (document.documentElement.dataset.headerGrab === "touch") {
+        delete document.documentElement.dataset.headerGrab;
+      }
+      if (pad.hasPointerCapture(event.pointerId)) {
+        pad.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      pad.removeEventListener("touchmove", claimTouch);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      if (document.documentElement.dataset.headerGrab === "touch") {
+        delete document.documentElement.dataset.headerGrab;
+      }
+    };
+  }, []);
+
   const onPointerDown = (event: PointerEvent<HTMLElement>) => {
     dragRef.current = {
       startX: event.clientX,
@@ -377,6 +473,39 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
     }
   };
 
+  const onGrabDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    const body = window.__headerSoftBody;
+    const mark = event.currentTarget.parentElement;
+    if (!body?.grab || !mark) {
+      return;
+    }
+
+    const bounds = headScreenBounds(mark.getBoundingClientRect());
+    const center = bounds?.center;
+    if (!center) {
+      return;
+    }
+
+    const plane = { x: center.x, y: center.y, z: center.z };
+    const point = screenToGrabPlane(event.clientX, event.clientY, plane) ?? plane;
+    if (event.pointerType !== "mouse") {
+      event.preventDefault();
+    }
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Window listeners keep following the finger when capture is unavailable.
+    }
+    body.grab(point);
+    holdRef.current = { id: event.pointerId, plane };
+    document.documentElement.dataset.headerGrab = "touch";
+    window.getSelection()?.removeAllRanges();
+  };
+
   return (
     <span
       className="site-mark"
@@ -393,6 +522,12 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
         </Link>
       )}
       <div ref={stageRef} className="soft-matter-stage" aria-hidden="true" />
+      <div
+        ref={grabPadRef}
+        className="head-grab"
+        aria-hidden="true"
+        onPointerDown={onGrabDown}
+      />
     </span>
   );
 }

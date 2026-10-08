@@ -49,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script src="/soft-matter/runtime.d631aa3ec6122788.js" strategy="beforeInteractive" />
         <Script src="/soft-matter/effect.b9030f95b969b94d.js" strategy="beforeInteractive" />
         <Script src="/soft-matter/head-skin.js?v=4" strategy="beforeInteractive" />
-        <Script src="/soft-matter/header-boot.js?v=play22" strategy="beforeInteractive" />
+        <Script src="/soft-matter/header-boot.js?v=play23" strategy="beforeInteractive" />
       </head>
       <body className="flex min-h-svh flex-col bg-background font-sans text-foreground">
         <SiteHeader />

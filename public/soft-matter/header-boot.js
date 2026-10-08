@@ -41,14 +41,6 @@
         "grab(s){this.homeAt=0,this.spinUntil=0,this.spinStart=0,this.homeFrom=null,this.grabNodes=[],this.moveGrab(s);",
       )
       .replaceAll(
-        'if(a.button!==0||k!==null||W||e.pointer.enabled===!1)return;te(a),u.updateMatrixWorld();const t=I.intersectObject(u,!1)[0];t&&(k=a.pointerId,',
-        'if(a.button!==0||k!==null||W||e.pointer.enabled===!1||window.__headerTouchOff&&a.pointerType==="touch")return;te(a),u.updateMatrixWorld();const t=I.intersectObject(u,!1)[0];t&&(window.__headerGrabKind=a.pointerType,k=a.pointerId,',
-      )
-      .replaceAll(
-        "a.pointer.enabled===!1&&r.grabbing&&D()",
-        '(a.pointer.enabled===!1||window.__headerTouchOff&&window.__headerGrabKind==="touch")&&r.grabbing&&D()',
-      )
-      .replaceAll(
         "release(){this.grabNodes=[]}",
         `release(){const g=this.grabNodes.length;this.grabNodes=[];if(g)this.homeAt=performance.now()+(${homeMs})}`,
       )

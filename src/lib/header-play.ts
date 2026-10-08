@@ -55,6 +55,10 @@ export type SoftBodyLift = {
   spinStart?: number;
   velocities?: Float64Array | number[];
   grabNodes?: unknown[];
+  grabbing?: boolean;
+  grab?: (point: { x: number; y: number; z: number }) => void;
+  moveGrab?: (point: { x: number; y: number; z: number }) => void;
+  release?: () => void;
   __playLift?: number;
 };
 
@@ -438,14 +442,30 @@ export type HeaderSoftMatter = {
 export type HeaderProjectCamera = HeaderCamera & {
   position: HeaderCamera["position"] & {
     clone: () => HeaderProjectVector;
+    x: number;
+    y: number;
+    z: number;
   };
+  getWorldDirection?: (target: HeaderProjectVector) => HeaderProjectVector;
 };
 
 export type HeaderProjectVector = {
   set: (x: number, y: number, z: number) => HeaderProjectVector;
   project: (camera: HeaderProjectCamera) => HeaderProjectVector;
+  unproject?: (camera: HeaderProjectCamera) => HeaderProjectVector;
+  clone?: () => HeaderProjectVector;
   x: number;
   y: number;
+  z: number;
+};
+
+export type HeadScreenBounds = {
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  grabbing: boolean;
+  center: { x: number; y: number; z: number };
 };
 
 declare global {
@@ -458,7 +478,120 @@ declare global {
     __headerHomeFrom?: ArrayLike<number> | null;
     __headerSoftBody?: SoftBodyLift;
     __headerSoftHandle?: HeaderSoftHandle;
-    __headerTouchOff?: boolean;
-    __headerGrabKind?: string;
   }
+}
+
+export function headScreenBounds(origin: DOMRect): HeadScreenBounds | null {
+  const handle = window.__headerSoftHandle;
+  const camera = handle?.ctx?.camera;
+  const canvas = headerStageCanvas(handle);
+  if (!handle?.ctx?.scene || !camera || !canvas) {
+    return null;
+  }
+
+  let matter: HeaderSoftMatter | undefined;
+  handle.ctx.scene.traverse((object) => {
+    if (object.userData?.softMatter) {
+      matter = object.userData.softMatter;
+    }
+  });
+
+  const center = matter?.center;
+  if (!center) {
+    return null;
+  }
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const projected = projectHeaderPoint(camera, center, canvasRect);
+  if (!projected) {
+    return null;
+  }
+
+  const edgeX = projectHeaderPoint(
+    camera,
+    { x: center.x + 1.2, y: center.y, z: center.z },
+    canvasRect,
+  );
+  const edgeY = projectHeaderPoint(
+    camera,
+    { x: center.x, y: center.y + 1.2, z: center.z },
+    canvasRect,
+  );
+
+  return {
+    x: projected.x - origin.left,
+    y: projected.y - origin.top,
+    rx: edgeX ? Math.max(18, Math.abs(edgeX.x - projected.x)) : 28,
+    ry: edgeY ? Math.max(18, Math.abs(edgeY.y - projected.y)) : 28,
+    grabbing: Boolean(matter?.grabbing || handle.ctx.pointer?.down),
+    center,
+  };
+}
+
+export function screenToGrabPlane(
+  clientX: number,
+  clientY: number,
+  plane: { x: number; y: number; z: number },
+) {
+  const handle = window.__headerSoftHandle;
+  const camera = handle?.ctx?.camera;
+  const canvas = headerStageCanvas(handle);
+  const rect = canvas?.getBoundingClientRect();
+  const origin = camera?.position;
+  if (!camera || !origin?.clone || !rect?.width || !rect.height) {
+    return null;
+  }
+
+  const ray = origin.clone();
+  const unproject = ray.unproject;
+  if (!unproject) {
+    return null;
+  }
+
+  camera.updateMatrixWorld?.();
+  const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+  const ndcY = -((clientY - rect.top) / rect.height) * 2 + 1;
+  const camX = origin.x;
+  const camY = origin.y;
+  const camZ = origin.z;
+  ray.set(ndcX, ndcY, 0.5);
+  unproject.call(ray, camera);
+
+  const dx = ray.x - camX;
+  const dy = ray.y - camY;
+  const dz = ray.z - camZ;
+  const normal = camera.getWorldDirection?.(origin.clone()) ?? { x: 0, y: 0, z: -1 };
+  const denom = dx * normal.x + dy * normal.y + dz * normal.z;
+  if (!Number.isFinite(denom) || Math.abs(denom) < 1e-5) {
+    return null;
+  }
+
+  const t =
+    ((plane.x - camX) * normal.x + (plane.y - camY) * normal.y + (plane.z - camZ) * normal.z) /
+    denom;
+  if (!Number.isFinite(t)) {
+    return null;
+  }
+
+  return {
+    x: camX + dx * t,
+    y: camY + dy * t,
+    z: camZ + dz * t,
+  };
+}
+
+function projectHeaderPoint(
+  camera: HeaderProjectCamera,
+  point: { x: number; y: number; z: number },
+  canvas: DOMRect,
+) {
+  const vector = camera.position.clone().set(point.x, point.y, point.z).project(camera);
+  if (!Number.isFinite(vector.x) || !Number.isFinite(vector.y)) {
+    return null;
+  }
+
+  return {
+    x: (vector.x * 0.5 + 0.5) * canvas.width + canvas.left,
+    y: (-vector.y * 0.5 + 0.5) * canvas.height + canvas.top,
+  };
 }

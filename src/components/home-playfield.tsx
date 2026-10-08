@@ -8,6 +8,7 @@ import {
   compactHeaderPlay,
   COMPACT_HEADER_PX,
   headerPlayForHeight,
+  headScreenBounds,
   headerStageCanvas,
   HOME_EASE_IN,
   HOME_ENTER_SHIFT,
@@ -583,7 +584,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           homeAnimRef.current = null;
           homingRef.current = false;
           grabbedAt = 0;
-          window.__headerTouchOff = false;
           window.__headerHoming = false;
           window.__headerHomeT = 0;
           window.__headerHomeFrom = null;
@@ -757,7 +757,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       const { struck } = stepPlayfield(playBodies, dt, bounds, bustCollider, suspendPhysics);
 
       if (struck) {
-        window.__headerTouchOff = true;
         const grabStillOpen = grabbedAt > 0 && now - grabbedAt < GRAB_HOME_MS;
         if (grabStillOpen || grabbedAt === 0) {
           stopHome(voiceRef.current?.phase === "flight");
@@ -795,7 +794,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       window.__headerEnterShift = 0;
       window.__headerEntering = false;
       window.__headerHoming = false;
-      window.__headerTouchOff = false;
       armedRef.current = false;
       button?.removeEventListener("pointerdown", onButtonDown);
       window.removeEventListener("pointermove", onButtonMove);
@@ -1284,62 +1282,17 @@ function restFromNode(node: HTMLElement, origin: DOMRect): PlayRest {
 }
 
 function readBust(origin: DOMRect): BustCollider | null {
-  const handle = window.__headerSoftHandle;
-  const camera = handle?.ctx?.camera;
-  const canvas = headerStageCanvas(handle);
-  if (!handle?.ctx?.scene || !camera || !canvas) {
-    return null;
-  }
-
-  let matter: { center?: { x: number; y: number; z: number }; grabbing?: boolean } | undefined;
-  handle.ctx.scene.traverse((object) => {
-    if (object.userData?.softMatter) {
-      matter = object.userData.softMatter;
-    }
-  });
-
-  const center = matter?.center;
-  if (!center) {
-    return null;
-  }
-
-  const canvasRect = canvas.getBoundingClientRect();
-  const projected = projectWorld(camera, center, canvasRect);
-  if (!projected) {
-    return null;
-  }
-
-  const edgeX = projectWorld(camera, { x: center.x + 1.2, y: center.y, z: center.z }, canvasRect);
-  const edgeY = projectWorld(camera, { x: center.x, y: center.y + 1.2, z: center.z }, canvasRect);
-  const rx = edgeX ? Math.max(18, Math.abs(edgeX.x - projected.x)) : 28;
-  const ry = edgeY ? Math.max(18, Math.abs(edgeY.y - projected.y)) : 28;
-
-  return {
-    x: projected.x - origin.left,
-    y: projected.y - origin.top,
-    rx,
-    ry,
-    grabbing: Boolean(matter?.grabbing || handle.ctx.pointer?.down),
-  };
-}
-
-function projectWorld(
-  camera: NonNullable<NonNullable<typeof window.__headerSoftHandle>["ctx"]>["camera"],
-  point: { x: number; y: number; z: number },
-  canvas: DOMRect,
-) {
-  if (!camera) {
-    return null;
-  }
-
-  const vector = camera.position.clone().set(point.x, point.y, point.z).project(camera);
-  if (!Number.isFinite(vector.x) || !Number.isFinite(vector.y)) {
+  const bounds = headScreenBounds(origin);
+  if (!bounds) {
     return null;
   }
 
   return {
-    x: (vector.x * 0.5 + 0.5) * canvas.width + canvas.left,
-    y: (-vector.y * 0.5 + 0.5) * canvas.height + canvas.top,
+    x: bounds.x,
+    y: bounds.y,
+    rx: bounds.rx,
+    ry: bounds.ry,
+    grabbing: bounds.grabbing,
   };
 }
 
