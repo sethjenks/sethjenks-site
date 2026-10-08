@@ -2,7 +2,7 @@ import { cellHash } from "./math";
 import { PLATE_MARK_KINDS, type PlateMarkKind } from "./types";
 
 export function enabledMarkKinds(
-  enabled?: readonly PlateMarkKind[] | null,
+  enabled?: readonly string[] | null,
 ): PlateMarkKind[] {
   if (!enabled) {
     return [...PLATE_MARK_KINDS];
@@ -18,13 +18,13 @@ export function pickMarkKind(
   column: number,
   row: number,
   detail: number,
-  enabled?: readonly PlateMarkKind[] | null,
+  enabled?: readonly string[] | null,
 ): PlateMarkKind {
   const bank = enabledMarkKinds(enabled);
   const lane = Math.floor(
     cellHash(seed + 17, column, row) * (2 + detail * 5),
   );
-  return bank[lane % bank.length] ?? "tick";
+  return bank[lane % bank.length];
 }
 
 export function drawMark(

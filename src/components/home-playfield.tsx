@@ -39,10 +39,12 @@ import {
   type VoiceMessage,
 } from "@/lib/play-voice";
 
-// const IDLE_MS = PLAY_HOME_MS;
 const GRAB_HOME_MS = PLAY_HOME_MS;
+const RELEASE_SETTLE_MS = 750;
 const VOICE_SCRAMBLE_S = 0.9;
 const SCRAMBLE_EASE = [0.32, 0.72, 0, 1] as const;
+const GROUND_RISE_S = 1.1;
+const GROUND_RISE_EASE = [0.86, 0, 0.07, 1] as const;
 const TEXT_MS = 0.38;
 const TEXT_STAGGER_S = 0.09;
 const HEAD_DELAY_S = TEXT_MS + TEXT_STAGGER_S + 0.08;
@@ -125,7 +127,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
   const rootRef = useRef<HTMLDivElement>(null);
   const bodiesRef = useRef<PlayBody[]>([]);
   const nodesRef = useRef<Map<string, HTMLElement>>(new Map());
-  const lastMotionRef = useRef(0);
   const homingRef = useRef(false);
   const prevBustRef = useRef({ x: 0, y: 0 });
   const armedRef = useRef(false);
@@ -381,14 +382,10 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
     let last = performance.now();
     let homeToken = 0;
     let grabbedAt = 0;
+    let settleAt = 0;
     const button = document.querySelector<HTMLElement>("[data-play-button]");
     const drag = { active: false, id: 0, x: 0, y: 0, lastX: 0, lastY: 0 };
     let wasGrabbing = false;
-
-    const bodiesForHome = () =>
-      voiceRef.current?.phase === "flight"
-        ? bodiesRef.current.filter((body) => !isRoleBody(body))
-        : bodiesRef.current;
 
     const clearVoice = () => {
       const run = voiceRef.current;
@@ -408,7 +405,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
         return;
       }
 
-      showIntroAside(root);
       releaseRoleVoice(root, roleRef.current);
       collectBodies(root, bodiesRef.current, nodesRef.current, journalSettledRef.current);
     };
@@ -431,6 +427,43 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
         window.__headerSoftBody.homeAt = 0;
         window.__headerSoftBody.homeFrom = null;
       }
+    };
+
+    const riseFallenBodies = () => {
+      const fallen = bodiesRef.current.filter((body) => body.loose);
+      if (fallen.length === 0) {
+        return;
+      }
+      if (reducedRef.current) {
+        finishPlayHome(fallen);
+        return;
+      }
+
+      const token = ++homeToken;
+      homingRef.current = true;
+      homeTRef.current = 0;
+      beginPlayHome(fallen);
+      const homeAnim = animate(0, 1, {
+        duration: GROUND_RISE_S,
+        ease: GROUND_RISE_EASE,
+        onUpdate(value) {
+          if (token !== homeToken) {
+            return;
+          }
+          homeTRef.current = value;
+          applyPlayHome(fallen, value);
+        },
+        onComplete() {
+          if (token !== homeToken) {
+            return;
+          }
+          finishPlayHome(fallen);
+          homeAnimRef.current = null;
+          homeTRef.current = 0;
+          homingRef.current = false;
+        },
+      });
+      homeAnimRef.current = homeAnim;
     };
 
     const startScramble = (generation: number) => {
@@ -457,6 +490,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           voiceRef.current.scramble = null;
           copy.textContent = roleRef.current;
           clearVoice();
+          riseFallenBodies();
         },
       });
     };
@@ -479,7 +513,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
               )
             : null;
         if (flight) {
-          hideIntroAside(root);
           const generation = voiceGenRef.current + 1;
           voiceGenRef.current = generation;
           voiceActiveRef.current = true;
@@ -495,12 +528,15 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
 
       const token = ++homeToken;
       const generation = voiceRef.current?.generation ?? 0;
+      const voiced = generation !== 0;
       const body = window.__headerSoftBody;
       homingRef.current = true;
       window.__headerHoming = true;
       homeTRef.current = 0;
       window.__headerHomeT = 0;
-      beginPlayHome(bodiesRef.current);
+      if (!voiced) {
+        beginPlayHome(bodiesRef.current);
+      }
       homeFromHeadRef.current = body ? snapshotSoftBody(body) : null;
       window.__headerHomeFrom = homeFromHeadRef.current;
       if (body) {
@@ -516,7 +552,9 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           }
           homeTRef.current = value;
           window.__headerHomeT = value;
-          applyPlayHome(bodiesForHome(), value);
+          if (!voiced) {
+            applyPlayHome(bodiesRef.current, value);
+          }
           const run = voiceRef.current;
           if (run?.generation === generation && run.phase === "flight") {
             paintVoiceFlight(run.flight, value);
@@ -531,8 +569,10 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           }
           homeTRef.current = 1;
           const run = voiceRef.current;
-          const voiced = run?.generation === generation && run.phase === "flight";
-          finishPlayHome(voiced ? bodiesForHome() : bodiesRef.current);
+          const stillVoiced = run?.generation === generation && run.phase === "flight";
+          if (!stillVoiced) {
+            finishPlayHome(bodiesRef.current);
+          }
           if (body) {
             pinSoftBodyRest(body);
             body.spinStart = performance.now();
@@ -547,7 +587,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
           window.__headerHoming = false;
           window.__headerHomeT = 0;
           window.__headerHomeFrom = null;
-          if (!voiced || !run) {
+          if (!stillVoiced || !run) {
             return;
           }
 
@@ -608,7 +648,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       body.vy = (event.clientY - drag.lastY) * 45;
       drag.lastX = event.clientX;
       drag.lastY = event.clientY;
-      lastMotionRef.current = performance.now();
       stopHome();
       if (window.__headerSoftBody) {
         window.__headerSoftBody.homeAt = 0;
@@ -621,7 +660,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       }
 
       drag.active = false;
-      lastMotionRef.current = performance.now();
     };
 
     button?.addEventListener("pointerdown", onButtonDown);
@@ -630,7 +668,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
     window.addEventListener("pointercancel", onButtonUp);
 
     const armGrabClock = (now: number) => {
-      if (grabbedAt === 0 || now - grabbedAt >= GRAB_HOME_MS) {
+      if (grabbedAt === 0) {
         grabbedAt = now;
       }
     };
@@ -678,43 +716,48 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       const liveBust = bust && armedRef.current ? bust : null;
 
       const holding = Boolean(bust?.grabbing) || drag.active;
-      if (bust?.grabbing && !wasGrabbing) {
+      const grabbing = Boolean(bust?.grabbing);
+      if (grabbing && !wasGrabbing) {
         armGrabClock(now);
       }
-      if (bust?.grabbing) {
-        lastMotionRef.current = now;
+      if (grabbing) {
         stopHome();
+        settleAt = 0;
       } else if (wasGrabbing) {
-        lastMotionRef.current = now;
         stopHome();
+        if (grabbedAt > 0 && now - grabbedAt >= GRAB_HOME_MS) {
+          settleAt = now + RELEASE_SETTLE_MS;
+        }
       }
-      wasGrabbing = Boolean(bust?.grabbing);
+      wasGrabbing = grabbing;
 
       const grabElapsed = grabbedAt > 0 && now - grabbedAt >= GRAB_HOME_MS;
-      // 5s stillness timer, off while we try the grab clock.
-      // const idleFor = now - lastMotionRef.current;
-      // const anyLoose = bodiesRef.current.some((body) => body.loose);
-      // const idleElapsed = anyLoose && lastMotionRef.current > 0 && idleFor >= IDLE_MS;
+      const settled = settleAt === 0 || now >= settleAt;
       if (
         !homingRef.current &&
         !voiceActiveRef.current &&
         !holding &&
-        grabElapsed
+        grabElapsed &&
+        settled
       ) {
+        settleAt = 0;
         startHome();
       }
 
-      const { struck } = stepPlayfield(
-        bodiesRef.current,
-        dt,
-        bounds,
-        drag.active ? null : liveBust,
-        homingRef.current,
-      );
+      const flight = voiceRef.current?.phase === "flight" ? voiceRef.current.flight : null;
+      let playBodies = bodiesRef.current;
+      let suspendPhysics = homingRef.current;
+      let bustCollider = drag.active ? null : liveBust;
+      if (flight) {
+        const flying = new Set(flight.flyers.map((flyer) => flyer.body));
+        playBodies = bodiesRef.current.filter((body) => !flying.has(body));
+        suspendPhysics = false;
+        bustCollider = null;
+      }
+      const { struck } = stepPlayfield(playBodies, dt, bounds, bustCollider, suspendPhysics);
 
       if (struck) {
         window.__headerTouchOff = true;
-        lastMotionRef.current = now;
         const grabStillOpen = grabbedAt > 0 && now - grabbedAt < GRAB_HOME_MS;
         if (grabStillOpen || grabbedAt === 0) {
           stopHome(voiceRef.current?.phase === "flight");
@@ -722,14 +765,14 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       }
 
       if (homingRef.current) {
-        applyPlayHome(bodiesForHome(), homeTRef.current);
+        if (voiceRef.current?.phase !== "flight") {
+          applyPlayHome(bodiesRef.current, homeTRef.current);
+        }
         const body = window.__headerSoftBody;
         if (body && homeFromHeadRef.current) {
           applySoftBodyHome(body, homeFromHeadRef.current, homeTRef.current);
         }
       } else if (window.__headerSoftBody && !bust?.grabbing) {
-        // 5s stillness timer, off while we try the grab clock.
-        // window.__headerSoftBody.homeAt = lastMotionRef.current + IDLE_MS;
         window.__headerSoftBody.homeAt = 0;
       }
 
@@ -761,8 +804,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
     };
   }, []);
 
-  const lines = Array.isArray(paragraphs) ? paragraphs : [];
-  const copyKey = [name, role, ...lines].join("\n");
+  const copyKey = [name, role, ...paragraphs].join("\n");
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !enteredRef.current || voiceActiveRef.current) {
@@ -775,14 +817,14 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
   return (
     <div ref={rootRef} className="home-playfield">
       <motion.div
-        className="mx-auto mt-[5vh] w-full max-w-[42rem] px-6 pt-8 sm:px-8 sm:pt-10 home-intro"
+        className="home-intro mx-auto w-full max-w-[42rem]"
         variants={introList}
         initial={prefersReduced ? "show" : "hide"}
         animate="show"
       >
         <PlayLine className="intro-name" text={name} lineId="name" links={links} />
         <PlayLine className="role-line" text={role} lineId="role" links={links} />
-        {lines.map((text, index) => (
+        {paragraphs.map((text, index) => (
           <PlayLine
             key={text}
             className="intro-copy"
@@ -866,39 +908,6 @@ function splitPlayTokens(text: string): PlayToken[] {
   }
 
   return tokens;
-}
-
-const ASIDE_FADE_MS = 450;
-
-function hideIntroAside(root: HTMLElement) {
-  const intro = root.querySelector<HTMLElement>(".home-intro");
-  if (!intro) {
-    return;
-  }
-
-  intro.removeAttribute("data-voice-aside-out");
-  intro.setAttribute("data-voice-aside", "");
-  intro.querySelectorAll<HTMLElement>(".intro-copy").forEach((node) => {
-    node.setAttribute("aria-hidden", "true");
-  });
-}
-
-function showIntroAside(root: HTMLElement) {
-  const intro = root.querySelector<HTMLElement>(".home-intro");
-  if (!intro?.hasAttribute("data-voice-aside")) {
-    return;
-  }
-
-  intro.setAttribute("data-voice-aside-out", "");
-  intro.removeAttribute("data-voice-aside");
-  intro.querySelectorAll<HTMLElement>(".intro-copy").forEach((node) => {
-    node.removeAttribute("aria-hidden");
-  });
-  window.setTimeout(() => {
-    if (!intro.hasAttribute("data-voice-aside")) {
-      intro.removeAttribute("data-voice-aside-out");
-    }
-  }, ASIDE_FADE_MS + 40);
 }
 
 function isRoleBody(body: PlayBody) {

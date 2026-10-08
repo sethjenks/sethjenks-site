@@ -12,12 +12,6 @@ export type LogoItem = {
   alt: string;
 };
 
-export type LogoBand = {
-  id: string;
-  label: string;
-  items: LogoItem[];
-};
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -54,22 +48,8 @@ function compareYearDesc(a: string, b: string): number {
   return b.localeCompare(a);
 }
 
-export function groupLogoBands(items: LogoItem[]): LogoBand[] {
-  const ordered = [...items].sort((a, b) => compareYearDesc(a.year, b.year));
-  const bands: LogoBand[] = [];
-
-  for (const item of ordered) {
-    const current = bands[bands.length - 1];
-
-    if (current && current.id === item.year) {
-      current.items.push(item);
-      continue;
-    }
-
-    bands.push({ id: item.year, label: item.year, items: [item] });
-  }
-
-  return bands;
+export function sortLogoItems(items: LogoItem[]): LogoItem[] {
+  return [...items].sort((a, b) => compareYearDesc(a.year, b.year));
 }
 
 export async function getLogoItems(): Promise<LogoItem[]> {

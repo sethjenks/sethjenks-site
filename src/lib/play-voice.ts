@@ -1,7 +1,9 @@
 import voiceFile from "../../content/voice.json";
+import { isVoiceEffectId, type VoiceEffectId } from "@/lib/voice-effects";
 
 export type VoiceMessage = {
   text: string;
+  effect?: VoiceEffectId;
 };
 
 export type VoiceDeck = {
@@ -101,7 +103,7 @@ export function scrambleText(from: string, to: string, t: number): string {
       target != null && target === target.toUpperCase() && target !== target.toLowerCase();
     const glyphs = upper ? UPPER : LOWER;
     const pick = Math.abs((index + 1) * 17 + step * 13) % glyphs.length;
-    out += glyphs[pick] ?? glyphs[0];
+    out += glyphs[pick];
   }
 
   return out;
@@ -117,12 +119,15 @@ function parseVoiceMessages(value: unknown): VoiceMessage[] {
       throw new Error(`content/voice.json[${index}] must be an object.`);
     }
 
-    const { text } = item;
+    const { text, effect } = item;
     if (typeof text !== "string" || text.trim().length === 0) {
       throw new Error(`content/voice.json[${index}].text must be a non-empty string.`);
     }
+    if (effect !== undefined && !isVoiceEffectId(effect)) {
+      throw new Error(`content/voice.json[${index}].effect must be a known effect id.`);
+    }
 
-    return { text: text.trim() };
+    return effect === undefined ? { text: text.trim() } : { text: text.trim(), effect };
   });
 }
 
@@ -148,9 +153,6 @@ function shuffle(messages: readonly VoiceMessage[]): VoiceMessage[] {
     const swap = Math.floor(Math.random() * (index + 1));
     const current = next[index];
     const other = next[swap];
-    if (!current || !other) {
-      continue;
-    }
     next[index] = other;
     next[swap] = current;
   }

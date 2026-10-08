@@ -9,7 +9,7 @@
   function flattenPlayfield(compiled) {
     const yMax = "window.__headerPlay&&window.__headerPlay.yMax||3.6";
     const yMin = "window.__headerPlay&&window.__headerPlay.yMin||.08";
-    const homeMs = "window.__headerPlay&&window.__headerPlay.homeMs||8e3";
+    const homeMs = "window.__headerPlay&&window.__headerPlay.homeMs||6500";
     return compiled
       .replaceAll('e.canvas.style.touchAction="none"', 'e.canvas.style.touchAction="pan-y"')
       .replaceAll(
@@ -55,10 +55,6 @@
       .replaceAll(
         "r.reset(Number(Z.seed)),r.nudge(.2),l.update()",
         'r.reset(Number(Z.seed));if(!matchMedia("(prefers-reduced-motion: reduce)").matches){const home=location.pathname==="/"||location.pathname==="";if(home){if(window.__headerEnterShift==null)window.__headerEnterShift=6}else{r.spinStart=performance.now()}}l.update()',
-      )
-      .replaceAll(
-        "step(s){const t=this.positions,r=this.velocities,o=this.stepSize,i=Math.exp(-Math.max(0,s.damping)*o);this.previous.set(t);for(let d=0;d<this.count;d++){",
-        "step(s){const t=this.positions,r=this.velocities,o=this.stepSize,i=Math.exp(-Math.max(0,s.damping)*o);this.previous.set(t);for(let d=0;d<this.count;d++){",
       )
       .replaceAll(
         "}metrics(){let s=0,t=0,r=1/0",

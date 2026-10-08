@@ -1,6 +1,6 @@
 import { enabledMarkKinds } from "./marks";
-import { clamp, unit } from "./math";
-import { encodeToneField, sampleToneField } from "./sample";
+import { clamp, encodeTones, unit } from "./math";
+import { sampleToneField } from "./sample";
 import type { PlateCoverTransform } from "./sample";
 import type {
   PlateField,
@@ -46,9 +46,17 @@ function asInks(value: unknown, fallback: string): string[] {
   return [asHex(fallback, "#111111")];
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function asEnabledMarks(value: unknown): PlateMarkKind[] {
+  if (!Array.isArray(value)) {
+    return enabledMarkKinds(null);
+  }
+
   return enabledMarkKinds(
-    Array.isArray(value) ? (value as PlateMarkKind[]) : null,
+    value.filter((item): item is string => typeof item === "string"),
   );
 }
 
@@ -138,7 +146,7 @@ export function createPlateRecipe({
     },
     rows: sampled.rows,
     seed,
-    tones: encodeToneField(sampled.tones),
+    tones: encodeTones(sampled.tones),
     version: PLATE_VERSION,
     width,
   };
@@ -162,9 +170,9 @@ export function parsePlateRecipe(value: unknown): PlateRecipe {
 
   const columns = clamp(integer(raw.columns, 120), 8, 320);
   const rows = clamp(integer(raw.rows, 1), 1, 320);
-  const marks = (raw.marks ?? {}) as Partial<PlateMarks>;
-  const field = (raw.field ?? {}) as Partial<PlateField>;
-  const motion = (raw.motion ?? {}) as Partial<PlateMotion>;
+  const marks = isRecord(raw.marks) ? raw.marks : {};
+  const field = isRecord(raw.field) ? raw.field : {};
+  const motion = isRecord(raw.motion) ? raw.motion : {};
 
   return {
     background: asHex(raw.background, "#FAFAFA"),

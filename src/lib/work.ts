@@ -44,12 +44,6 @@ export type WorkItem = {
   blocks?: WorkBlock[];
 };
 
-export type WorkBand = {
-  id: string;
-  label: string;
-  items: WorkItem[];
-};
-
 const DISPLAY_ORDER = [
   "intermission",
   "boardwalk-bots",
@@ -332,56 +326,6 @@ export function sortWorkForDisplay(items: WorkItem[]): WorkItem[] {
   });
 }
 
-function workSpanLabel(items: WorkItem[]): string {
-  const years = items
-    .map((item) => yearRank(item.year))
-    .filter((year) => Number.isFinite(year));
-
-  if (years.length === 0) {
-    return "";
-  }
-
-  const newest = Math.max(...years);
-  const oldest = Math.min(...years);
-
-  return oldest === newest ? String(newest) : `${oldest}–${newest}`;
-}
-
-export function groupWorkBands(items: WorkItem[]): WorkBand[] {
-  const ordered = sortWorkForDisplay(items);
-
-  if (ordered.length === 0) {
-    return [];
-  }
-
-  return [
-    {
-      id: "work",
-      label: workSpanLabel(ordered),
-      items: ordered,
-    },
-  ];
-}
-
-export function getNextWorkItem(
-  items: WorkItem[],
-  id: string,
-): WorkItem | undefined {
-  const ordered = sortWorkForDisplay(items);
-
-  if (ordered.length < 2) {
-    return undefined;
-  }
-
-  const index = ordered.findIndex((item) => item.id === id);
-
-  if (index === -1) {
-    return undefined;
-  }
-
-  return ordered[(index + 1) % ordered.length];
-}
-
 export function heroAlt(item: WorkItem): string {
   if (item.alt && item.alt.trim().length > 0) {
     return item.alt.trim();
@@ -392,10 +336,6 @@ export function heroAlt(item: WorkItem): string {
 
 export function isPhoneStill(item: WorkItem): boolean {
   return item.width <= 800 && item.height > item.width;
-}
-
-export function isDenseDesktopStill(item: WorkItem): boolean {
-  return item.width / item.height >= 0.9 && item.height <= 1200;
 }
 
 export async function getWorkItems(): Promise<WorkItem[]> {

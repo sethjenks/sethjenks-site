@@ -147,7 +147,7 @@ export function EntryPlateFigure({
   }, [plateSrc]);
 
   return (
-    <figure className="aluminum-frame overflow-hidden">
+    <figure className="aluminum-frame overflow-clip">
       <div className="relative aspect-[2/1] w-full">
         <Image
           src={media.src}

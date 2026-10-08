@@ -8,7 +8,7 @@ export {
   defaultPlateMotion,
   parsePlateRecipe,
 } from "./recipe";
-export { drawCover, encodeToneField, sampleToneField } from "./sample";
+export { drawCover, sampleToneField } from "./sample";
 export type { PlateCoverTransform } from "./sample";
 export {
   PLATE_MARK_KINDS,

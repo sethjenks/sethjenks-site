@@ -67,8 +67,10 @@ export function WorkStudy({ item, related }: WorkStudyProps) {
                     className="study-related-image"
                   />
                 </span>
-                <span className="study-related-title">{entry.title}</span>
-                <span className="study-related-role">{entry.role}</span>
+                <span className="study-related-copy">
+                  <span className="study-related-title">{entry.title}</span>
+                  <span className="study-related-role">{entry.role}</span>
+                </span>
               </Link>
             ))}
           </div>

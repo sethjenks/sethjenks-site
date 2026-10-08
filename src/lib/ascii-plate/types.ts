@@ -67,11 +67,6 @@ export type PlatePaintView = {
   progress: number;
 };
 
-export type PlateSampleSource = {
-  height: number;
-  width: number;
-};
-
 export type PlateImageLike =
   | HTMLCanvasElement
   | HTMLImageElement

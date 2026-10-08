@@ -35,8 +35,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${timelessSans.variable} ${GeistSans.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
+      // The boot script sets data-play-enter before paint. React does not render it.
+      suppressHydrationWarning
     >
       <head>
+        <meta name="color-scheme" content="light" />
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -48,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script src="/soft-matter/head-skin.js?v=4" strategy="beforeInteractive" />
         <Script src="/soft-matter/header-boot.js?v=play22" strategy="beforeInteractive" />
       </head>
-      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+      <body className="flex min-h-svh flex-col bg-background font-sans text-foreground">
         <SiteHeader />
         <div className="flex min-w-0 flex-1 flex-col">{children}</div>
         <SiteFooter />

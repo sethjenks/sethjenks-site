@@ -1,4 +1,4 @@
-import { clamp, encodeTones, plateRows } from "./math";
+import { clamp, plateRows } from "./math";
 import type { PlateImageLike } from "./types";
 
 export type PlateCoverTransform = {
@@ -116,8 +116,4 @@ export function sampleToneField({
   }
 
   return { rows, tones };
-}
-
-export function encodeToneField(tones: Uint8Array): string {
-  return encodeTones(tones);
 }

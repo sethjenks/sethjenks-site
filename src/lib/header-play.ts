@@ -5,7 +5,7 @@ export const COMPACT_CAM_LIFT = 1.2;
 export const COMPACT_CAM_Z = 3.45;
 export const COMPACT_LOOK_Y = 1.05;
 export const COMPACT_HOME_MS = 5000;
-export const PLAY_HOME_MS = 8000;
+export const PLAY_HOME_MS = 6500;
 export const HOME_RETURN_MS = 2000;
 export const HEAD_REST_Y = 1.2;
 export const HEAD_TOP_OFFSET = 1.2;
@@ -193,42 +193,6 @@ export function applySoftBodyHome(body: SoftBodyLift, from: ArrayLike<number>, t
   }
 }
 
-export function seatSoftBodyOnFloor(body: SoftBodyLift | null | undefined) {
-  if (!body) {
-    return;
-  }
-
-  let restX = 0;
-  let restZ = 0;
-  let liveX = 0;
-  let liveZ = 0;
-  for (let index = 0; index < body.count; index += 1) {
-    const x = index * 3;
-    restX += body.rest[x];
-    restZ += body.rest[x + 2];
-    liveX += body.positions[x];
-    liveZ += body.positions[x + 2];
-  }
-  const count = Math.max(1, body.count);
-  const shiftX = liveX / count - restX / count;
-  const shiftZ = liveZ / count - restZ / count;
-
-  for (let index = 0; index < body.count; index += 1) {
-    const x = index * 3;
-    body.positions[x] = body.rest[x] + shiftX;
-    body.positions[x + 1] = body.rest[x + 1];
-    body.positions[x + 2] = body.rest[x + 2] + shiftZ;
-    body.previous[x] = body.positions[x];
-    body.previous[x + 1] = body.positions[x + 1];
-    body.previous[x + 2] = body.positions[x + 2];
-    if (body.velocities) {
-      body.velocities[x] = 0;
-      body.velocities[x + 1] = 0;
-      body.velocities[x + 2] = 0;
-    }
-  }
-}
-
 export function headerStageCanvas(handle?: HeaderSoftHandle | null) {
   return (
     handle?.ctx?.canvas ??
@@ -237,14 +201,6 @@ export function headerStageCanvas(handle?: HeaderSoftHandle | null) {
       ?.shadowRoot?.querySelector<HTMLCanvasElement>("canvas") ??
     document.querySelector<HTMLCanvasElement>(".soft-matter-stage canvas")
   );
-}
-
-export function holdSoftBody(body: SoftBodyLift | null | undefined) {
-  if (!body) {
-    return;
-  }
-
-  body.homeAt = performance.now();
 }
 
 export function syncSoftBody(play: HeaderPlayConfig) {

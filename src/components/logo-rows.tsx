@@ -2,25 +2,23 @@
 
 import Image from "next/image";
 import { useCallback, useRef, type KeyboardEvent, type PointerEvent } from "react";
-import type { LogoBand, LogoItem } from "@/lib/logos";
+import type { LogoItem } from "@/lib/logos";
+import { yearSpan } from "@/lib/work-shape";
 
 const DRAG_THRESHOLD_PX = 8;
 
 type LogoRowsProps = {
-  bands: LogoBand[];
+  items: LogoItem[];
   heading?: string;
   id?: string;
 };
 
-export function LogoRows({ bands, heading = "Brands", id = "logos" }: LogoRowsProps) {
+export function LogoRows({ items, heading = "Brands", id = "logos" }: LogoRowsProps) {
   const headingId = `${id}-heading`;
-  const total = bands.reduce((count, band) => count + band.items.length, 0);
 
-  if (total === 0) {
+  if (items.length === 0) {
     return null;
   }
-
-  const items = bands.flatMap((band) => band.items);
 
   return (
     <section id={id} className="logo-section" aria-labelledby={headingId}>
@@ -28,29 +26,11 @@ export function LogoRows({ bands, heading = "Brands", id = "logos" }: LogoRowsPr
         <h2 id={headingId} className="work-section-title">
           {heading}
         </h2>
-        <span className="work-count">{spanLabel(items)}</span>
+        <span className="work-count">{yearSpan(items.map((item) => item.year))}</span>
       </div>
       <LogoTrack items={items} label={heading} />
     </section>
   );
-}
-
-function spanLabel(items: LogoItem[]): string {
-  const years = items
-    .map((item) => {
-      const match = item.year.match(/\d{4}/);
-      return match ? Number(match[0]) : Number.NaN;
-    })
-    .filter((year) => Number.isFinite(year));
-
-  if (years.length === 0) {
-    return "";
-  }
-
-  const newest = Math.max(...years);
-  const oldest = Math.min(...years);
-
-  return oldest === newest ? String(newest) : `${oldest}–${newest}`;
 }
 
 function LogoTrack({ items, label }: { items: LogoItem[]; label: string }) {

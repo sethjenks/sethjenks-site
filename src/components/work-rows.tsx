@@ -10,8 +10,8 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from "react";
-import type { WorkBand, WorkItem } from "@/lib/work";
-import { isMobileScreen } from "@/lib/work-shape";
+import type { WorkItem } from "@/lib/work";
+import { isMobileScreen, yearSpan } from "@/lib/work-shape";
 
 const DRAG_THRESHOLD_PX = 8;
 
@@ -34,14 +34,13 @@ function objectPositionFor(id: string): string {
 }
 
 type WorkRowsProps = {
-  bands: WorkBand[];
+  items: WorkItem[];
   heading?: string;
   id?: string;
 };
 
-export function WorkRows({ bands, heading = "Work", id = "work" }: WorkRowsProps) {
+export function WorkRows({ items, heading = "Work", id = "work" }: WorkRowsProps) {
   const headingId = `${id}-heading`;
-  const items = bands.flatMap((band) => band.items);
 
   if (items.length === 0) {
     return null;
@@ -53,29 +52,11 @@ export function WorkRows({ bands, heading = "Work", id = "work" }: WorkRowsProps
         <h2 id={headingId} className="work-section-title">
           {heading}
         </h2>
-        <span className="work-count">{spanLabel(items)}</span>
+        <span className="work-count">{yearSpan(items.map((item) => item.year))}</span>
       </div>
       <WorkTrack items={items} label={heading} />
     </section>
   );
-}
-
-function spanLabel(items: WorkItem[]): string {
-  const years = items
-    .map((item) => {
-      const match = item.year.match(/\d{4}/);
-      return match ? Number(match[0]) : Number.NaN;
-    })
-    .filter((year) => Number.isFinite(year));
-
-  if (years.length === 0) {
-    return "";
-  }
-
-  const newest = Math.max(...years);
-  const oldest = Math.min(...years);
-
-  return oldest === newest ? String(newest) : `${oldest}–${newest}`;
 }
 
 function WorkTrack({ items, label }: { items: WorkItem[]; label: string }) {
@@ -258,7 +239,7 @@ function WorkCard({
         />
         <span className="work-card-verb">
           Read
-          <ChevronRight aria-hidden="true" size={12} strokeWidth={1.5} />
+          <ChevronRight aria-hidden="true" strokeWidth={1.5} />
         </span>
       </span>
       <span className="work-card-meta">
