@@ -8,7 +8,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const home = pathname === "/";
   const onJournal = pathname === "/journal" || pathname.startsWith("/journal/");
-  const keyHref = home || onJournal ? "#journal" : "/#journal";
+  const keyHref = onJournal ? "#journal" : "/journal";
 
   return (
     <header className="site-header">

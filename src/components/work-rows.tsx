@@ -11,18 +11,11 @@ import {
   type PointerEvent,
 } from "react";
 import type { WorkItem } from "@/lib/work";
-import { isMobileScreen, yearSpan } from "@/lib/work-shape";
+import { isMobileScreen } from "@/lib/work-shape";
 
 const DRAG_THRESHOLD_PX = 8;
 
 const OBJECT_POSITION: Record<string, string> = {
-  intermission: "center top",
-  "boardwalk-bots": "center top",
-  offramp: "center center",
-  "brand-brand": "center top",
-  "food-passport": "center center",
-  "philo-shirt": "center center",
-  "level-hardscapes": "center center",
   "offer-builder": "center center",
   "chia-signer": "center center",
   "chia-wallet": "center center",
@@ -52,7 +45,6 @@ export function WorkRows({ items, heading = "Work", id = "work" }: WorkRowsProps
         <h2 id={headingId} className="work-section-title">
           {heading}
         </h2>
-        <span className="work-count">{yearSpan(items.map((item) => item.year))}</span>
       </div>
       <WorkTrack items={items} label={heading} />
     </section>

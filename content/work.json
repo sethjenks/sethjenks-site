@@ -1,208 +1,5 @@
 [
   {
-    "id": "level-hardscapes",
-    "title": "Level Hardscapes",
-    "year": "2026",
-    "role": "Landing",
-    "src": "/media/work/level-hardscapes.jpg",
-    "width": 1440,
-    "height": 767,
-    "summary": "A client landing for a premium outdoor-living studio. Dark field, architectural type, material photography, not a SaaS product shot.",
-    "alt": "Brand board for Level Hardscapes on a black field, with the wordmark, color swatches, and a do and don’t list.",
-    "sections": [
-      {
-        "heading": "The field",
-        "body": [
-          "Every line on the page points at hardscape. The palette, the do and don\u2019t, and a single CTA sit on a black field so the photography can carry the claim."
-        ]
-      },
-      {
-        "heading": "What stays out",
-        "body": [
-          "The board is the client piece: palette, type, and a do and don’t list on a black field, with one ask. Anything that does not point at the hardscape stays off the page so the photography can carry it."
-        ]
-      }
-    ],
-    "tags": [
-      "Philo",
-      "landing"
-    ]
-  },
-  {
-    "id": "intermission",
-    "title": "Intermission",
-    "year": "2026",
-    "role": "Product",
-    "src": "/media/work/intermission.jpg",
-    "width": 390,
-    "height": 852,
-    "summary": "A health dashboard that treats labs as a quiet grid of hormone, metabolic, cardio, reproductive, and sleep scores, instead of a portal dump.",
-    "alt": "Phone screen of the Intermission dashboard for Nadia, age 34, with six health scores in a quiet grid.",
-    "sections": [
-      {
-        "heading": "The view",
-        "body": [
-          "The still is Nadia\u2019s view: a name, an age, and six scores that can be read in a glance. Color stays in the tiles. The chrome stays out."
-        ]
-      },
-      {
-        "heading": "Range and watch",
-        "body": [
-          "I designed it so a marker that needs a look sits next to one that is already in range, without turning the phone into a clinic clipboard."
-        ]
-      }
-    ],
-    "tags": [
-      "personal",
-      "product"
-    ]
-  },
-  {
-    "id": "boardwalk-bots",
-    "title": "Boardwalk Bots",
-    "year": "2026",
-    "role": "Product",
-    "src": "/media/work/boardwalk-bots.jpg",
-    "width": 1120,
-    "height": 1064,
-    "summary": "An agent workspace for a construction BD team. Meridian writes the morning digest, scores call-today projects, and only spends enrichment credits after you approve a record.",
-    "alt": "Boardwalk Bots desk for Westland Construction, with a call-today list, the Meridian project in the center, and routines on the right.",
-    "sections": [
-      {
-        "heading": "The desk",
-        "body": [
-          "Westland Construction is the sample desk. The left rail is the stack: call today, enrich, CRM. The center is one project at a time, with a reason it matched."
-        ]
-      },
-      {
-        "heading": "Credits after you ask",
-        "body": [
-          "Routines on the right run the market scan and the CRM write. Contact lookup stays locked until someone asks. Empty lookups are not charged."
-        ]
-      }
-    ],
-    "tags": [
-      "Philo",
-      "product"
-    ]
-  },
-  {
-    "id": "food-passport",
-    "title": "Food Passport",
-    "year": "2026",
-    "role": "Print",
-    "src": "/media/work/food-passport.jpg",
-    "width": 1650,
-    "height": 2550,
-    "summary": "A junior field-series passport. Kids log foods; the cover line is stay curious, not finish the plate.",
-    "alt": "Food Explorer Passport cover with a yellow explorer stamp, a blank name line, and the line stay curious.",
-    "sections": [
-      {
-        "heading": "The cover",
-        "body": [
-          "Food Explorer Passport is a blank name line, a yellow explorer stamp, and a lot of paper. It is a field guide, not a chore chart."
-        ]
-      },
-      {
-        "heading": "The line",
-        "body": [
-          "The cover type is stacked and plain on purpose. The only color is the stamp. You do not have to like every food."
-        ]
-      }
-    ],
-    "tags": [
-      "personal",
-      "print"
-    ]
-  },
-  {
-    "id": "offramp",
-    "title": "Offramp",
-    "year": "2026",
-    "role": "Product",
-    "src": "/media/work/offramp.jpg",
-    "width": 1440,
-    "height": 1024,
-    "summary": "A seven-question diagnostic that turns what an owner already knows into a picture of exit readiness. The still is Hudson Mechanical mid-assessment.",
-    "alt": "Offramp diagnostic for Hudson Mechanical, with an exit-readiness map around the business and completed diagnostics on the right.",
-    "sections": [
-      {
-        "heading": "The map",
-        "body": [
-          "The map around \u201cyour business\u201d is the whole product: exit target, earnings, customer risk, owner dependence, records, revenue trend, timeline."
-        ]
-      },
-      {
-        "heading": "Resume",
-        "body": [
-          "Completed diagnostics stay on the right so an owner can compare later. Resume picks up at the step they left, here owner dependence, step three of seven."
-        ]
-      }
-    ],
-    "tags": [
-      "Philo",
-      "product"
-    ]
-  },
-  {
-    "id": "philo-shirt",
-    "title": "Philo Shirt",
-    "year": "2026",
-    "role": "Merch",
-    "src": "/media/work/philo-shirt.jpg",
-    "width": 720,
-    "height": 900,
-    "summary": "A Philo merch frame. CONNECTLECT, builders backing builders. Cream center stack, black ink, cassette-deck geometry.",
-    "alt": "Philo shirt graphic on black, cream center stack with two reels, a signal line, and a DIN jack.",
-    "sections": [
-      {
-        "heading": "The print",
-        "body": [
-          "The tee is a center print: two reels, a signal line, and a DIN jack. It is a schematic, not a logo lockup."
-        ]
-      },
-      {
-        "heading": "One ink",
-        "body": [
-          "Cream on black, one ink, no extra marks. The caption is the thesis: find the signal, sharpen it."
-        ]
-      }
-    ],
-    "tags": [
-      "Philo",
-      "merch"
-    ]
-  },
-  {
-    "id": "brand-brand",
-    "title": "brand.brand",
-    "year": "2026",
-    "role": "Product",
-    "src": "/media/work/brand-brand.jpg",
-    "width": 1440,
-    "height": 2164,
-    "summary": "A product for agencies and in-house teams: one brand guide humans and agents can both read. Edit free; pay when you publish.",
-    "alt": "brand.brand page for the Citrus Pear workspace, with a brand guide, a voice panel, and a publish price.",
-    "sections": [
-      {
-        "heading": "The page",
-        "body": [
-          "The marketing page is the product: a guide with a Brand Agent, a voice panel, and a publish price. Citrus Pear is the sample workspace."
-        ]
-      },
-      {
-        "heading": "Publish",
-        "body": [
-          "Structured brand data, a generated URL, and a brand.json token for external agents. I designed the page so the free plan and the publish license sit in the same column."
-        ]
-      }
-    ],
-    "tags": [
-      "Arcana",
-      "product"
-    ]
-  },
-  {
     "id": "offer-builder",
     "title": "Chia Offer Builder",
     "year": "2023",
@@ -219,7 +16,7 @@
       {
         "heading": "Two interfaces, then NFTs",
         "body": [
-          "In the Chia Wallet, there were two different interfaces for offers \u2014 one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work. We needed an interface allowing any combination of assets to be traded for any other combination of assets that was also future-proof and intuitive to use."
+          "In the Chia Wallet, there were two different interfaces for offers — one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work. We needed an interface allowing any combination of assets to be traded for any other combination of assets that was also future-proof and intuitive to use."
         ]
       },
       {
@@ -248,7 +45,7 @@
         "type": "essay",
         "heading": "A proposal, not a payment",
         "body": [
-          "In the Chia Wallet, there were two different interfaces for offers \u2014 one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work.",
+          "In the Chia Wallet, there were two different interfaces for offers — one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work.",
           "I took a first principles approach with Offer Builder. Offers are different from transactions in that you are only creating a proposal for a transaction. This needs to be evident in the interface design. The solution we came up with needed to be intuitive, instructive, and durable."
         ]
       },
@@ -471,7 +268,7 @@
   {
     "id": "chia-wallet",
     "title": "Chia Reference Wallet",
-    "year": "2022\u20132023",
+    "year": "2022–2023",
     "role": "UI/UX",
     "src": "/media/work/chia-wallet-hero.jpg",
     "width": 2200,
@@ -542,7 +339,7 @@
           {
             "label": "Year",
             "lines": [
-              "2022\u20132023"
+              "2022–2023"
             ]
           },
           {

@@ -6,6 +6,12 @@
     "href": "/work/chia-friends"
   },
   {
+    "id": "trashformers",
+    "title": "Trashformers",
+    "line": "Official SpaceBucks NFTs. Each dumpster unboxes a Trashformer.",
+    "href": "https://trashformers.xyz/"
+  },
+  {
     "id": "paper-tips",
     "title": "Paper.tips",
     "line": "An unofficial field guide to Paper.",
@@ -13,24 +19,14 @@
   },
   {
     "id": "batgan",
-    "title": "Batgan"
+    "title": "BatGAN",
+    "line": "AI-based NFTs started in 2021 with the first version of Imagen.",
+    "href": "https://mintgarden.io/collections/col146kk92ny6vyeaypwqmp3q8lgep53r35fajgt9wvmhpnuq3xx4flqlfqzwl?filter=Palette&filter_value=Ooze"
   },
   {
     "id": "weirdness-engine",
     "title": "Weirdness Engine",
-    "line": "Five directions, then one of them lands on the page.",
+    "line": "A set of skills that push AI agents into more unique work.",
     "href": "https://github.com/sethjenks/weirdness-engine"
-  },
-  {
-    "id": "offramp",
-    "title": "Offramp",
-    "line": "A seven-question diagnostic of exit readiness.",
-    "href": "/work/offramp"
-  },
-  {
-    "id": "brand-brand",
-    "title": "brand.brand",
-    "line": "One brand guide humans and agents can both read.",
-    "href": "/work/brand-brand"
   }
 ]

@@ -45,13 +45,6 @@ export type WorkItem = {
 };
 
 const DISPLAY_ORDER = [
-  "intermission",
-  "boardwalk-bots",
-  "offramp",
-  "brand-brand",
-  "food-passport",
-  "philo-shirt",
-  "level-hardscapes",
   "offer-builder",
   "chia-signer",
   "chia-wallet",

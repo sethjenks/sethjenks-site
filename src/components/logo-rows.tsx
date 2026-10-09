@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useCallback, useRef, type KeyboardEvent, type PointerEvent } from "react";
 import type { LogoItem } from "@/lib/logos";
-import { yearSpan } from "@/lib/work-shape";
 
 const DRAG_THRESHOLD_PX = 8;
 
@@ -26,7 +25,6 @@ export function LogoRows({ items, heading = "Brands", id = "logos" }: LogoRowsPr
         <h2 id={headingId} className="work-section-title">
           {heading}
         </h2>
-        <span className="work-count">{yearSpan(items.map((item) => item.year))}</span>
       </div>
       <LogoTrack items={items} label={heading} />
     </section>
