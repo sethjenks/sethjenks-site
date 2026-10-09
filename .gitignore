@@ -2,6 +2,9 @@
 
 # dependencies
 /node_modules
+/sync/node_modules
+/sync/.wrangler
+/sync/.dev.vars
 /studio/ascii/node_modules
 /.pnp
 .pnp.*

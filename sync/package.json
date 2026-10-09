@@ -1,0 +1,21 @@
+{
+  "name": "sethjenks-wall",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tldraw/sync-core": "5.5.2",
+    "@tldraw/tlschema": "5.5.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "workerd"]
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "typescript": "^5",
+    "wrangler": "^4.75.0"
+  }
+}
