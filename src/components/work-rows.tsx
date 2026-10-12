@@ -5,10 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   useCallback,
+  useEffect,
   useRef,
   type KeyboardEvent,
   type MouseEvent,
-  type PointerEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import type { WorkItem } from "@/lib/work";
 import { isMobileScreen } from "@/lib/work-shape";
@@ -97,7 +98,38 @@ function WorkTrack({ items, label }: { items: WorkItem[]; label: string }) {
     });
   }, []);
 
-  const onPointerDown = useCallback((event: PointerEvent<HTMLDivElement>) => {
+  const endDrag = useCallback((pointerId: number) => {
+    const drag = dragRef.current;
+    const node = scrollerRef.current;
+    if (!drag || !node || drag.pointerId !== pointerId) {
+      return;
+    }
+
+    dragRef.current = null;
+    delete node.dataset.dragging;
+    if (node.hasPointerCapture(pointerId)) {
+      node.releasePointerCapture(pointerId);
+    }
+  }, []);
+
+  useEffect(() => {
+    const finish = (event: PointerEvent) => {
+      endDrag(event.pointerId);
+    };
+
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+    return () => {
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+    };
+  }, [endDrag]);
+
+  const onPointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) {
+      return;
+    }
+
     if (event.pointerType !== "mouse" && event.pointerType !== "pen") {
       return;
     }
@@ -114,10 +146,9 @@ function WorkTrack({ items, label }: { items: WorkItem[]; label: string }) {
       startLeft: node.scrollLeft,
       distance: 0,
     };
-    node.setPointerCapture(event.pointerId);
   }, []);
 
-  const onPointerMove = useCallback((event: PointerEvent<HTMLDivElement>) => {
+  const onPointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     const node = scrollerRef.current;
     if (!drag || !node || drag.pointerId !== event.pointerId) {
@@ -132,23 +163,19 @@ function WorkTrack({ items, label }: { items: WorkItem[]; label: string }) {
     }
 
     suppressClickRef.current = true;
+    if (!node.hasPointerCapture(event.pointerId)) {
+      node.setPointerCapture(event.pointerId);
+    }
     node.dataset.dragging = "";
     node.scrollLeft = drag.startLeft - deltaX;
   }, []);
 
-  const endDrag = useCallback((event: PointerEvent<HTMLDivElement>) => {
-    const drag = dragRef.current;
-    const node = scrollerRef.current;
-    if (!drag || !node || drag.pointerId !== event.pointerId) {
-      return;
-    }
-
-    dragRef.current = null;
-    delete node.dataset.dragging;
-    if (node.hasPointerCapture(event.pointerId)) {
-      node.releasePointerCapture(event.pointerId);
-    }
-  }, []);
+  const onPointerEnd = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      endDrag(event.pointerId);
+    },
+    [endDrag],
+  );
 
   const onItemClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
     if (suppressClickRef.current) {
@@ -183,8 +210,8 @@ function WorkTrack({ items, label }: { items: WorkItem[]; label: string }) {
         tabIndex={0}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
         onKeyDown={onKeyDown}
       >
         {items.map((item, index) => (

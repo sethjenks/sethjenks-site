@@ -648,6 +648,7 @@
     flex: 0 0 auto;
     flex-direction: column;
     scroll-snap-align: start;
+    cursor: pointer;
     color: inherit;
     text-decoration: none;
   }
