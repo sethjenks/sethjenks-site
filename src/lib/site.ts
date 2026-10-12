@@ -2,6 +2,7 @@ export const CONTACTS = [
   { label: "X", href: "https://twitter.com/sethjenks" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/sethjenks" },
   { label: "GitHub", href: "https://github.com/sethjenks" },
+  { label: "on.design", href: "https://on.design/seth" },
 ] as const;
 
 /**
