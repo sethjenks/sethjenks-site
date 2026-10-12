@@ -14,6 +14,26 @@ const MessageBoard = dynamic(
 	},
 );
 
+const PHRASE = "Create with me";
+const PHRASE_COUNT = 24;
+
+function CreateStrip() {
+	return (
+		<div className="create-strip" aria-label={PHRASE}>
+			<div className="create-strip-track" aria-hidden="true">
+				{Array.from({ length: PHRASE_COUNT }, (_, index) => (
+					<span key={index}>{PHRASE}</span>
+				))}
+			</div>
+		</div>
+	);
+}
+
 export function MessageBoardSlot() {
-	return <MessageBoard />;
+	return (
+		<div className="message-board-slot">
+			<CreateStrip />
+			<MessageBoard />
+		</div>
+	);
 }
