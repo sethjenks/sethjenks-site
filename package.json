@@ -7,7 +7,8 @@
     "studio": "npm --prefix studio/ascii run dev",
     "build": "next build",
     "start": "next start --port 43127",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:monsters": "node --experimental-strip-types --import ./scripts/monster-test-register.mjs --test src/lib/monsters/*.test.ts"
   },
   "dependencies": {
     "@tldraw/sync": "^5.5.2",

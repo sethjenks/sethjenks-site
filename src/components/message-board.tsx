@@ -7,6 +7,8 @@ import {
 	type TLAssetStore,
 	type TLUiOverrides,
 } from "tldraw";
+import { MonsterControls } from "@/components/monster-controls";
+import { publishEditor } from "@/lib/monsters/editor-bridge";
 import "tldraw/tldraw.css";
 
 const syncUrl = process.env.NEXT_PUBLIC_TLDRAW_SYNC_URL;
@@ -37,6 +39,8 @@ const uiOverrides: TLUiOverrides = {
 function openOnText(editor: Editor) {
 	editor.user.updateUserPreferences({ colorScheme: "light" });
 	editor.setCurrentTool("text");
+	publishEditor(editor);
+	return () => publishEditor(null);
 }
 
 export function MessageBoard() {
@@ -56,16 +60,19 @@ function SyncedBoard({ uri }: { uri: string }) {
 			return <BoardStatus>The board is offline.</BoardStatus>;
 		case "synced-remote":
 			return (
-				<section className="message-board" aria-label="Wall">
-					<Tldraw
-						store={store.store}
-						licenseKey={licenseKey}
-						overrides={uiOverrides}
-						acceptedImageMimeTypes={[]}
-						acceptedVideoMimeTypes={[]}
-						onMount={openOnText}
-					/>
-				</section>
+				<div className="message-board-wrap">
+					<section className="message-board" aria-label="Wall">
+						<Tldraw
+							store={store.store}
+							licenseKey={licenseKey}
+							overrides={uiOverrides}
+							acceptedImageMimeTypes={[]}
+							acceptedVideoMimeTypes={[]}
+							onMount={openOnText}
+						/>
+					</section>
+					<MonsterControls />
+				</div>
 			);
 		default: {
 			const unreachable: never = store;
