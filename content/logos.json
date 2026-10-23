@@ -1,5 +1,33 @@
 [
   {
+    "id": "xf",
+    "name": "XF",
+    "year": "2026",
+    "src": "/media/logos/xf.png",
+    "alt": "XF logomark"
+  },
+  {
+    "id": "xch",
+    "name": "XCH",
+    "year": "2026",
+    "src": "/media/logos/xch-mark.png",
+    "alt": "XCH logomark"
+  },
+  {
+    "id": "xch-pay",
+    "name": "XCH Pay",
+    "year": "2026",
+    "src": "/media/logos/xch-pay.png",
+    "alt": "XCH Pay logomark"
+  },
+  {
+    "id": "merch-makers",
+    "name": "MerchMakers",
+    "year": "2026",
+    "src": "/media/logos/merch-makers.png",
+    "alt": "MerchMakers logomark"
+  },
+  {
     "id": "pomifer",
     "name": "Pomifer",
     "year": "2026",

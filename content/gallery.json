@@ -1,0 +1,434 @@
+[
+  {
+    "id": "embarc",
+    "title": "Embarc",
+    "media": "video",
+    "src": "/media/work/embarc.mp4",
+    "poster": "/media/work/embarc-poster.jpg",
+    "width": 1024,
+    "height": 536,
+    "alt": "A montage of Embarc, from the wordmark to school lockups, a sidewalk sign, app icons, the website, a billboard, the learning hub, and a street banner."
+  },
+  {
+    "id": "xf",
+    "title": "XF",
+    "media": "video",
+    "src": "/media/work/xf.mp4",
+    "poster": "/media/work/xf-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A loop of the XF collection: a hemp hoodie, a green hoodie back print, a green tee, a cap, an outdoor hemp hoodie, and a green bottle, each with the XF mark."
+  },
+  {
+    "id": "sage",
+    "title": "Sage",
+    "media": "video",
+    "src": "/media/work/sage.mp4",
+    "poster": "/media/work/sage-poster.jpg",
+    "width": 1024,
+    "height": 660,
+    "alt": "A loop of Sage, the Chia wallet, moving from the product page to the character banner and the green eye mark."
+  },
+  {
+    "id": "work-your-ass-off",
+    "title": "Work Your Ass Off",
+    "src": "/media/work/work-your-ass-off-padded.jpg",
+    "width": 3200,
+    "height": 3528,
+    "alt": "Distressed white lettering reading Work Your Ass Off beside a flexing figure and a signature, on black."
+  },
+  {
+    "id": "what-a-life",
+    "title": "What a Life",
+    "media": "video",
+    "src": "/media/work/what-a-life.mp4",
+    "poster": "/media/work/what-a-life-poster.jpg",
+    "width": 1024,
+    "height": 576,
+    "alt": "A montage of What a Life: the O! color studies, a black cap, a light blue tee, a yellow lakeside flag, and a green cap."
+  },
+  {
+    "id": "paper-tips",
+    "title": "Paper.tips",
+    "media": "frame",
+    "src": "/media/work/paper-tips.html",
+    "width": 1440,
+    "height": 900,
+    "alt": "Paper.tips, an unofficial field guide to Paper."
+  },
+  {
+    "id": "faultline-hoodie",
+    "title": "Hoodie",
+    "media": "video",
+    "src": "/media/work/faultline-hoodie.mp4",
+    "poster": "/media/work/faultline-hoodie-poster.jpg",
+    "width": 1470,
+    "height": 1926,
+    "alt": "A montage of the Faultline hoodie: the Let Go poster, the Dragged lettering, and the gray hoodie with the print on the back."
+  },
+  {
+    "id": "final-card",
+    "title": "Final",
+    "src": "/media/work/final-card.png",
+    "width": 800,
+    "height": 600,
+    "alt": "A white Final debit card on a pale blue field, with a silver MasterCard mark."
+  },
+  {
+    "id": "philo-stickers",
+    "title": "Stickers",
+    "src": "/media/work/philo-stickers.jpg",
+    "width": 1024,
+    "height": 764,
+    "alt": "Philo sticker sheet on black, with phi marks, an eye, a crystal, and the words Vision to Venture."
+  },
+  {
+    "id": "philo-sticker-set",
+    "title": "Sticker set",
+    "media": "video",
+    "src": "/media/work/philo-sticker-set.mp4",
+    "poster": "/media/work/philo-sticker-set-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A jump cut through thirteen Philo stickers, each centered on white: phi marks, hex locks, a crest, a ticket, a pill of icons, and a tall deck."
+  },
+  {
+    "id": "philo-headshots",
+    "title": "Headshots",
+    "media": "video",
+    "src": "/media/work/philo-headshots.mp4",
+    "poster": "/media/work/philo-headshots-poster.jpg",
+    "width": 764,
+    "height": 1024,
+    "alt": "A fast jump cut through thirty-six black-and-white Philo portraits."
+  },
+  {
+    "id": "crayon-illustrations",
+    "title": "Illustrations",
+    "media": "video",
+    "src": "/media/work/crayon-illustrations.mp4",
+    "poster": "/media/work/crayon-illustrations-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A jump cut through fifteen blue-and-yellow crayon illustrations on warm cream: a vial, a woman talking, blood tubes, a laptop, a chart, a package, a doctor, a bike, and a beaker."
+  },
+  {
+    "id": "orientation",
+    "title": "Orientation",
+    "media": "frame",
+    "fit": "screen",
+    "src": "/media/work/orientation.html",
+    "width": 390,
+    "height": 852,
+    "alt": "Signer orientation screen reading Goodbye Seed Phrases, with a Secure Enclave card and actions to create or add a key."
+  },
+  {
+    "id": "faultline-afraid-tee",
+    "title": "Afraid Tee",
+    "media": "video",
+    "src": "/media/work/faultline-afraid-tee.mp4",
+    "poster": "/media/work/faultline-afraid-tee-poster.jpg",
+    "width": 1470,
+    "height": 1926,
+    "alt": "A montage of the Faultline Afraid tee, from the beast poster to the black shirt."
+  },
+  {
+    "id": "sage-advice",
+    "title": "Sage advice",
+    "src": "/media/work/sage-advice.jpg",
+    "width": 1024,
+    "height": 744,
+    "alt": "A hooded figure cups a glowing crystal ball that holds the Sage eye, set on dark cloth against a star field."
+  },
+  {
+    "id": "faultline-do-it-afraid",
+    "title": "Do It Afraid",
+    "src": "/media/work/faultline-do-it-afraid.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "Two people sit in a moss-covered boat on a cliff above a flooded New York skyline, with pale green lettering reading Do It Afraid and the Faultline Project mark."
+  },
+  {
+    "id": "keep-fighting-tee",
+    "title": "Keep Fighting Tee",
+    "media": "video",
+    "src": "/media/work/keep-fighting-tee.mp4",
+    "poster": "/media/work/keep-fighting-tee-poster.jpg",
+    "width": 1470,
+    "height": 1926,
+    "alt": "A montage of Faultline Keep Fighting: a black tee photographed with the print on the back, then the same graphic flat on a dark ground."
+  },
+  {
+    "id": "faultline-anomaly",
+    "title": "Anomaly",
+    "src": "/media/work/faultline-anomaly.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A stone Faultline mark floats over a coastal city while a suited figure stands on a cliff, with the line Do It Afraid and the Faultline Project mark."
+  },
+  {
+    "id": "icons",
+    "title": "Icons",
+    "media": "video",
+    "src": "/media/work/icons.mp4",
+    "poster": "/media/work/icons-poster.jpg",
+    "width": 800,
+    "height": 600,
+    "alt": "A montage of four icons: a red play button, a speedometer near 85 mph, a green radar, and a black On Air sign."
+  },
+  {
+    "id": "merch-makers",
+    "title": "Merch Makers",
+    "media": "video",
+    "src": "/media/work/merch-makers.mp4",
+    "poster": "/media/work/merch-makers-poster.jpg",
+    "width": 1640,
+    "height": 1920,
+    "alt": "A montage of three Merch Makers graphics: a turquoise octopus on black, a glass neon skull on light gray, and an iridescent buffalo skull on charcoal."
+  },
+  {
+    "id": "sweatshirt",
+    "title": "Sweatshirt",
+    "src": "/media/work/sweatshirt.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A red sweatshirt on stone, with a white mark across the chest."
+  },
+  {
+    "id": "xymo",
+    "title": "Xymo",
+    "media": "frame",
+    "fit": "screen",
+    "mark": true,
+    "src": "/media/work/xymo.html",
+    "width": 512,
+    "height": 512,
+    "alt": "Xymo app icon, a rounded square of pink-to-violet glass ribs with the word xymo in dark letters."
+  },
+  {
+    "id": "sunset",
+    "title": "Sunset",
+    "media": "video",
+    "src": "/media/work/sunset.mp4",
+    "poster": "/media/work/sunset-poster.jpg",
+    "width": 1024,
+    "height": 632,
+    "alt": "A montage of Sunset, from the wordmark to a billboard, social cards, phone screens, a laptop, merch, and business cards."
+  },
+  {
+    "id": "faultline-rebuild",
+    "title": "Rebuild",
+    "src": "/media/work/faultline-rebuild.png",
+    "width": 952,
+    "height": 1024,
+    "alt": "A worn white Faultline Project badge with a wireframe globe, the word Rebuild, and the line Growth begins at the breakpoint, on black."
+  },
+  {
+    "id": "jacket",
+    "title": "Jacket",
+    "src": "/media/work/jacket.jpg",
+    "width": 614,
+    "height": 1024,
+    "alt": "A man in profile wearing a black jacket with a white mark on the sleeve."
+  },
+  {
+    "id": "fatherhood",
+    "title": "Fatherhood Movement",
+    "media": "video",
+    "src": "/media/work/fatherhood.mp4",
+    "poster": "/media/work/fatherhood-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A montage of Fatherhood Movement: a Tune In photo poster, the brand sheet, and a green Tune In poster."
+  },
+  {
+    "id": "timelord",
+    "title": "Timelord",
+    "src": "/media/work/timelord.jpg",
+    "width": 1024,
+    "height": 768,
+    "alt": "Navy and gold ASIC Timelord Team badge, with a portrait, stars, and the letters VDF."
+  },
+  {
+    "id": "faultline-gloves",
+    "title": "Gloves",
+    "media": "video",
+    "src": "/media/work/faultline-gloves.mp4",
+    "poster": "/media/work/faultline-gloves-poster.jpg",
+    "width": 624,
+    "height": 820,
+    "alt": "A montage of Faultline boxing gloves: black tees shown front and back, then a black hoodie with the same back print."
+  },
+  {
+    "id": "sulek",
+    "title": "Sulek",
+    "mark": true,
+    "pad": 16,
+    "src": "/media/work/sulek.svg",
+    "width": 959.361,
+    "height": 1036.5,
+    "alt": "Orange Sulek mark with a stepped tower, scattered stars, and a geometric wordmark."
+  },
+  {
+    "id": "credentials",
+    "title": "Credentials",
+    "src": "/media/work/credentials.jpg",
+    "width": 1024,
+    "height": 661,
+    "alt": "Verifiable Credentials screen with a green government ID card between cards for badging, KYC status, and memberships."
+  },
+  {
+    "id": "faultline-demons-tee",
+    "title": "Demons Tee",
+    "media": "video",
+    "src": "/media/work/faultline-demons-tee.mp4",
+    "poster": "/media/work/faultline-demons-tee-poster.jpg",
+    "width": 1470,
+    "height": 1926,
+    "alt": "A montage of the Faultline Demons tee, from the one-eyed demon poster to the black shirt."
+  },
+  {
+    "id": "zip-hoodie",
+    "title": "Zip Hoodie",
+    "src": "/media/work/zip-hoodie.jpg",
+    "width": 1024,
+    "height": 576,
+    "alt": "Front and back of a black zip hoodie, with a small Sam Sulek chest mark and a wireframe graphic across the back."
+  },
+  {
+    "id": "keep-fighting",
+    "title": "Keep Fighting",
+    "media": "video",
+    "src": "/media/work/keep-fighting.mp4",
+    "poster": "/media/work/keep-fighting-poster.jpg",
+    "width": 1470,
+    "height": 1926,
+    "alt": "A montage of Faultline Keep Fighting: tees and hoodies, then hoodies and sweatpants, each with the figure printed on the back."
+  },
+  {
+    "id": "context-defensibility",
+    "title": "Context Matrix",
+    "media": "frame",
+    "src": "/media/work/context-defensibility-matrix.html",
+    "width": 900,
+    "height": 1200,
+    "alt": "The Context Defensibility Matrix, a two-axis map of whether rivals and models can copy a company's context."
+  },
+  {
+    "id": "batgan",
+    "title": "BatGAN",
+    "media": "video",
+    "src": "/media/work/batgan.mp4",
+    "poster": "/media/work/batgan-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A loop of BatGAN portraits."
+  },
+  {
+    "id": "lift-the-world",
+    "title": "Lift the World",
+    "src": "/media/work/lift-the-world-inset.jpg",
+    "width": 2160,
+    "height": 1650,
+    "alt": "Distressed cream lettering reading Lift the World around a wireframe globe, with Arnold's Pump Club underneath, on black."
+  },
+  {
+    "id": "vision",
+    "title": "Vision",
+    "mark": true,
+    "src": "/media/work/vision-icon.png",
+    "width": 1062,
+    "height": 1062,
+    "alt": "Rounded app icon with a green-to-teal geometric mark and a small square at the center, on a dark field."
+  },
+  {
+    "id": "security-scorecard",
+    "title": "SecurityScorecard",
+    "mark": true,
+    "src": "/media/work/security-scorecard.webp",
+    "width": 4592,
+    "height": 2856,
+    "alt": "SecurityScorecard card reading \u201cWith enough data you can predict the future,\u201d with a crystal ball held in outlined hands."
+  },
+  {
+    "id": "spacebase",
+    "title": "SpaceBase",
+    "media": "video",
+    "src": "/media/work/spacebase.mp4",
+    "poster": "/media/work/spacebase-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A jumpcut loop of SpaceBase pixel skulls, each with a different hair color and background."
+  },
+  {
+    "id": "skillhack",
+    "title": "Skillhack",
+    "src": "/media/work/skillhack.jpg",
+    "width": 1024,
+    "height": 771,
+    "alt": "Skillhack.ai prototyping still of glitch-textured hands holding a phone, the screen filled with magenta, cyan, and orange noise."
+  },
+  {
+    "id": "farming",
+    "title": "Farming",
+    "src": "/media/work/farming.jpg",
+    "width": 1024,
+    "height": 589,
+    "alt": "Split illustration of an orange mining rig dropping coins beside an opened hard drive over a green plot."
+  },
+  {
+    "id": "intermission-iron",
+    "title": "Blood Iron",
+    "mark": true,
+    "src": "/media/work/intermission-iron.png",
+    "width": 470,
+    "height": 1024,
+    "alt": "Intermission phone screen titled Blood Iron, with a red blood cell and a note on what TSH measures."
+  },
+  {
+    "id": "trashformers",
+    "title": "Trashformers",
+    "media": "video",
+    "src": "/media/work/trashformers.mp4",
+    "poster": "/media/work/trashformers-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A loop of Trashformers, voxel robots built from dumpsters and junk."
+  },
+  {
+    "id": "la-strong",
+    "title": "LA Strong",
+    "src": "/media/work/la-strong-padded.png",
+    "width": 1024,
+    "height": 1024,
+    "alt": "Distressed red LA Strong lettering arched over a white bodybuilder, with red stars on a black field."
+  },
+  {
+    "id": "philo-vision",
+    "title": "Vision to Venture",
+    "media": "video",
+    "src": "/media/work/philo-vision.mp4",
+    "poster": "/media/work/philo-vision-poster.jpg",
+    "width": 1920,
+    "height": 1080,
+    "alt": "A person at a skatepark wearing a cream Philo shirt with a blue back graphic of an eye, a star, and clouds."
+  },
+  {
+    "id": "chia-friends",
+    "title": "Chia Friends",
+    "media": "video",
+    "src": "/media/work/chia-friends.mp4",
+    "poster": "/media/work/chia-friends-poster.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "A loop of Chia Friends pixel-art characters."
+  },
+  {
+    "id": "study-icons",
+    "title": "Study",
+    "src": "/media/work/study-pair.jpg",
+    "width": 1024,
+    "height": 768,
+    "alt": "Two Study app icons on a dark surface, one unlit and one lit with a blue glow."
+  }
+]

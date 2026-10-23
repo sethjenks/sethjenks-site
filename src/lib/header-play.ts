@@ -233,7 +233,7 @@ export function syncSoftBody(play: HeaderPlayConfig) {
     const topY = restTopY(body);
     const bottomY = restBottomY(body);
     const canvasPageTop = rect.top + window.scrollY;
-    frameHeadTop(handle?.ctx?.camera, play, width, height, topY, canvasPageTop);
+    frameHeadTop(handle?.ctx?.camera, play, width, height, topY);
     fitHeadAboveText(
       handle?.ctx?.camera,
       play,
@@ -285,14 +285,15 @@ function frameHeadTop(
   width: number,
   height: number,
   topY: number,
-  canvasTop: number,
 ) {
   if (!camera?.position.clone) {
     return;
   }
 
   const aspect = width / Math.max(1, height);
-  const target = HEAD_TOP_INSET_PX - canvasTop;
+  // The crown sits inside this canvas. The stage can start below the page,
+  // so the inset is not a page coordinate.
+  const target = HEAD_TOP_INSET_PX;
   const fov = ((camera.fov ?? 35) * Math.PI) / 180;
   const worldPerPx = (2 * play.camZ * Math.tan(fov / 2)) / height;
 
@@ -355,7 +356,7 @@ function fitHeadAboveText(
     const currentH = Math.max(8, chin - crown);
     const allowedH = Math.max(8, limit - HEAD_TOP_INSET_PX);
     play.camZ *= currentH / allowedH;
-    frameHeadTop(camera, play, width, height, topY, canvasTop);
+    frameHeadTop(camera, play, width, height, topY);
   }
 }
 

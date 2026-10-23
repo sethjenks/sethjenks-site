@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xymo</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: transparent;
+  }
+
+  .screen {
+    width: 100%;
+    height: 100%;
+    container-type: size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .fit {
+    position: relative;
+    width: min(76cqw, 76cqh);
+    height: min(76cqw, 76cqh);
+    container-type: size;
+  }
+
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 512px;
+    height: 512px;
+    overflow: hidden;
+    transform-origin: top left;
+    transform: scale(calc(100cqw / 512px));
+    border-radius: 176px;
+    background: #fff;
+  }
+
+  .glass {
+    position: absolute;
+    left: -116px;
+    top: -28px;
+    width: 848px;
+    height: 568px;
+  }
+
+  .glass img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+  }
+
+  .mark {
+    position: absolute;
+    left: 32px;
+    top: 32px;
+    width: 448px;
+    height: 448px;
+  }
+
+  .mark img {
+    display: block;
+    width: 448px;
+    height: 448px;
+  }
+</style>
+</head>
+<body>
+  <div class="screen">
+    <div class="fit">
+      <div class="canvas">
+      <div class="glass"><img src="xymo/glass.jpg" alt=""></div>
+      <div class="mark"><img src="xymo/mark.svg" alt=""></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

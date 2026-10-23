@@ -2,17 +2,20 @@ import { HomePlayfield } from "@/components/home-playfield";
 import { LogoRows } from "@/components/logo-rows";
 import { MessageBoardSlot } from "@/components/message-board-slot";
 import { ProjectList } from "@/components/project-list";
+import { WorkMasonry } from "@/components/work-masonry";
 import { WorkRows } from "@/components/work-rows";
+import { getGalleryItems } from "@/lib/gallery";
 import { getLogoItems, sortLogoItems } from "@/lib/logos";
 import { getProjectItems } from "@/lib/projects";
 import { INTRO } from "@/lib/intro";
 import { getWorkItems, sortWorkForDisplay } from "@/lib/work";
 
 export default async function Home() {
-  const [work, logos, projects] = await Promise.all([
+  const [work, logos, projects, gallery] = await Promise.all([
     getWorkItems(),
     getLogoItems(),
     getProjectItems(),
+    getGalleryItems(),
   ]);
 
   return (
@@ -25,6 +28,7 @@ export default async function Home() {
       />
       <WorkRows id="work" heading="Work" items={sortWorkForDisplay(work)} />
       <LogoRows id="logos" heading="Brands" items={sortLogoItems(logos)} />
+      <WorkMasonry tiles={gallery} />
       <ProjectList items={projects} />
       <MessageBoardSlot />
     </main>

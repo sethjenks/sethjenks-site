@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Context Defensibility Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,400&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15120e;
+    --ink-2:#1d1a14;
+    --panel:#211d16;
+    --panel-2:#262119;
+    --line:#3a3327;
+    --paper:#f2 ece0;
+    --paper:#f2ece0;
+    --paper-dim:#bdb3a0;
+    --paper-faint:#8c8474;
+    --acid:#c8f135;
+    --acid-deep:#a6cc1f;
+    --amber:#e8a23d;
+    --rust:#d4663a;
+    --shadow:rgba(0,0,0,.45);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Spline Sans',sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* grain overlay */
+  body::after{
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;z-index:999;
+    opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+  /* ---- header ---- */
+  header{padding:78px 0 34px;position:relative}
+  .kicker{
+    font-family:'Spline Sans Mono',monospace;
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--acid);
+    display:flex;align-items:center;gap:14px;
+    opacity:0;animation:rise .7s .05s forwards;
+  }
+  .kicker::before{content:"";width:34px;height:1px;background:var(--acid)}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:900;
+    font-size:clamp(40px,7vw,86px);
+    line-height:.96;
+    letter-spacing:-.02em;
+    margin:20px 0 0;
+    max-width:14ch;
+    opacity:0;animation:rise .8s .12s forwards;
+  }
+  h1 em{font-style:italic;font-weight:400;color:var(--acid)}
+  .standfirst{
+    margin-top:26px;max-width:60ch;
+    font-size:clamp(16px,1.6vw,19px);
+    color:var(--paper-dim);
+    opacity:0;animation:rise .8s .22s forwards;
+  }
+  .standfirst b{color:var(--paper);font-weight:600}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:26px;margin-top:32px;
+    font-family:'Spline Sans Mono',monospace;font-size:12.5px;
+    color:var(--paper-faint);
+    opacity:0;animation:rise .8s .3s forwards;
+  }
+  .legend span{display:flex;align-items:center;gap:9px}
+  .dot{width:10px;height:10px;border-radius:50%}
+
+  /* ---- matrix ---- */
+  .matrix-section{padding:30px 0 40px}
+  .matrix-shell{
+    position:relative;
+    padding-left:54px;padding-bottom:54px;
+    opacity:0;animation:rise .9s .38s forwards;
+  }
+  /* y axis label */
+  .axis-y{
+    position:absolute;left:0;top:0;bottom:54px;width:54px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .axis-y span{
+    transform:rotate(-180deg);writing-mode:vertical-rl;
+    font-family:'Spline Sans Mono',monospace;font-size:12px;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--paper);
+    display:flex;align-items:center;gap:14px;
+  }
+  .axis-y span::after{content:"";height:60px;width:1px;background:linear-gradient(var(--line),var(--acid))}
+  .axis-x{
+    position:absolute;left:54px;right:0;bottom:0;height:54px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Spline Sans Mono',monospace;font-size:12px;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--paper);
+    gap:14px;
+  }
+  .axis-x::after{content:"";width:60px;height:1px;background:linear-gradient(90deg,var(--line),var(--acid))}
+  .axis-end{
+    position:absolute;font-family:'Spline Sans Mono',monospace;
+    font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--paper-faint);
+  }
+  .ye-low{left:-2px;bottom:54px;transform:rotate(-90deg) translateX(-100%);transform-origin:left bottom}
+  .ye-high{left:-2px;top:0;transform:rotate(-90deg);transform-origin:left top}
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:1fr 1fr;
+    gap:14px;
+    position:relative;
+  }
+  /* low/high markers along axes via grid corner notes handled by quadrant tags */
+
+  .quad{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:26px 24px 24px;
+    min-height:300px;
+    overflow:hidden;
+    transition:border-color .35s, transform .35s, background .35s;
+  }
+  .quad::before{
+    content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background:radial-gradient(120% 90% at var(--gx,90%) var(--gy,10%), var(--glow,transparent) 0%, transparent 55%);
+    transition:opacity .4s;
+  }
+  .quad:hover{transform:translateY(-3px);border-color:var(--qc,var(--acid))}
+  .quad:hover::before{opacity:.85}
+
+  .quad-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:relative;z-index:1}
+  .quad-tag{
+    font-family:'Spline Sans Mono',monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--qc,var(--acid));
+    border:1px solid var(--qc,var(--acid));border-radius:100px;
+    padding:5px 11px;white-space:nowrap;
+  }
+  .quad h2{
+    font-family:'Fraunces',serif;font-weight:600;font-size:26px;
+    line-height:1.05;letter-spacing:-.01em;margin-bottom:4px;
+  }
+  .verdict{
+    font-size:13.5px;color:var(--paper-dim);margin-bottom:20px;
+    position:relative;z-index:1;max-width:42ch;
+  }
+  .verdict b{color:var(--paper);font-weight:600}
+
+  .firms{display:flex;flex-direction:column;gap:11px;position:relative;z-index:1}
+  .firm{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-left:3px solid var(--qc,var(--acid));
+    border-radius:4px;
+    padding:12px 14px;
+    transition:transform .25s, background .25s;
+    cursor:default;
+  }
+  .firm:hover{transform:translateX(4px);background:#2c261d}
+  .firm-name{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+  .firm-name .layer{
+    font-family:'Spline Sans Mono',monospace;font-size:10px;
+    color:var(--paper-faint);letter-spacing:.08em;font-weight:400;
+    margin-left:auto;text-transform:uppercase;
+  }
+  .firm-why{font-size:13px;color:var(--paper-dim);margin-top:3px}
+
+  /* score chips */
+  .scores{display:flex;gap:7px;margin-top:9px}
+  .score{
+    font-family:'Spline Sans Mono',monospace;font-size:10.5px;
+    letter-spacing:.05em;color:var(--paper-faint);
+    display:flex;align-items:center;gap:5px;
+  }
+  .pip{display:inline-flex;gap:2px}
+  .pip i{width:6px;height:6px;border-radius:50%;background:var(--line);display:block}
+  .pip i.on{background:var(--qc,var(--acid))}
+
+  /* ---- reading the map ---- */
+  .read{padding:44px 0 80px;border-top:1px solid var(--line);margin-top:28px}
+  .read-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:48px}
+  .read h3{
+    font-family:'Fraunces',serif;font-weight:600;font-size:30px;letter-spacing:-.01em;
+    margin-bottom:18px;
+  }
+  .read h3 em{font-style:italic;color:var(--acid);font-weight:400}
+  .read p{color:var(--paper-dim);margin-bottom:16px;max-width:54ch}
+  .read p b{color:var(--paper);font-weight:600}
+  .paradox{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:26px 26px 22px;align-self:start;position:relative;overflow:hidden;
+  }
+  .paradox::before{
+    content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;
+    background:radial-gradient(circle,var(--rust),transparent 70%);opacity:.28;
+  }
+  .paradox .quad-tag{color:var(--rust);border-color:var(--rust);display:inline-block;margin-bottom:14px}
+  .paradox h4{font-family:'Fraunces',serif;font-weight:600;font-size:21px;margin-bottom:12px;line-height:1.15}
+  .paradox p{font-size:14px;margin-bottom:0}
+
+  footer{
+    border-top:1px solid var(--line);padding:30px 0 60px;
+    font-family:'Spline Sans Mono',monospace;font-size:11.5px;
+    color:var(--paper-faint);letter-spacing:.04em;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  }
+  footer b{color:var(--paper-dim);font-weight:500}
+
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+  @media(max-width:840px){
+    .grid{grid-template-columns:1fr}
+    .read-grid{grid-template-columns:1fr;gap:30px}
+    .matrix-shell{padding-left:38px}
+    .axis-y{width:38px}
+    .ye-low,.ye-high{display:none}
+    .quad{min-height:0}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Context as a Strategic Asset &nbsp;/&nbsp; VRIO Field Map</div>
+    <h1>The Context <em>Defensibility</em> Matrix</h1>
+    <p class="standfirst">Every company feeding context to AI agents faces the same question: <b>if everyone runs on the same models, where does advantage come from?</b> Two moats decide it. Whether rivals can copy your context, and whether the model already knows it. Plot a context asset on both, and its real worth becomes obvious.</p>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--acid)"></i> Durable advantage</span>
+      <span><i class="dot" style="background:var(--amber)"></i> Temporary edge</span>
+      <span><i class="dot" style="background:#6fa8dc"></i> Table stakes</span>
+      <span><i class="dot" style="background:var(--paper-faint)"></i> Commodity</span>
+    </div>
+  </header>
+
+  <section class="matrix-section">
+    <div class="matrix-shell">
+
+      <div class="axis-y"><span>Moat against competitors</span></div>
+      <div class="axis-end ye-low">Low</div>
+      <div class="axis-end ye-high">High</div>
+
+      <div class="grid">
+
+        <!-- TOP LEFT: high competitors, low model -->
+        <div class="quad" style="--qc:var(--amber);--glow:rgba(232,162,61,.22);--gx:88%;--gy:14%">
+          <div class="quad-head">
+            <div>
+              <h2>Temporary Edge</h2>
+            </div>
+            <div class="quad-tag">Rivals can't &nbsp;·&nbsp; Model can</div>
+          </div>
+          <p class="verdict">Rare among your competitors, but a frontier model can synthesize a competent version on request. Useful today. Don't build the strategy on it.</p>
+          <div class="firms">
+            <div class="firm">
+              <div class="firm-name">Jasper <span class="layer">Procedural</span></div>
+              <div class="firm-why">Its library of marketing-copy templates and prompts outpaced rivals early, but the underlying model can reproduce them, which is the classic wrapper squeeze.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">A boutique firm's playbook <span class="layer">Semantic</span></div>
+              <div class="firm-why">A documented methodology rare among regional peers, yet assembled from public frameworks the model already learned in training.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">Chegg <span class="layer">Semantic</span></div>
+              <div class="firm-why">A large bank of step-by-step study answers that was rare among competitors until general models could generate the same explanations for free.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP RIGHT: high competitors, high model -->
+        <div class="quad" style="--qc:var(--acid);--glow:rgba(200,241,53,.2);--gx:90%;--gy:12%">
+          <div class="quad-head">
+            <div>
+              <h2>Durable Advantage</h2>
+            </div>
+            <div class="quad-tag">Rivals can't &nbsp;·&nbsp; Model can't</div>
+          </div>
+          <p class="verdict">Rare, costly to copy, <b>and</b> beyond what the model can synthesize. Born from a proprietary loop. This is the moat worth defending.</p>
+          <div class="firms">
+            <div class="firm">
+              <div class="firm-name">Bloomberg <span class="layer">Environmental</span></div>
+              <div class="firm-why">Live proprietary market data plus decades of dealer relationships and a locked-in user network. Not public, not static, not reproducible from training data.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">Tesla (fleet data) <span class="layer">Environmental</span></div>
+              <div class="firm-why">Billions of real-world edge-case driving miles streaming from its fleet, a physical-world feedback loop no model can observe and no rival can backfill.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">Stripe Radar <span class="layer">Relational</span></div>
+              <div class="firm-why">Fraud signal drawn from payment patterns across millions of merchants, refreshed continuously. The loop, not the rulebook, is the asset.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM LEFT: low competitors, low model -->
+        <div class="quad" style="--qc:var(--paper-faint);--glow:rgba(140,132,116,.18);--gx:88%;--gy:90%">
+          <div class="quad-head">
+            <div>
+              <h2>Commodity</h2>
+            </div>
+            <div class="quad-tag">Rivals have it &nbsp;·&nbsp; Model has it</div>
+          </div>
+          <p class="verdict">Everyone in the industry holds it and the model knows it cold. Necessary plumbing. Build it cheaply and spend zero strategy attention here.</p>
+          <div class="firms">
+            <div class="firm">
+              <div class="firm-name">Generic brand voice doc <span class="layer">Semantic</span></div>
+              <div class="firm-why">"Friendly, bold, human" guidelines assembled from the same public branding frameworks every agency and model already references.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">Standard coding style guide <span class="layer">Instructional</span></div>
+              <div class="firm-why">PEP 8 and its kin are published, universal, and baked into every model. Useful to state, worth nothing as an edge.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">SaaS onboarding email flow <span class="layer">Procedural</span></div>
+              <div class="firm-why">A welcome sequence built from off-the-shelf best practices that any competitor and any model can draft in minutes.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM RIGHT: low competitors, high model -->
+        <div class="quad" style="--qc:#6fa8dc;--glow:rgba(111,168,220,.2);--gx:90%;--gy:88%">
+          <div class="quad-head">
+            <div>
+              <h2>Table Stakes</h2>
+            </div>
+            <div class="quad-tag">Rivals have it &nbsp;·&nbsp; Model can't</div>
+          </div>
+          <p class="verdict">The model can't reproduce it, but every serious competitor already runs it. Required to operate, not a differentiator. Build it well, move on.</p>
+          <div class="firms">
+            <div class="firm">
+              <div class="firm-name">Airline seat inventory <span class="layer">Environmental</span></div>
+              <div class="firm-why">Live availability the model can never hold, yet every carrier has the same class of system. Operating necessity, not advantage.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">Retail pricing &amp; stock feeds <span class="layer">Environmental</span></div>
+              <div class="firm-why">Current state only the retailer knows, but a capability shared by all of them. The freshness is real; the edge is not.</div>
+            </div>
+            <div class="firm">
+              <div class="firm-name">Bank core ledger <span class="layer">Episodic</span></div>
+              <div class="firm-why">Proprietary transaction records the model cannot see, standard issue across every bank. Foundational, undifferentiating.</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /grid -->
+
+      <div class="axis-x"><span>Moat against the model</span></div>
+
+    </div>
+  </section>
+
+  <section class="read">
+    <div class="read-grid">
+      <div>
+        <h3>Reading the <em>map</em></h3>
+        <p>Score a context asset on both axes separately, then read where it lands. <b>Effort to create is not cost to copy</b>. A brand brief that took three weeks to write still takes three minutes to clone the moment the file leaves the building, which is why so much "proprietary" context quietly sits in the bottom-left.</p>
+        <p>The pattern repeats by layer. <b>Instructional and public-semantic context</b> tends to fall toward commodity. <b>Episodic, relational, and environmental context</b>, the kind generated by your own operations and the physical world, is where durable advantage concentrates. If your context investment is flowing mostly into the first group, that itself is the finding.</p>
+        <p>The aim is not to fill the top-right. Most assets belong elsewhere, and that's fine. The aim is to know which one or two assets are the real moat, so you protect those and stop overspending on the rest.</p>
+      </div>
+      <div class="paradox">
+        <span class="quad-tag">The trap</span>
+        <h4>Codifying your edge can erase it</h4>
+        <p>The most defensible context is often tacit, the judgment living in experienced people's heads, defensible precisely because it was never written down. The moment you codify it into a clean, agent-readable brain, you convert your stickiest asset into a portable one. What couldn't walk out the door now fits in a file.</p>
+        <p style="margin-top:14px">So codify with eyes open. Treat the <b style="color:var(--paper)">loop</b> that produces and refreshes context as the asset, not the document it emits. Keep that loop proprietary even when you share its output, and pair any company brain with real access governance from day one, not as an afterthought.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span><b>The Context Defensibility Matrix</b> &nbsp;·&nbsp; A VRIO scoring lens for agent context</span>
+    <span>Two axes &nbsp;·&nbsp; four verdicts &nbsp;·&nbsp; one moat worth defending</span>
+  </footer>
+
+</div>
+
+<script>
+  // tasteful parallax on quadrant glow following the cursor
+  document.querySelectorAll('.quad').forEach(q=>{
+    q.addEventListener('pointermove',e=>{
+      const r=q.getBoundingClientRect();
+      q.style.setProperty('--gx',((e.clientX-r.left)/r.width*100)+'%');
+      q.style.setProperty('--gy',((e.clientY-r.top)/r.height*100)+'%');
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -16,7 +16,7 @@ export function WorkStudy({ item, related }: WorkStudyProps) {
   const more = nextWorks(item, related);
 
   return (
-    <article className="study">
+    <main className="study">
       <header className="study-intro">
         <h1 className="study-title">{item.title}</h1>
         <div className="study-meta">
@@ -76,7 +76,7 @@ export function WorkStudy({ item, related }: WorkStudyProps) {
           </div>
         </aside>
       ) : null}
-    </article>
+    </main>
   );
 }
 

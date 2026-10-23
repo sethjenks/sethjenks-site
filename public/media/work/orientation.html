@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orientation</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #f8fbfc;
+  }
+
+  .stage {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+  }
+
+  .screen {
+    width: min(100vw, calc(100vh * 390 / 852));
+    aspect-ratio: 390 / 852;
+    container-type: size;
+    position: relative;
+    overflow: hidden;
+    background: #f8fbfc;
+  }
+
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 390px;
+    height: 852px;
+    overflow: hidden;
+    transform-origin: top left;
+    transform: scale(calc(100cqw / 390px));
+    background: #f8fbfc;
+    color: rgba(15, 37, 42, 0.87);
+    font-family: "SF Pro Text", "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wash-gradient,
+  .wash-ellipse {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .wash-gradient {
+    left: -805.47px;
+    top: -3.11px;
+    width: 2005.642px;
+    height: 482.356px;
+    background: linear-gradient(
+      to bottom,
+      #0d3349 0.751%,
+      rgba(26, 130, 132, 0.59) 60.535%,
+      rgba(37, 114, 156, 0) 100%
+    );
+  }
+
+  .wash-ellipse {
+    left: -940.7px;
+    top: 66.82px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2378.338px;
+    height: 872.579px;
+  }
+
+  .wash-ellipse div {
+    position: relative;
+    flex: none;
+    width: 2112.473px;
+    height: 580.14px;
+    transform: rotate(-169.75deg) skewX(-20.84deg) scaleY(0.93);
+  }
+
+  .wash-ellipse img {
+    position: absolute;
+    top: -26.92%;
+    left: -7.39%;
+    width: calc(100% + 14.78%);
+    height: calc(100% + 53.84%);
+    max-width: none;
+  }
+
+  .lines {
+    position: absolute;
+    left: 1px;
+    display: block;
+  }
+
+  .lines-top {
+    top: -149px;
+  }
+
+  .lines-bottom {
+    top: 362px;
+    transform: rotate(180deg);
+  }
+
+  .stepper {
+    position: absolute;
+    left: 32px;
+    top: 72px;
+    display: block;
+  }
+
+  .enclave-wrap {
+    position: absolute;
+    left: 84px;
+    top: 190px;
+    width: 222px;
+    height: 160px;
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(111deg, rgba(123, 0, 255, 0.7) 24%, rgba(0, 126, 242, 0.7) 92%);
+    filter: blur(11.5px);
+  }
+
+  .enclave {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-sizing: border-box;
+    padding: 32px;
+    border-radius: 24px;
+    background: #0f252a;
+    color: #f1f7f9;
+    box-shadow:
+      0 4px 5px rgba(15, 37, 42, 0.15),
+      0 18px 9px rgba(15, 37, 42, 0.13),
+      0 40px 12px rgba(15, 37, 42, 0.08);
+  }
+
+  .enclave p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 22px;
+  }
+
+  .copy {
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    bottom: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .headline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .headline h1,
+  .headline .lead {
+    margin: 0;
+  }
+
+  .headline h1 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: normal;
+  }
+
+  .headline .lead {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .headline .note {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+    color: rgba(15, 37, 42, 0.6);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .actions button {
+    width: 100%;
+    margin: 0;
+    padding: 14px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: rgba(15, 37, 42, 0.87);
+    font: 400 16px/22px "SF Pro Text", "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.4px;
+    cursor: default;
+  }
+
+  .actions .primary {
+    background: #5ece71;
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="screen">
+      <div class="canvas">
+        <div class="wash-gradient"></div>
+        <div class="wash-ellipse">
+          <div><img src="orientation/ellipse.svg" alt=""></div>
+        </div>
+        <img class="lines lines-top" src="orientation/lines-top.svg" width="389" height="358" alt="">
+        <img class="lines lines-bottom" src="orientation/lines-bottom.svg" width="389" height="358" alt="">
+        <img class="stepper" src="orientation/stepper.svg" width="326" height="8" alt="">
+        <div class="enclave-wrap">
+          <div class="glow"></div>
+          <div class="enclave">
+            <img src="orientation/apple.svg" width="54" height="72" alt="">
+            <p>Secure<br>Enclave</p>
+          </div>
+        </div>
+        <div class="copy">
+          <div class="headline">
+            <div>
+              <h1>Goodbye Seed Phrases</h1>
+              <p class="lead">You can’t steal what you can’t access.</p>
+            </div>
+            <p class="note">Keys stored in Secure Enclave.</p>
+          </div>
+          <div class="actions">
+            <button class="primary" type="button">Create a New Key</button>
+            <button type="button">Add an Existing Key</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

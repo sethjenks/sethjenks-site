@@ -183,6 +183,8 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
     }
 
     let lastHeight = 0;
+    let lastOffset = -1;
+    let settleFrame = 0;
     const applyHeight = () => {
       const work = document.getElementById("work");
       const end = work ?? root.querySelector(".playfield-end");
@@ -191,26 +193,48 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       }
 
       const gap = work ? 8 : 0;
+      const playfieldTop = root.getBoundingClientRect().top + window.scrollY;
+      const header = document.querySelector(".site-header");
+      const headerRect = header?.getBoundingClientRect();
+      const headerTop = headerRect ? headerRect.top + window.scrollY : 0;
+      const headerBottom = headerRect ? headerRect.bottom + window.scrollY : 0;
+      // The header's own box is the canvas, not content sitting above the
+      // playfield. Only a real section between them should push the stage down.
+      const contentAbove = Math.max(0, Math.round(playfieldTop - headerBottom));
+      const offset =
+        contentAbove > 0 ? Math.max(0, Math.round(playfieldTop - headerTop)) : 0;
+      const endTop = end.getBoundingClientRect().top + window.scrollY;
+      const canvasTop = headerTop + offset;
       const height = Math.max(
         COMPACT_HEADER_PX,
-        Math.round(end.getBoundingClientRect().top + window.scrollY - gap),
+        Math.round(endTop - canvasTop - gap),
       );
       const role = root.querySelector(".intro-name") ?? root.querySelector(".role-line");
       const textShift = window.innerHeight * 0.05;
       const roleTop = role?.getBoundingClientRect().top;
       const textTop =
-        (roleTop == null ? COMPACT_HEADER_PX + 32 + textShift : roleTop + window.scrollY) -
-        textShift;
+        (roleTop == null
+          ? playfieldTop + COMPACT_HEADER_PX + 32 + textShift
+          : roleTop + window.scrollY) - textShift;
       const play = headerPlayForHeight(height, window.innerWidth, textTop);
       applyHeaderPlay(play);
       syncSoftBody(play);
       alignJournalToHead(bodiesRef.current);
 
       document.documentElement.dataset.playfield = "home";
+      document.documentElement.style.setProperty("--playfield-offset", `${offset}px`);
+      document.documentElement.style.setProperty(
+        "--playfield-header",
+        offset > 0 ? "0px" : `${COMPACT_HEADER_PX}px`,
+      );
       document.documentElement.style.setProperty("--playfield-height", `${height}px`);
-      if (height !== lastHeight) {
+      if (height !== lastHeight || offset !== lastOffset) {
         lastHeight = height;
-        window.dispatchEvent(new Event("resize"));
+        lastOffset = offset;
+        cancelAnimationFrame(settleFrame);
+        settleFrame = requestAnimationFrame(() => {
+          window.dispatchEvent(new Event("resize"));
+        });
       }
       return height;
     };
@@ -245,6 +269,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       if (button) {
         button.inert = false;
       }
+      cancelAnimationFrame(settleFrame);
       observer.disconnect();
       window.removeEventListener("resize", onResize);
       window.__headerEnterShift = 0;
@@ -253,6 +278,8 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       applyHeaderPlay(compact);
       syncSoftBody(compact);
       delete document.documentElement.dataset.playfield;
+      document.documentElement.style.removeProperty("--playfield-offset");
+      document.documentElement.style.removeProperty("--playfield-header");
       document.documentElement.style.removeProperty("--playfield-height");
       nodesRef.current.forEach((node) => {
         node.style.transform = "";

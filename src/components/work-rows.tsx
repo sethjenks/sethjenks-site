@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -258,7 +259,13 @@ function WorkCard({
         />
         <span className="work-card-verb">
           Read
-          <ChevronRight aria-hidden="true" strokeWidth={1.5} />
+          <HugeiconsIcon
+            icon={ArrowRight01Icon}
+            size="1cap"
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
         </span>
       </span>
       <span className="work-card-meta">

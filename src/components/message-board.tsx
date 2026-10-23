@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, type ReactNode } from "react";
 import { useSync } from "@tldraw/sync";
 import {
 	Tldraw,
@@ -47,13 +48,36 @@ export function MessageBoard() {
 }
 
 function SyncedBoard({ uri }: { uri: string }) {
+	const [attempt, setAttempt] = useState(0);
+
+	return (
+		<SyncedAttempt
+			key={attempt}
+			uri={uri}
+			onRetry={() => setAttempt((current) => current + 1)}
+		/>
+	);
+}
+
+function SyncedAttempt({ uri, onRetry }: { uri: string; onRetry: () => void }) {
 	const store = useSync({ uri, assets });
 
 	switch (store.status) {
 		case "loading":
 			return <BoardStatus>Connecting…</BoardStatus>;
 		case "error":
-			return <BoardStatus>The board is offline.</BoardStatus>;
+			return (
+				<BoardStatus
+					live="assertive"
+					action={
+						<button type="button" onClick={onRetry}>
+							Try again
+						</button>
+					}
+				>
+					The board is offline.
+				</BoardStatus>
+			);
 		case "synced-remote":
 			return (
 				<section className="message-board" aria-label="Wall">
@@ -74,10 +98,21 @@ function SyncedBoard({ uri }: { uri: string }) {
 	}
 }
 
-function BoardStatus({ children }: { children: string }) {
+function BoardStatus({
+	children,
+	action,
+	live = "polite",
+}: {
+	children: string;
+	action?: ReactNode;
+	live?: "polite" | "assertive";
+}) {
 	return (
 		<section className="message-board" aria-label="Wall">
-			<p className="message-board-status">{children}</p>
+			<div className="message-board-status">
+				<p role={live === "assertive" ? "alert" : "status"}>{children}</p>
+				{action}
+			</div>
 		</section>
 	);
 }

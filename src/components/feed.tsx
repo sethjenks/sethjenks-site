@@ -34,7 +34,7 @@ function EntryArticle({
               const label = normalizeTag(tag);
               return (
                 <li key={label}>
-                  <Link href={`/journal?tag=${encodeURIComponent(label)}`}>{label}</Link>
+                  <Link href={`/journal/tag/${encodeURIComponent(label)}`}>{label}</Link>
                 </li>
               );
             })}

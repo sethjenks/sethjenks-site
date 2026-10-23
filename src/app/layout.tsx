@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { MotionRoot } from "@/components/motion-root";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { geistPixelSquare } from "@/lib/pixel-font";
@@ -9,6 +10,15 @@ import { timelessSans } from "@/lib/timeless-sans";
 import { INTRO } from "@/lib/intro";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+  colorScheme: "light",
+  themeColor: "oklch(98.5% 0 none)",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -39,7 +49,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <meta name="color-scheme" content="light" />
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -52,9 +61,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script src="/soft-matter/header-boot.js?v=play23" strategy="beforeInteractive" />
       </head>
       <body className="flex min-h-svh flex-col bg-background font-sans text-foreground">
-        <SiteHeader />
-        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
-        <SiteFooter />
+        <MotionRoot>
+          <SiteHeader />
+          <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+          <SiteFooter />
+        </MotionRoot>
       </body>
     </html>
   );

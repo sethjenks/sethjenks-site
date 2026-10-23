@@ -241,6 +241,38 @@ export function normalizeTag(tag: string): string {
   return tag.trim().toLowerCase();
 }
 
+export function filterDayGroupsByTag(groups: DayGroup[], tag: string): DayGroup[] {
+  const filter = normalizeTag(tag);
+  if (!filter) {
+    return groups;
+  }
+
+  return groups
+    .map((group) => ({
+      ...group,
+      entries: group.entries.filter((entry) =>
+        entry.tags?.some((item) => normalizeTag(item) === filter),
+      ),
+    }))
+    .filter((group) => group.entries.length > 0);
+}
+
+export async function getJournalTags(): Promise<string[]> {
+  const entries = await getEntries();
+  const tags = new Set<string>();
+
+  for (const entry of entries) {
+    for (const tag of entry.tags ?? []) {
+      const label = normalizeTag(tag);
+      if (label) {
+        tags.add(label);
+      }
+    }
+  }
+
+  return [...tags].sort();
+}
+
 export async function getEntryDayGroups(): Promise<DayGroup[]> {
   return groupEntriesByDay(await getEntries());
 }

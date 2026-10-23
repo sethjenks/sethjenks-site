@@ -1,0 +1,116 @@
+@font-face {
+  font-family: "Aachen";
+  src: local("Aachen"), local("Aachen Bold");
+  font-weight: 700;
+  font-style: normal;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #202136;
+}
+
+.stage {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.screen {
+  width: min(100vw, calc(100vh * 1470 / 1925));
+  aspect-ratio: 1470 / 1925;
+  container-type: size;
+  position: relative;
+  overflow: hidden;
+  background: #202136;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1470px;
+  height: 1925px;
+  overflow: hidden;
+  transform-origin: top left;
+  transform: scale(calc(100cqw / 1470px));
+  background: #202136;
+  box-shadow: inset 0 0 0 1px #000;
+  color: #fff;
+  font-family: "Aachen", serif;
+  font-weight: 700;
+}
+
+.layer,
+.wash,
+.spin,
+.logo,
+.quote {
+  position: absolute;
+}
+
+.layer img,
+.spin img,
+.logo img {
+  display: block;
+  max-width: none;
+  object-fit: cover;
+}
+
+.layer img {
+  width: 100%;
+  height: 100%;
+}
+
+.spin,
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin img,
+.logo img {
+  position: relative;
+  flex: none;
+}
+
+.logo img {
+  width: 78.5px;
+  height: 421.5px;
+  transform: rotate(-90deg);
+}
+
+.wash.color {
+  background: linear-gradient(to bottom, #000, #262626);
+  mix-blend-mode: color;
+  backdrop-filter: blur(15.15px);
+}
+
+.wash.hard-demons {
+  background: linear-gradient(to bottom, rgba(13, 149, 204, 0.5), rgba(113, 19, 125, 0.5));
+  mix-blend-mode: hard-light;
+}
+
+.wash.hard-beast {
+  background: linear-gradient(to bottom, rgba(57, 185, 166, 0.5), rgba(100, 75, 93, 0.5));
+  mix-blend-mode: hard-light;
+}
+
+.wash.plus {
+  background: linear-gradient(
+    21.656deg,
+    rgba(75, 191, 226, 0.2) 15.911%,
+    rgba(211, 120, 145, 0.2) 73.728%
+  );
+  mix-blend-mode: plus-lighter;
+}
+
+.quote {
+  margin: 0;
+  line-height: 1.09;
+  text-transform: uppercase;
+}

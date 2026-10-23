@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import {
   AlignWidget,
   FrameWidget,
@@ -20,6 +21,10 @@ export const metadata: Metadata = {
 };
 
 export default function LabPage() {
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
+
   return (
     <main className="lab-page">
       <h1>Lab</h1>
