@@ -934,8 +934,7 @@
     height: 100%;
     padding-block: max(24px, env(safe-area-inset-top, 0px))
       max(24px, env(safe-area-inset-bottom, 0px));
-    padding-inline: max(24px, env(safe-area-inset-left, 0px))
-      max(24px, env(safe-area-inset-right, 0px));
+    padding-inline: 0;
   }
 
   .work-lightbox-close {
@@ -972,6 +971,8 @@
     width: 100%;
     min-height: 0;
     margin: 0;
+    padding-inline: max(24px, env(safe-area-inset-left, 0px))
+      max(24px, env(safe-area-inset-right, 0px));
     container-type: size;
   }
 
@@ -1037,17 +1038,8 @@
     appearance: none;
   }
 
-  .work-lightbox-caption {
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    width: min(100%, 42rem);
-  }
-
   .work-lightbox-stack {
-    --chrome: 104px;
+    --chrome: 52px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1073,8 +1065,7 @@
     flex: none;
   }
 
-  .work-lightbox-stack .work-lightbox-transport,
-  .work-lightbox-stack .work-lightbox-bar {
+  .work-lightbox-stack .work-lightbox-transport {
     width: min(100%, 42rem);
     flex: none;
   }
@@ -1157,7 +1148,8 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .work-lightbox-transport .work-lightbox-step:hover {
+    .work-lightbox-transport .work-lightbox-step:hover,
+    .work-lightbox-bar .work-lightbox-step:hover {
       background: color-mix(in oklch, var(--ink) 5%, var(--paper));
     }
   }
@@ -1180,21 +1172,37 @@
   }
 
   .work-lightbox-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
+    column-gap: 12px;
+    flex: none;
+    width: min(100%, 42rem);
+    padding-inline: max(8px, env(safe-area-inset-left, 0px))
+      max(8px, env(safe-area-inset-right, 0px));
+  }
+
+  .work-lightbox-bar > .work-lightbox-step:first-child {
+    justify-self: start;
+  }
+
+  .work-lightbox-bar > .work-lightbox-step:last-child {
+    justify-self: end;
   }
 
   .work-lightbox-title {
+    grid-column: 2;
+    width: max-content;
+    max-width: 100%;
     min-width: 0;
     margin: 0;
+    justify-self: center;
     overflow: hidden;
     font-family: var(--font-mono);
     font-size: 12px;
     letter-spacing: 0.08em;
     line-height: 1.4;
+    text-align: center;
     text-overflow: ellipsis;
     text-transform: uppercase;
     white-space: nowrap;

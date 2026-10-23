@@ -515,11 +515,6 @@ function LightboxView({
               onToggleMute={toggleMute}
               onSeek={seek}
             />
-            <LightboxTitle
-              title={tile.title}
-              tileCount={tileCount}
-              onStep={onStep}
-            />
           </div>
         ) : (
           <span
@@ -541,15 +536,11 @@ function LightboxView({
           </span>
         )}
       </figure>
-      {tile.media === "video" ? null : (
-        <div className="work-lightbox-caption">
-          <LightboxTitle
-            title={tile.title}
-            tileCount={tileCount}
-            onStep={onStep}
-          />
-        </div>
-      )}
+      <LightboxTitle
+        title={tile.title}
+        tileCount={tileCount}
+        onStep={onStep}
+      />
     </div>
   );
 }
