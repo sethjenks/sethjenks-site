@@ -22,7 +22,7 @@ import {
   type KeyboardEvent,
   type Ref,
 } from "react";
-import type { GalleryItem } from "@/lib/gallery";
+import type { GalleryImage, GalleryItem, GalleryVideo } from "@/lib/gallery";
 
 const SHARED_EASE = [0.23, 1, 0.32, 1] as const;
 const FLIP_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
@@ -93,6 +93,53 @@ const INITIAL_COLUMN_WIDTH_PX = IDEAL_CARD_PX;
 
 const IMAGE_SIZES =
   "(min-width: 1200px) 25vw, (min-width: 800px) 33vw, (min-width: 560px) 50vw, calc(100vw - 48px)";
+const VIDEO_ROOT_MARGIN = "240px 0px";
+const ENTER_LIMIT = 6;
+
+type StillPhase = "enter" | "in" | "out";
+
+type StillLayer = {
+  id: string;
+  tile: GalleryImage;
+  phase: StillPhase;
+};
+
+function revealAfterPaint(mark: () => void) {
+  window.setTimeout(mark, 0);
+}
+
+function isOnScreen(element: HTMLElement): boolean {
+  const rect = element.getBoundingClientRect();
+  const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+  const viewWidth = window.innerWidth || document.documentElement.clientWidth;
+  return (
+    rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.top < viewHeight &&
+    rect.left < viewWidth
+  );
+}
+
+function pushStill(
+  current: StillLayer[],
+  tile: GalleryImage,
+  reducedMotion: boolean,
+): StillLayer[] {
+  if (reducedMotion) {
+    return [{ id: tile.id, tile, phase: "in" }];
+  }
+
+  const existing = current.find((layer) => layer.id === tile.id);
+  const outgoing = current
+    .filter((layer) => layer.id !== tile.id)
+    .map((layer) => ({ ...layer, phase: "out" as const }));
+
+  if (existing) {
+    return [...outgoing, { ...existing, tile, phase: "in" }];
+  }
+
+  return [...outgoing, { id: tile.id, tile, phase: "enter" }];
+}
 
 type MasonryLayout = {
   columns: number;
@@ -168,61 +215,119 @@ type WorkMasonryProps = {
   tiles: GalleryItem[];
 };
 
+function MasonryImage({
+  tile,
+  eager,
+}: {
+  tile: GalleryImage;
+  eager: boolean;
+}) {
+  const [ready, setReady] = useState(false);
+
+  return (
+    <Image
+      src={tile.src}
+      alt={tile.alt}
+      width={tile.width}
+      height={tile.height}
+      sizes={IMAGE_SIZES}
+      loading={eager ? "eager" : "lazy"}
+      className="work-masonry-image"
+      data-ready={ready ? "" : undefined}
+      style={{
+        position: "absolute",
+        inset: tile.pad == null ? 0 : `${tile.pad}cqw`,
+        width: tile.pad == null ? "100%" : `calc(100% - ${tile.pad * 2}cqw)`,
+        height: tile.pad == null ? "100%" : `calc(100% - ${tile.pad * 2}cqw)`,
+        maxWidth: tile.pad == null ? undefined : "none",
+        objectFit: tile.mark ? "contain" : "cover",
+      }}
+      draggable={false}
+      onLoad={() => revealAfterPaint(() => setReady(true))}
+      onError={() => revealAfterPaint(() => setReady(true))}
+    />
+  );
+}
+
+function MasonryVideo({
+  tile,
+  eager,
+}: {
+  tile: GalleryVideo;
+  eager: boolean;
+}) {
+  const [ready, setReady] = useState(false);
+
+  return (
+    <>
+      <Image
+        src={tile.poster}
+        alt=""
+        width={tile.width}
+        height={tile.height}
+        sizes={IMAGE_SIZES}
+        loading={eager ? "eager" : "lazy"}
+        className="work-masonry-image"
+        data-ready={ready ? "" : undefined}
+        draggable={false}
+        onLoad={() => revealAfterPaint(() => setReady(true))}
+        onError={() => revealAfterPaint(() => setReady(true))}
+      />
+      <video
+        className="work-masonry-video"
+        data-src={tile.src}
+        muted
+        loop
+        playsInline
+        preload="none"
+        tabIndex={-1}
+        aria-hidden="true"
+        onPlaying={(event) => {
+          event.currentTarget.setAttribute("data-playing", "");
+        }}
+        onPause={(event) => {
+          event.currentTarget.removeAttribute("data-playing");
+        }}
+      />
+    </>
+  );
+}
+
+function MasonryEmbed({
+  tile,
+  eager,
+}: {
+  tile: Extract<GalleryItem, { media: "frame" }>;
+  eager: boolean;
+}) {
+  const [ready, setReady] = useState(false);
+
+  return (
+    <iframe
+      className={frameEmbedClass(tile.fit, "masonry")}
+      src={tile.src}
+      title={tile.alt}
+      loading={eager ? "eager" : "lazy"}
+      data-ready={ready ? "" : undefined}
+      onLoad={() => revealAfterPaint(() => setReady(true))}
+    />
+  );
+}
+
 function TileVisual({
   tile,
   eager,
-  reducedMotion,
 }: {
   tile: GalleryItem;
   eager: boolean;
-  reducedMotion: boolean;
 }) {
   switch (tile.media) {
     case "image":
-      return (
-        <Image
-          src={tile.src}
-          alt={tile.alt}
-          width={tile.width}
-          height={tile.height}
-          sizes={IMAGE_SIZES}
-          loading={eager ? "eager" : "lazy"}
-          className="work-masonry-image"
-          style={{
-            position: "absolute",
-            inset: tile.pad == null ? 0 : `${tile.pad}cqw`,
-            width: tile.pad == null ? "100%" : `calc(100% - ${tile.pad * 2}cqw)`,
-            height: tile.pad == null ? "100%" : `calc(100% - ${tile.pad * 2}cqw)`,
-            maxWidth: tile.pad == null ? undefined : "none",
-            objectFit: tile.mark ? "contain" : "cover",
-          }}
-          draggable={false}
-        />
-      );
+      return <MasonryImage tile={tile} eager={eager} />;
     case "video":
-      return (
-        <video
-          className="work-masonry-video"
-          src={tile.src}
-          poster={tile.poster}
-          muted
-          loop
-          playsInline
-          autoPlay={!reducedMotion}
-          preload={reducedMotion ? "none" : "metadata"}
-          tabIndex={-1}
-          aria-hidden="true"
-        />
-      );
+      return <MasonryVideo tile={tile} eager={eager} />;
     case "frame":
-      return (
-        <iframe
-          className={frameEmbedClass(tile.fit, "masonry")}
-          src={tile.src}
-          title={tile.alt}
-          loading={eager ? "eager" : "lazy"}
-        />
-      );
+      return <MasonryEmbed tile={tile} eager={eager} />;
     default: {
       const unknownTile: never = tile;
       return unknownTile;
@@ -408,6 +513,99 @@ function LightboxVisual({
       return unknownTile;
     }
   }
+}
+
+function StillStage({
+  tile,
+  reducedMotion,
+}: {
+  tile: GalleryImage;
+  reducedMotion: boolean;
+}) {
+  const [snapshot, setSnapshot] = useState<{ id: string; layers: StillLayer[] }>({
+    id: tile.id,
+    layers: [{ id: tile.id, tile, phase: "in" }],
+  });
+
+  if (snapshot.id !== tile.id) {
+    setSnapshot({
+      id: tile.id,
+      layers: pushStill(snapshot.layers, tile, reducedMotion),
+    });
+  }
+
+  const layers = snapshot.id === tile.id ? snapshot.layers : pushStill(snapshot.layers, tile, reducedMotion);
+  const needsReveal = layers.some((layer) => layer.phase === "enter");
+
+  useEffect(() => {
+    if (!needsReveal) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setSnapshot((current) => ({
+        ...current,
+        layers: current.layers.map((layer) =>
+          layer.phase === "enter" ? { ...layer, phase: "in" } : layer,
+        ),
+      }));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [needsReveal]);
+
+  useEffect(() => {
+    if (!layers.some((layer) => layer.phase === "out")) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSnapshot((current) => ({
+        ...current,
+        layers: current.layers.filter((layer) => layer.phase !== "out"),
+      }));
+    }, 420);
+
+    return () => window.clearTimeout(timer);
+  }, [layers]);
+
+  return (
+    <span className="work-lightbox-stills">
+      {layers.map((layer) => (
+        <Image
+          key={layer.id}
+          src={layer.tile.src}
+          alt={layer.tile.alt}
+          width={layer.tile.width}
+          height={layer.tile.height}
+          sizes="100vw"
+          quality={90}
+          loading="eager"
+          className="work-lightbox-image work-lightbox-still"
+          data-still={layer.id}
+          data-phase={layer.phase}
+          draggable={false}
+          onTransitionEnd={(event) => {
+            if (event.propertyName !== "opacity") {
+              return;
+            }
+            if (event.target !== event.currentTarget) {
+              return;
+            }
+            const phase = event.currentTarget.getAttribute("data-phase");
+            const id = event.currentTarget.getAttribute("data-still");
+            if (phase !== "out" || !id) {
+              return;
+            }
+            setSnapshot((current) => ({
+              ...current,
+              layers: current.layers.filter((item) => item.id !== id),
+            }));
+          }}
+        />
+      ))}
+    </span>
+  );
 }
 
 function LightboxTitle({
@@ -600,16 +798,20 @@ function LightboxView({
           data-fit={tile.media === "frame" ? tile.fit : undefined}
           style={frameStyle}
         >
-          <LightboxVisual
-            tile={tile}
-            reducedMotion={reducedMotion}
-            videoRef={tile.media === "video" ? videoRef : undefined}
-            onVideoPlay={() => setPlaying(true)}
-            onVideoPause={() => setPlaying(false)}
-            onVideoTime={setCurrent}
-            onVideoDuration={setDuration}
-            onVideoVolume={setMuted}
-          />
+          {tile.media === "image" ? (
+            <StillStage tile={tile} reducedMotion={reducedMotion} />
+          ) : (
+            <LightboxVisual
+              tile={tile}
+              reducedMotion={reducedMotion}
+              videoRef={tile.media === "video" ? videoRef : undefined}
+              onVideoPlay={() => setPlaying(true)}
+              onVideoPause={() => setPlaying(false)}
+              onVideoTime={setCurrent}
+              onVideoDuration={setDuration}
+              onVideoVolume={setMuted}
+            />
+          )}
         </span>
         {tile.media === "video" ? (
           <motion.div
@@ -666,6 +868,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   const frameRef = useRef<HTMLSpanElement>(null);
   const flipRef = useRef<Animation | null>(null);
   const originRef = useRef<Box | null>(null);
+  const entranceStarted = useRef(false);
 
   useLayoutEffect(() => {
     const node = gridRef.current;
@@ -724,16 +927,125 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
       return;
     }
 
-    const videos = root.querySelectorAll("video");
-    videos.forEach((video) => {
-      if (reducedMotion || openIndex != null) {
-        video.pause();
+    const videos = [
+      ...root.querySelectorAll<HTMLVideoElement>("video.work-masonry-video"),
+    ];
+    const pause = (video: HTMLVideoElement) => {
+      video.pause();
+    };
+
+    if (reducedMotion || openIndex != null) {
+      videos.forEach(pause);
+      return;
+    }
+
+    let active = true;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target;
+          if (!(video instanceof HTMLVideoElement)) {
+            continue;
+          }
+
+          if (!entry.isIntersecting) {
+            pause(video);
+            continue;
+          }
+
+          const source = video.dataset.src;
+          if (source && video.dataset.armed !== "true") {
+            video.dataset.armed = "true";
+            video.src = source;
+          }
+
+          void video.play().then(() => {
+            if (!active) {
+              video.pause();
+            }
+          }).catch(() => undefined);
+        }
+      },
+      { rootMargin: VIDEO_ROOT_MARGIN, threshold: 0 },
+    );
+
+    videos.forEach((video) => observer.observe(video));
+    return () => {
+      active = false;
+      observer.disconnect();
+      videos.forEach(pause);
+    };
+  }, [reducedMotion, openIndex, tiles]);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      return;
+    }
+
+    const grid = gridRef.current;
+    if (!grid) {
+      return;
+    }
+
+    const cards = () => [
+      ...grid.querySelectorAll<HTMLElement>(".work-masonry-card"),
+    ];
+    const markFade = (card: HTMLElement) => {
+      if (!card.dataset.enter) {
+        card.dataset.enter = "fade";
+      }
+    };
+    const onAnimationEnd = (event: globalThis.AnimationEvent) => {
+      const card = event.target;
+      if (!(card instanceof HTMLElement) || !card.classList.contains("work-masonry-card")) {
         return;
       }
+      if (
+        event.animationName !== "work-masonry-rise" &&
+        event.animationName !== "work-masonry-fade"
+      ) {
+        return;
+      }
+      card.dataset.enter = "settled";
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entranceStarted.current) {
+          if (!entries.some((entry) => entry.isIntersecting)) {
+            return;
+          }
 
-      void video.play().catch(() => undefined);
-    });
-  }, [reducedMotion, openIndex, tiles]);
+          entranceStarted.current = true;
+          const visible = cards().filter((card) => isOnScreen(card));
+          visible.forEach((card, index) => {
+            if (index < ENTER_LIMIT) {
+              card.style.setProperty("--enter-i", String(index));
+              card.dataset.enter = "stagger";
+              return;
+            }
+            card.dataset.enter = "fade";
+          });
+          grid.dataset.entrance = "armed";
+          return;
+        }
+
+        for (const entry of entries) {
+          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) {
+            continue;
+          }
+          markFade(entry.target);
+        }
+      },
+      { threshold: 0.01 },
+    );
+
+    grid.addEventListener("animationend", onAnimationEnd);
+    cards().forEach((card) => observer.observe(card));
+    return () => {
+      observer.disconnect();
+      grid.removeEventListener("animationend", onAnimationEnd);
+    };
+  }, [reducedMotion, tiles]);
 
   useLayoutEffect(() => {
     const origin = originRef.current;
@@ -883,11 +1195,15 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
 
   return (
       <section className="work-masonry" aria-label="Gallery">
-        <div ref={gridRef} className="work-masonry-grid" style={gridStyle}>
+        <div
+          ref={gridRef}
+          className="work-masonry-grid"
+          style={gridStyle}
+        >
           {tiles.map((tile, index) => {
             const cardStyle = {
               gridRow: `span ${rowSpan(tile, layout.columnWidth)}`,
-            };
+            } as CSSProperties;
             const mark = isGalleryMark(tile);
             const held = heldId === tile.id;
             const surface = (
@@ -909,11 +1225,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
                       : {}),
                   }}
                 >
-                  <TileVisual
-                    tile={tile}
-                    eager={index < layout.columns}
-                    reducedMotion={reducedMotion}
-                  />
+                  <TileVisual tile={tile} eager={index < layout.columns} />
                 </span>
                 {tile.media === "frame" ? (
                   <button
