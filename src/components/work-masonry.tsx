@@ -11,6 +11,7 @@ import {
   VolumeOffIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import {
   useEffect,
@@ -22,6 +23,66 @@ import {
   type Ref,
 } from "react";
 import type { GalleryItem } from "@/lib/gallery";
+
+const SHARED_EASE = [0.23, 1, 0.32, 1] as const;
+const FLIP_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
+const FLIP_MS = 300;
+
+type Box = { x: number; y: number; width: number; height: number };
+
+function toBox(rect: DOMRect): Box {
+  return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+}
+
+function flipTransform(from: Box, laidOut: Box) {
+  const sx = laidOut.width === 0 ? 1 : from.width / laidOut.width;
+  const sy = laidOut.height === 0 ? 1 : from.height / laidOut.height;
+  return `translate(${from.x - laidOut.x}px, ${from.y - laidOut.y}px) scale(${sx}, ${sy})`;
+}
+
+function measureLaidOut(element: HTMLElement): Box {
+  const previous = element.style.transform;
+  element.style.transform = "none";
+  const box = toBox(element.getBoundingClientRect());
+  element.style.transform = previous;
+  return box;
+}
+
+function clearFlip(element: HTMLElement) {
+  element.style.transform = "";
+  element.style.transformOrigin = "";
+}
+
+function playSharedFlip(
+  element: HTMLElement,
+  from: Box,
+  to: Box,
+  release: boolean,
+  onFinish: () => void,
+) {
+  const laidOut = measureLaidOut(element);
+  if (laidOut.width === 0 || laidOut.height === 0) {
+    clearFlip(element);
+    onFinish();
+    return null;
+  }
+
+  const start = flipTransform(from, laidOut);
+  const end = flipTransform(to, laidOut);
+  element.style.transformOrigin = "top left";
+  element.style.transform = start;
+  const animation = element.animate(
+    [{ transform: start }, { transform: end }],
+    { duration: FLIP_MS, easing: FLIP_EASE, fill: "forwards" },
+  );
+  animation.onfinish = () => {
+    if (release) {
+      clearFlip(element);
+    }
+    onFinish();
+  };
+  return animation;
+}
 
 const ROW_PX = 8;
 const GAP_PX = 16;
@@ -403,14 +464,22 @@ function LightboxView({
   tile,
   reducedMotion,
   tileCount,
+  chromeOn,
+  fading,
+  frameRef,
   onStep,
   onClose,
+  onFadeEnd,
 }: {
   tile: GalleryItem;
   reducedMotion: boolean;
   tileCount: number;
+  chromeOn: boolean;
+  fading: boolean;
+  frameRef: Ref<HTMLSpanElement>;
   onStep: (delta: number) => void;
   onClose: () => void;
+  onFadeEnd: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -453,19 +522,58 @@ function LightboxView({
     setCurrent(next);
   };
 
+  const [playbackTile, setPlaybackTile] = useState(tile.id);
+  if (playbackTile !== tile.id) {
+    setPlaybackTile(tile.id);
+    setPlaying(false);
+    setMuted(true);
+    setDuration(0);
+    setCurrent(0);
+  }
+
+  const mark = isGalleryMark(tile);
+  const chromeTransition = {
+    duration: reducedMotion ? 0.18 : chromeOn ? 0.18 : 0.14,
+    delay: !reducedMotion && chromeOn ? 0.08 : 0,
+    ease: SHARED_EASE,
+  };
+  const frameStyle = {
+    "--lightbox-w": tile.width,
+    "--lightbox-h": tile.height,
+    borderRadius: mark ? 0 : 16,
+  } as CSSProperties;
+  const frameClass = mark
+    ? "work-lightbox-frame work-lightbox-mark"
+    : "work-lightbox-frame";
+
   return (
-    <div
+    <motion.div
       className="work-lightbox-layout"
+      initial={false}
+      animate={{ opacity: fading ? 0 : 1 }}
+      transition={{
+        duration: reducedMotion ? 0.18 : 0,
+        ease: SHARED_EASE,
+      }}
+      onAnimationComplete={() => {
+        if (fading) {
+          onFadeEnd();
+        }
+      }}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
-      <button
+      <motion.button
         type="button"
         className="work-lightbox-close"
         aria-label="Close"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: chromeOn ? 1 : 0 }}
+        transition={chromeTransition}
+        style={{ pointerEvents: chromeOn ? "auto" : "none" }}
         onClick={onClose}
       >
         <HugeiconsIcon
@@ -475,37 +583,42 @@ function LightboxView({
           color="currentColor"
           aria-hidden="true"
         />
-      </button>
+      </motion.button>
       <figure
         className="work-lightbox-figure"
+        data-media={tile.media}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
             onClose();
           }
         }}
       >
+        <span
+          ref={frameRef}
+          className={frameClass}
+          data-media={tile.media}
+          data-fit={tile.media === "frame" ? tile.fit : undefined}
+          style={frameStyle}
+        >
+          <LightboxVisual
+            tile={tile}
+            reducedMotion={reducedMotion}
+            videoRef={tile.media === "video" ? videoRef : undefined}
+            onVideoPlay={() => setPlaying(true)}
+            onVideoPause={() => setPlaying(false)}
+            onVideoTime={setCurrent}
+            onVideoDuration={setDuration}
+            onVideoVolume={setMuted}
+          />
+        </span>
         {tile.media === "video" ? (
-          <div
-            className="work-lightbox-stack"
-            style={
-              {
-                "--lightbox-w": tile.width,
-                "--lightbox-h": tile.height,
-              } as CSSProperties
-            }
+          <motion.div
+            className="work-lightbox-transport-slot"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: chromeOn ? 1 : 0 }}
+            transition={chromeTransition}
+            style={{ pointerEvents: chromeOn ? "auto" : "none" }}
           >
-            <span className="work-lightbox-frame" data-media="video">
-              <LightboxVisual
-                tile={tile}
-                reducedMotion={reducedMotion}
-                videoRef={videoRef}
-                onVideoPlay={() => setPlaying(true)}
-                onVideoPause={() => setPlaying(false)}
-                onVideoTime={setCurrent}
-                onVideoDuration={setDuration}
-                onVideoVolume={setMuted}
-              />
-            </span>
             <VideoTransport
               playing={playing}
               muted={muted}
@@ -515,33 +628,23 @@ function LightboxView({
               onToggleMute={toggleMute}
               onSeek={seek}
             />
-          </div>
-        ) : (
-          <span
-            className={
-              isGalleryMark(tile)
-                ? "work-lightbox-frame work-lightbox-mark"
-                : "work-lightbox-frame"
-            }
-            data-media={tile.media}
-            data-fit={tile.media === "frame" ? tile.fit : undefined}
-            style={
-              {
-                "--lightbox-w": tile.width,
-                "--lightbox-h": tile.height,
-              } as CSSProperties
-            }
-          >
-            <LightboxVisual tile={tile} reducedMotion={reducedMotion} />
-          </span>
-        )}
+          </motion.div>
+        ) : null}
       </figure>
-      <LightboxTitle
-        title={tile.title}
-        tileCount={tileCount}
-        onStep={onStep}
-      />
-    </div>
+      <motion.div
+        className="work-lightbox-chrome"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: chromeOn ? 1 : 0 }}
+        transition={chromeTransition}
+        style={{ pointerEvents: chromeOn ? "auto" : "none" }}
+      >
+        <LightboxTitle
+          title={tile.title}
+          tileCount={tileCount}
+          onStep={onStep}
+        />
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -554,6 +657,15 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     columnWidth: INITIAL_COLUMN_WIDTH_PX,
   });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [heldId, setHeldId] = useState<string | null>(null);
+  const [closing, setClosing] = useState(false);
+  const [chromeOn, setChromeOn] = useState(false);
+  const closingRef = useRef(false);
+  const closeTimer = useRef<number | null>(null);
+  const finishCloseRef = useRef<() => void>(() => {});
+  const frameRef = useRef<HTMLSpanElement>(null);
+  const flipRef = useRef<Animation | null>(null);
+  const originRef = useRef<Box | null>(null);
 
   useLayoutEffect(() => {
     const node = gridRef.current;
@@ -623,28 +735,128 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     });
   }, [reducedMotion, openIndex, tiles]);
 
+  useLayoutEffect(() => {
+    const origin = originRef.current;
+    const frame = frameRef.current;
+    if (!origin || !frame || reducedMotion || closingRef.current) {
+      return;
+    }
+
+    originRef.current = null;
+    flipRef.current?.cancel();
+    const laidOut = toBox(frame.getBoundingClientRect());
+    flipRef.current = playSharedFlip(frame, origin, laidOut, true, () => {
+      flipRef.current = null;
+      if (!closingRef.current) {
+        setChromeOn(true);
+      }
+    });
+  }, [openIndex, reducedMotion]);
+
+  useLayoutEffect(() => {
+    if (!closing || reducedMotion) {
+      return;
+    }
+
+    const frame = frameRef.current;
+    const gridFrame =
+      heldId == null
+        ? null
+        : gridRef.current?.querySelector<HTMLElement>(
+            `[data-tile-id="${CSS.escape(heldId)}"]`,
+          );
+    if (!frame || !gridFrame) {
+      finishCloseRef.current();
+      return;
+    }
+
+    const from = toBox(frame.getBoundingClientRect());
+    flipRef.current?.cancel();
+    const to = toBox(gridFrame.getBoundingClientRect());
+    flipRef.current = playSharedFlip(frame, from, to, false, () => {
+      flipRef.current = null;
+      finishCloseRef.current();
+    });
+  }, [closing, heldId, reducedMotion]);
+
   if (tiles.length === 0) {
     return null;
   }
 
   const openTile = openIndex == null ? null : tiles[openIndex] ?? null;
 
+  const finishClose = () => {
+    if (!closingRef.current) {
+      return;
+    }
+
+    closingRef.current = false;
+    if (closeTimer.current != null) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+
+    setClosing(false);
+    setOpenIndex(null);
+    setHeldId(null);
+    setChromeOn(false);
+    originRef.current = null;
+    const dialog = dialogRef.current;
+    if (dialog?.open) {
+      dialog.close();
+    }
+  };
+
+  finishCloseRef.current = finishClose;
+
   const openAt = (index: number) => {
-    setOpenIndex(index);
+    if (closingRef.current) {
+      return;
+    }
+
     const dialog = dialogRef.current;
     if (dialog && !dialog.open) {
       dialog.showModal();
     }
+
+    const tile = tiles[index];
+    const source = gridRef.current?.querySelector<HTMLElement>(
+      `[data-tile-id="${CSS.escape(tile?.id ?? "")}"]`,
+    );
+    originRef.current =
+      reducedMotion || !source ? null : toBox(source.getBoundingClientRect());
+    setChromeOn(reducedMotion);
+    setHeldId(reducedMotion || !tile ? null : tile.id);
+    setOpenIndex(index);
+  };
+
+  const requestClose = () => {
+    if (openIndex == null || closingRef.current) {
+      return;
+    }
+
+    setChromeOn(false);
+    closingRef.current = true;
+    setClosing(true);
+    closeTimer.current = window.setTimeout(finishClose, 700);
   };
 
   const step = (delta: number) => {
-    setOpenIndex((current) => {
-      if (current == null) {
-        return current;
-      }
+    if (openIndex == null || closingRef.current || tiles.length < 2) {
+      return;
+    }
 
-      return (current + delta + tiles.length) % tiles.length;
-    });
+    const next = (openIndex + delta + tiles.length) % tiles.length;
+    const tile = tiles[next];
+    originRef.current = null;
+    flipRef.current?.cancel();
+    flipRef.current = null;
+    if (frameRef.current) {
+      clearFlip(frameRef.current);
+    }
+    setChromeOn(true);
+    setOpenIndex(next);
+    setHeldId(reducedMotion || !tile ? null : tile.id);
   };
 
   const onDialogKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
@@ -670,31 +882,40 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   } as CSSProperties;
 
   return (
-    <section className="work-masonry" aria-label="Gallery">
-      <div ref={gridRef} className="work-masonry-grid" style={gridStyle}>
-        {tiles.map((tile, index) => {
-          const cardStyle = {
-            gridRow: `span ${rowSpan(tile, layout.columnWidth)}`,
-          };
-          const visual = (
-            <TileVisual
-              tile={tile}
-              eager={index < layout.columns}
-              reducedMotion={reducedMotion}
-            />
-          );
-
-          if (tile.media === "frame") {
-            return (
-              <div key={tile.id} className="work-masonry-card" style={cardStyle}>
+      <section className="work-masonry" aria-label="Gallery">
+        <div ref={gridRef} className="work-masonry-grid" style={gridStyle}>
+          {tiles.map((tile, index) => {
+            const cardStyle = {
+              gridRow: `span ${rowSpan(tile, layout.columnWidth)}`,
+            };
+            const mark = isGalleryMark(tile);
+            const held = heldId === tile.id;
+            const surface = (
+              <span
+                className="work-masonry-shell"
+                data-held={held ? "true" : undefined}
+              >
                 <span
+                  data-tile-id={tile.id}
                   className={
-                    tile.mark
+                    mark
                       ? "work-masonry-frame work-masonry-mark"
                       : "work-masonry-frame"
                   }
+                  style={{
+                    borderRadius: mark ? 0 : 16,
+                    ...(tile.media === "image" && tile.pad != null
+                      ? { containerType: "size" as const }
+                      : {}),
+                  }}
                 >
-                  {visual}
+                  <TileVisual
+                    tile={tile}
+                    eager={index < layout.columns}
+                    reducedMotion={reducedMotion}
+                  />
+                </span>
+                {tile.media === "frame" ? (
                   <button
                     type="button"
                     className="work-masonry-verb"
@@ -705,67 +926,88 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
                   >
                     <TileLabel title={tile.title} />
                   </button>
-                </span>
-              </div>
-            );
-          }
-
-          return (
-            <button
-              key={tile.id}
-              type="button"
-              className="work-masonry-card"
-              style={cardStyle}
-              aria-haspopup="dialog"
-              aria-expanded={openIndex === index}
-              aria-controls="work-lightbox"
-              onClick={() => openAt(index)}
-            >
-              <span
-                className={
-                  tile.media === "image" && tile.mark
-                    ? "work-masonry-frame work-masonry-mark"
-                    : "work-masonry-frame"
-                }
-                style={
-                  tile.media === "image" && tile.pad != null
-                    ? { containerType: "size" }
-                    : undefined
-                }
-              >
-                {visual}
-                <span className="work-masonry-verb">
-                  <TileLabel title={tile.title} />
-                </span>
+                ) : (
+                  <span className="work-masonry-verb">
+                    <TileLabel title={tile.title} />
+                  </span>
+                )}
               </span>
-            </button>
-          );
-        })}
-      </div>
-      <dialog
-        ref={dialogRef}
-        id="work-lightbox"
-        className="work-lightbox"
-        aria-labelledby="work-lightbox-title"
-        onClose={() => setOpenIndex(null)}
-        onKeyDown={onDialogKeyDown}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) {
-            event.currentTarget.close();
-          }
-        }}
-      >
-        {openTile ? (
-          <LightboxView
-            key={openTile.id}
-            tile={openTile}
-            reducedMotion={reducedMotion}
-            tileCount={tiles.length}
-            onStep={step}
-            onClose={() => dialogRef.current?.close()}
+            );
+
+            if (tile.media === "frame") {
+              return (
+                <div
+                  key={tile.id}
+                  className="work-masonry-card"
+                  style={cardStyle}
+                >
+                  {surface}
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={tile.id}
+                type="button"
+                className="work-masonry-card"
+                style={cardStyle}
+                aria-haspopup="dialog"
+                aria-expanded={openIndex === index}
+                aria-controls="work-lightbox"
+                onClick={() => openAt(index)}
+              >
+                {surface}
+              </button>
+            );
+          })}
+        </div>
+        <dialog
+          ref={dialogRef}
+          id="work-lightbox"
+          className="work-lightbox"
+          aria-labelledby="work-lightbox-title"
+          onCancel={(event) => {
+            event.preventDefault();
+            requestClose();
+          }}
+          onClose={() => {
+            closingRef.current = false;
+            setClosing(false);
+            setOpenIndex(null);
+            setHeldId(null);
+            setChromeOn(false);
+          }}
+          onKeyDown={onDialogKeyDown}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              requestClose();
+            }
+          }}
+        >
+          <motion.div
+            className="work-lightbox-scrim"
+            initial={false}
+            animate={{ opacity: openTile && !closing ? 1 : 0 }}
+            transition={{
+              duration: reducedMotion ? 0.18 : 0.26,
+              ease: SHARED_EASE,
+            }}
           />
-        ) : null}
-      </dialog>
-    </section>
+          {openTile ? (
+            <LightboxView
+              tile={openTile}
+              reducedMotion={reducedMotion}
+              tileCount={tiles.length}
+              chromeOn={chromeOn}
+              fading={reducedMotion && closing}
+              frameRef={frameRef}
+              onStep={step}
+              onClose={requestClose}
+              onFadeEnd={finishClose}
+            />
+          ) : null}
+        </dialog>
+      </section>
   );
 }
