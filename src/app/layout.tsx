@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { MonsterHost } from "@/components/monster-host";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { geistPixelSquare } from "@/lib/pixel-font";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <div className="flex min-w-0 flex-1 flex-col">{children}</div>
         <SiteFooter />
+        <MonsterHost />
       </body>
     </html>
   );
