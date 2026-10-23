@@ -2232,6 +2232,118 @@
   line-height: 1.45;
 }
 
+.monster-note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--quiet);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.monster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.monster-modes {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.monster-mode {
+  min-block-size: 44px;
+  padding-inline: 0.9rem;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  cursor: pointer;
+}
+
+.monster-mode[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.monster-mode:disabled,
+.monster-mode:disabled:active {
+  border-color: var(--hairline);
+  background: var(--paper);
+  color: var(--quiet);
+  cursor: default;
+}
+
+.monster-mode:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .monster-mode:hover:not(:disabled):not([aria-pressed="true"]) {
+    background: color-mix(in oklch, var(--ink) 5%, var(--paper));
+  }
+}
+
+.monster-mode:active:not(:disabled) {
+  background: color-mix(in oklch, var(--ink) 9%, var(--paper));
+}
+
+.monster-mode[aria-pressed="true"]:active:not(:disabled) {
+  background: var(--ink);
+}
+
+.local-wall {
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.local-wall[data-mode="select"] {
+  cursor: default;
+}
+
+.local-wall-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.local-ink {
+  fill: none;
+  stroke: var(--ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.local-ink[data-selected="true"] {
+  stroke-width: 6px;
+}
+
+circle.local-ink {
+  fill: var(--ink);
+  stroke: none;
+}
+
+circle.local-ink[data-selected="true"] {
+  stroke: var(--ink);
+  stroke-width: 4px;
+}
+
+.local-lasso {
+  fill: color-mix(in oklch, var(--ink) 6%, transparent);
+  stroke: var(--ink);
+  stroke-width: 1px;
+}
+
 .monster-summon {
   min-block-size: 44px;
   padding-inline: 1.05rem;
@@ -2271,7 +2383,8 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .monster-summon {
+  .monster-summon,
+  .monster-mode {
     transition: background-color 140ms var(--ease-out);
   }
 }

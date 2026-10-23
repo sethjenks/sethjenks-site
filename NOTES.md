@@ -4,11 +4,19 @@ A visitor selects ink on the home page wall and presses Bring to life. Those str
 
 ## Architecture
 
-The wall is unchanged as a synced document. `MessageBoard` still opens on the text tool, and Bring to life never creates, edits, or deletes records. The selected draw shapes are hidden with a local stylesheet (`opacity: 0 !important`, because tldraw sets inline opacity). When the creature dies, that stylesheet is cleared and the strokes are on the wall again.
+The synced wall document is not edited. Bring to life never creates, edits, or deletes records. On a licensed host the canvas is still tldraw, with the toolbar and style panel hidden. The pen is black and it is the only drawing tool. Select, in the bar under the wall, switches to the select tool so a visitor can drag around strokes. With nothing selected, Bring to life uses the strokes that visitor just drew.
+
+Selected marks are hidden with a local stylesheet (`opacity: 0 !important`, because tldraw sets inline opacity). Local preview strokes use the same veil on `[data-ink-id]`. When the creature dies, that stylesheet is cleared and the strokes come back.
 
 Trait math and the walker live in `src/lib/monsters`. The button sits under the wall. The creature is a `position: fixed` stage mounted from the root layout so it survives client navigations. `MonsterHost` listens for `monster:summon` and only then loads `MonsterStage` with `next/dynamic` and `ssr: false`. Until someone summons, the home page does not download the walker.
 
-The editor is published through a tiny external store (`editor-bridge.ts`). Putting `setState` in the tldraw `onMount` callback remounts the editor in a loop and leaves the canvas on its loading screen. The mount callback stays a stable module function, the same shape as the previous `openOnText` handler.
+The editor is published through a tiny external store (`editor-bridge.ts`). Putting `setState` in the tldraw `onMount` callback remounts the editor in a loop and leaves the canvas on its loading screen. The mount callback stays a stable module function.
+
+## Preview canvas
+
+The blank preview was not a failed socket. The preview connects to `wss://sethjenks-wall.sethjenks.workers.dev` (handshake 101). About five seconds later tldraw hides the whole editor: the license key is not valid for `*.vercel.app` preview hosts, and `LicenseProvider` renders an invisible gate (`unlicensed-production`). The page then shows a white board and the bar, with no toolbar.
+
+Preview hosts (any `*.vercel.app` host other than `sethjenks-site.vercel.app`) therefore skip tldraw and draw on a local pen canvas in the browser. That canvas does not open a socket and does not write wall records. If the shared socket is missing, errors, or is still loading after 8 seconds, the same local canvas is used and the bar says the shared wall did not connect. The production alias keeps the synced tldraw wall.
 
 One creature at a time. A second press is disabled and the hint says one creature is already on the page.
 
@@ -47,8 +55,8 @@ The card is paper, a 1px hairline, and a 2px radius. The button is a quiet ink c
 
 Checked in the browser against a local sync worker (not the production wall):
 
-- The wall still connects, the pen still draws, and the default tool is still text.
-- Select draw shapes, and Bring to life enables. Text selection stays disabled.
+- On a licensed host the wall still connects. The only drawing tool is a black pen. Select is a separate control in the bar. Bring to life uses the current selection, or the strokes drawn in this visit when nothing is selected.
+- Vercel preview hosts skip tldraw (the license hides that editor) and draw on a local canvas. The shared room is not written. A failed or slow sync uses that same canvas.
 - The strokes fade off the canvas. The creature peels, lands, and walks. Legs swing. A friendly creature turns when the cursor crosses to the other side.
 - The trait card and the screen-reader status follow the creature (`Pell is on the page. Small, friendly, 2 legs, about 54 seconds.`).
 - A grumpy wide-card case is covered by a unit test: the creature leaves the card instead of pinning itself to the screen edge.
@@ -73,7 +81,7 @@ Checked in the browser against a local sync worker (not the production wall):
 
 Motion for the creature is a `requestAnimationFrame` loop, paused while `document.hidden`. Reduced motion is read at summon and tracked if the preference changes. CSS for the button only transitions `background-color`, and only under `prefers-reduced-motion: no-preference`. Hover styles sit under `(hover: hover) and (pointer: fine)`.
 
-The home route does not import the stage. The wall chunk grows by the button, the trait function, and the stroke extractor. The walker, collider scan, and SVG stage load on the first summon.
+The home route does not import the stage. The synced tldraw chunk loads only when the host is allowed to use it. Preview and offline visits load the local pen instead. The walker, collider scan, and SVG stage load on the first summon.
 
 ## Multi-monster and shared creatures
 

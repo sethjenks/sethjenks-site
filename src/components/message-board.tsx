@@ -1,90 +1,83 @@
 "use client";
 
-import { useSync } from "@tldraw/sync";
-import {
-	Tldraw,
-	type Editor,
-	type TLAssetStore,
-	type TLUiOverrides,
-} from "tldraw";
+import dynamic from "next/dynamic";
+import { useSyncExternalStore, type ReactNode } from "react";
+import { LocalWall } from "@/components/local-wall";
 import { MonsterControls } from "@/components/monster-controls";
-import { publishEditor } from "@/lib/monsters/editor-bridge";
-import "tldraw/tldraw.css";
+import { getOfflineNote, subscribeBoard } from "@/lib/monsters/board";
 
 const syncUrl = process.env.NEXT_PUBLIC_TLDRAW_SYNC_URL;
-const licenseKey = process.env.NEXT_PUBLIC_TLDRAW_LICENSE_KEY;
 
-const assets: TLAssetStore = {
-	async upload() {
-		throw new Error("Uploads are off.");
+const SyncedBoard = dynamic(
+	() => import("@/components/synced-board").then((mod) => mod.SyncedBoard),
+	{
+		ssr: false,
+		loading: () => <p className="message-board-status">Connecting…</p>,
 	},
-	resolve(asset) {
-		return asset.props.src;
-	},
-};
+);
 
-const uiOverrides: TLUiOverrides = {
-	tools(_editor, tools) {
-		const next = { ...tools };
-		delete next.asset;
-		return next;
-	},
-	actions(_editor, actions) {
-		const next = { ...actions };
-		delete next["insert-media"];
-		return next;
-	},
-};
+const PREVIEW_NOTE =
+	"Drawings on this preview stay in this browser. The shared wall is unchanged.";
+const MISSING_NOTE = "The shared wall is offline. You can still draw here.";
 
-function openOnText(editor: Editor) {
-	editor.user.updateUserPreferences({ colorScheme: "light" });
-	editor.setCurrentTool("text");
-	publishEditor(editor);
-	return () => publishEditor(null);
+type WallKind = "pending" | "local" | "sync";
+
+function isPreviewHost(hostname: string): boolean {
+	return hostname.endsWith(".vercel.app") && hostname !== "sethjenks-site.vercel.app";
+}
+
+function wallKind(): WallKind {
+	if (typeof window === "undefined") {
+		return "pending";
+	}
+	if (getOfflineNote() || isPreviewHost(window.location.hostname) || !syncUrl) {
+		return "local";
+	}
+	return "sync";
+}
+
+function wallNote(): string | null {
+	if (getOfflineNote()) {
+		return getOfflineNote();
+	}
+	if (typeof window === "undefined") {
+		return null;
+	}
+	if (isPreviewHost(window.location.hostname)) {
+		return PREVIEW_NOTE;
+	}
+	if (!syncUrl) {
+		return MISSING_NOTE;
+	}
+	return null;
 }
 
 export function MessageBoard() {
-	if (!syncUrl) {
-		return <BoardStatus>The board is offline.</BoardStatus>;
-	}
-	return <SyncedBoard uri={syncUrl} />;
-}
+	const kind = useSyncExternalStore(subscribeBoard, wallKind, wallKind);
+	const note = useSyncExternalStore(subscribeBoard, wallNote, wallNote);
 
-function SyncedBoard({ uri }: { uri: string }) {
-	const store = useSync({ uri, assets });
-
-	switch (store.status) {
-		case "loading":
-			return <BoardStatus>Connecting…</BoardStatus>;
-		case "error":
-			return <BoardStatus>The board is offline.</BoardStatus>;
-		case "synced-remote":
-			return (
-				<div className="message-board-wrap">
-					<section className="message-board" aria-label="Wall">
-						<Tldraw
-							store={store.store}
-							licenseKey={licenseKey}
-							overrides={uiOverrides}
-							acceptedImageMimeTypes={[]}
-							acceptedVideoMimeTypes={[]}
-							onMount={openOnText}
-						/>
-					</section>
-					<MonsterControls />
-				</div>
-			);
+	let board: ReactNode = <p className="message-board-status">Connecting…</p>;
+	switch (kind) {
+		case "pending":
+			break;
+		case "local":
+			board = <LocalWall />;
+			break;
+		case "sync":
+			board = syncUrl ? <SyncedBoard uri={syncUrl} /> : <LocalWall />;
+			break;
 		default: {
-			const unreachable: never = store;
-			return unreachable;
+			const unreachable: never = kind;
+			board = unreachable;
 		}
 	}
-}
 
-function BoardStatus({ children }: { children: string }) {
 	return (
-		<section className="message-board" aria-label="Wall">
-			<p className="message-board-status">{children}</p>
-		</section>
+		<div className="message-board-wrap">
+			<section className="message-board" aria-label="Wall">
+				{board}
+			</section>
+			<MonsterControls note={note} />
+		</div>
 	);
 }

@@ -114,7 +114,10 @@ export function MonsterStage() {
     if (veil) {
       const fade = reducedQuery.matches ? "" : "transition:opacity 180ms var(--ease-out);";
       veil.textContent = view.shapeIds
-        .map((id) => `.tl-shape[data-shape-id="${escapeAttr(id)}"]{opacity:0 !important;${fade}}`)
+        .map((id) => {
+          const name = escapeAttr(id);
+          return `.tl-shape[data-shape-id="${name}"],[data-ink-id="${name}"]{opacity:0 !important;${fade}}`;
+        })
         .join("");
     }
 
