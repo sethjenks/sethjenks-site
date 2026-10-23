@@ -8,7 +8,6 @@ import {
 	type TLAssetStore,
 	type TLUiComponents,
 } from "tldraw";
-import { DefaultColorStyle, DefaultSizeStyle } from "@tldraw/tlschema";
 import {
 	getBoardMode,
 	notifyBoard,
@@ -76,12 +75,17 @@ function lockPen(editor: Editor) {
 	if (editor.getCurrentToolId() !== want) {
 		editor.setCurrentTool(want);
 	}
-	if (editor.getStyleForNextShape(DefaultColorStyle) !== "black") {
-		editor.setStyleForNextShapes(DefaultColorStyle, "black");
+	const styles = editor.getInstanceState().stylesForNextShape;
+	if (styles["tldraw:color"] === "black" && styles["tldraw:size"] === "m") {
+		return;
 	}
-	if (editor.getStyleForNextShape(DefaultSizeStyle) !== "m") {
-		editor.setStyleForNextShapes(DefaultSizeStyle, "m");
-	}
+	editor.updateInstanceState({
+		stylesForNextShape: {
+			...styles,
+			"tldraw:color": "black",
+			"tldraw:size": "m",
+		},
+	});
 }
 
 function selectionFor(editor: Editor, born: Set<string>): BoardSelection {
@@ -113,8 +117,7 @@ function openOnPen(editor: Editor) {
 	sessionInks.set(editor, born);
 	editor.user.updateUserPreferences({ colorScheme: "light" });
 	editor.setCurrentTool("draw");
-	editor.setStyleForNextShapes(DefaultColorStyle, "black");
-	editor.setStyleForNextShapes(DefaultSizeStyle, "m");
+	lockPen(editor);
 	publishEditor(editor);
 
 	const readSelection = () => {
@@ -156,6 +159,17 @@ function openOnPen(editor: Editor) {
 				const id = addedDrawId(record);
 				if (id) {
 					born.add(id);
+					const shape = editor.getShape(id as Parameters<Editor["getShape"]>[0]);
+					if (
+						shape?.type === "draw" &&
+						(shape.props.color !== "black" || shape.props.size !== "m")
+					) {
+						editor.updateShape({
+							id: shape.id,
+							type: "draw",
+							props: { color: "black", size: "m" },
+						});
+					}
 				}
 			}
 		}

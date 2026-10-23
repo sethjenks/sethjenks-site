@@ -51,7 +51,9 @@ function pageWidth(size: keyof typeof STROKE_SIZES, scale: number): number {
 }
 
 export function extractDrawing(editor: Editor, ids?: readonly string[]): MonsterDrawing | null {
-  const shapeIds = ids ?? editor.getSelectedShapeIds();
+  const shapeIds: TLShapeId[] = ids
+    ? ids.map((id) => id as TLShapeId)
+    : [...editor.getSelectedShapeIds()];
   const pageStrokes: InkStroke[] = [];
   const screenPoints = new Map<string, InkPoint[]>();
   const colors = new Map<string, string>();

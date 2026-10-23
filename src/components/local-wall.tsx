@@ -97,7 +97,7 @@ export function LocalWall() {
         lasso.setAttribute("y", String(point.y));
         lasso.setAttribute("width", "0");
         lasso.setAttribute("height", "0");
-        lasso.hidden = false;
+        lasso.style.display = "";
       }
       return;
     }
@@ -110,7 +110,7 @@ export function LocalWall() {
     const draft = draftRef.current;
     if (draft) {
       draft.setAttribute("d", "");
-      draft.hidden = false;
+      draft.style.display = "";
     }
   }
 
@@ -152,7 +152,7 @@ export function LocalWall() {
     if (lasso) {
       lassoPoints.current = null;
       if (lassoRef.current) {
-        lassoRef.current.hidden = true;
+        lassoRef.current.style.display = "none";
       }
       const box = normalizeBox(lasso.start, lasso.end);
       const tap = box.w < 6 && box.h < 6;
@@ -169,7 +169,7 @@ export function LocalWall() {
     const drawing = drawingRef.current;
     drawingRef.current = null;
     if (draftRef.current) {
-      draftRef.current.hidden = true;
+      draftRef.current.style.display = "none";
       draftRef.current.setAttribute("d", "");
     }
     if (!drawing || drawing.points.length === 0) {
@@ -198,8 +198,8 @@ export function LocalWall() {
             selected={selected.includes(stroke.id)}
           />
         ))}
-        <path ref={draftRef} className="local-ink" hidden strokeWidth={PEN_WIDTH} />
-        <rect ref={lassoRef} className="local-lasso" hidden />
+        <path ref={draftRef} className="local-ink" style={{ display: "none" }} strokeWidth={PEN_WIDTH} />
+        <rect ref={lassoRef} className="local-lasso" style={{ display: "none" }} />
       </svg>
       <span className="sr-only">
         {mode === "select"
