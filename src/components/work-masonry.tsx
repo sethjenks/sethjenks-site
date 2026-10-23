@@ -5,6 +5,8 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Cancel01Icon,
+  FullScreenIcon,
+  MinimizeScreenIcon,
   PauseIcon,
   PlayIcon,
   VolumeHighIcon,
@@ -19,10 +21,18 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type FocusEvent,
+  type FormEvent,
   type KeyboardEvent,
+  type PointerEvent,
   type Ref,
 } from "react";
-import type { GalleryImage, GalleryItem, GalleryVideo } from "@/lib/gallery";
+import type {
+  GalleryFrame,
+  GalleryImage,
+  GalleryItem,
+  GalleryVideo,
+} from "@/lib/gallery";
 
 const SHARED_EASE = [0.23, 1, 0.32, 1] as const;
 const FLIP_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
@@ -95,6 +105,35 @@ const IMAGE_SIZES =
   "(min-width: 1200px) 25vw, (min-width: 800px) 33vw, (min-width: 560px) 50vw, calc(100vw - 48px)";
 const VIDEO_ROOT_MARGIN = "240px 0px";
 const ENTER_LIMIT = 6;
+const CONTROLS_HIDE_MS = 2500;
+
+type WebkitFullscreenVideo = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitExitFullscreen?: () => void;
+  webkitDisplayingFullscreen?: boolean;
+};
+
+function asWebkitVideo(video: HTMLVideoElement): WebkitFullscreenVideo {
+  return video;
+}
+
+function stageIsFullscreen(stage: HTMLElement | null) {
+  return stage != null && document.fullscreenElement === stage;
+}
+
+function leaveLightboxFullscreen(dialog: HTMLElement | null) {
+  const video = dialog?.querySelector(".work-lightbox-stage video");
+  if (video instanceof HTMLVideoElement) {
+    const webkit = asWebkitVideo(video);
+    if (webkit.webkitDisplayingFullscreen) {
+      webkit.webkitExitFullscreen?.();
+    }
+  }
+
+  if (document.fullscreenElement) {
+    void document.exitFullscreen().catch(() => undefined);
+  }
+}
 
 type StillPhase = "enter" | "in" | "out";
 
@@ -346,173 +385,546 @@ function clockLabel(seconds: number): string {
   return `${minutes}:${remain.toString().padStart(2, "0")}`;
 }
 
-function VideoTransport({
-  playing,
-  muted,
-  duration,
-  current,
-  onTogglePlay,
-  onToggleMute,
-  onSeek,
+function isFinePointer(event: PointerEvent<HTMLElement>) {
+  return event.pointerType === "mouse" || event.pointerType === "pen";
+}
+
+function LightboxPlayer({
+  tile,
+  reducedMotion,
 }: {
-  playing: boolean;
-  muted: boolean;
-  duration: number;
-  current: number;
-  onTogglePlay: () => void;
-  onToggleMute: () => void;
-  onSeek: (seconds: number) => void;
+  tile: GalleryVideo;
+  reducedMotion: boolean;
 }) {
-  const seekable = duration > 0;
-  const progress = seekable ? Math.min(100, (current / duration) * 100) : 0;
-  const elapsed = clockLabel(current);
-  const total = clockLabel(duration);
+  const stageRef = useRef<HTMLSpanElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fillRef = useRef<HTMLSpanElement>(null);
+  const seekRef = useRef<HTMLInputElement>(null);
+  const openRef = useRef(false);
+  const playingRef = useRef(false);
+  const engagedRef = useRef(false);
+  const scrubbingRef = useRef(false);
+  const hoveringControlsRef = useRef(false);
+  const openAtPointerDown = useRef(false);
+  const revealGesture = useRef(false);
+  const hoverReveal = useRef(0);
+  const pendingSeek = useRef<number | null>(null);
+  const pendingAt = useRef(0);
+  const hideTimer = useRef(0);
+  const fullscreenRef = useRef(false);
+  const clockKey = useRef({ current: -1, duration: -1 });
+  const paintFrameRef = useRef<(time: number, length: number) => void>(() => {});
+  const [controls, setControls] = useState<"closed" | "open">("closed");
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [clock, setClock] = useState({ current: 0, duration: 0 });
+
+  const clearHide = () => {
+    window.clearTimeout(hideTimer.current);
+    hideTimer.current = 0;
+  };
+
+  const hide = () => {
+    clearHide();
+    if (!openRef.current) {
+      return;
+    }
+    openRef.current = false;
+    setControls("closed");
+  };
+
+  const scheduleHide = () => {
+    clearHide();
+    if (
+      !openRef.current ||
+      !playingRef.current ||
+      engagedRef.current ||
+      scrubbingRef.current ||
+      hoveringControlsRef.current
+    ) {
+      return;
+    }
+
+    hideTimer.current = window.setTimeout(() => {
+      hideTimer.current = 0;
+      if (
+        !playingRef.current ||
+        engagedRef.current ||
+        scrubbingRef.current ||
+        hoveringControlsRef.current
+      ) {
+        return;
+      }
+      hide();
+    }, CONTROLS_HIDE_MS);
+  };
+
+  const reveal = () => {
+    if (!openRef.current) {
+      openRef.current = true;
+      setControls("open");
+    }
+    scheduleHide();
+  };
+
+  const revealFromHover = (event: PointerEvent<HTMLElement>) => {
+    if (!isFinePointer(event)) {
+      return;
+    }
+
+    if (openRef.current) {
+      scheduleHide();
+      return;
+    }
+
+    if (hoverReveal.current) {
+      return;
+    }
+
+    hoverReveal.current = window.requestAnimationFrame(() => {
+      hoverReveal.current = 0;
+      reveal();
+    });
+  };
+
+  const cancelHoverReveal = () => {
+    if (!hoverReveal.current) {
+      return;
+    }
+    window.cancelAnimationFrame(hoverReveal.current);
+    hoverReveal.current = 0;
+  };
+
+  useEffect(() => {
+    const paint = (time: number, length: number) => {
+      const safeLength = Number.isFinite(length) && length > 0 ? length : 0;
+      const safeTime = Number.isFinite(time) && time > 0 ? time : 0;
+      const ratio = safeLength > 0 ? Math.min(1, safeTime / safeLength) : 0;
+      if (fillRef.current) {
+        fillRef.current.style.transform = `scaleX(${ratio})`;
+      }
+
+      const nextCurrent = Math.floor(safeTime);
+      const nextDuration = Math.floor(safeLength);
+      if (
+        clockKey.current.current === nextCurrent &&
+        clockKey.current.duration === nextDuration
+      ) {
+        return;
+      }
+
+      clockKey.current = { current: nextCurrent, duration: nextDuration };
+      setClock({ current: nextCurrent, duration: safeLength });
+    };
+    paintFrameRef.current = paint;
+
+    let frame = 0;
+    const tick = () => {
+      const video = videoRef.current;
+      const seek = seekRef.current;
+      if (video && !scrubbingRef.current) {
+        const length = Number.isFinite(video.duration) ? video.duration : 0;
+        let time = video.currentTime;
+        const pending = pendingSeek.current;
+        if (pending != null) {
+          if (performance.now() - pendingAt.current > 500) {
+            pendingSeek.current = null;
+          } else {
+            time = pending;
+          }
+        }
+        paint(time, length);
+        if (seek) {
+          seek.value = String(time);
+        }
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    frame = window.requestAnimationFrame(tick);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(hoverReveal.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const stage = stageRef.current;
+    const sync = () => {
+      const webkit = video ? asWebkitVideo(video) : null;
+      const active =
+        stageIsFullscreen(stage) || Boolean(webkit?.webkitDisplayingFullscreen);
+      const entered = active && !fullscreenRef.current;
+      fullscreenRef.current = active;
+      setFullscreen(active);
+      if (entered) {
+        openRef.current = true;
+        setControls("open");
+      }
+    };
+
+    document.addEventListener("fullscreenchange", sync);
+    video?.addEventListener("webkitbeginfullscreen", sync);
+    video?.addEventListener("webkitendfullscreen", sync);
+    return () => {
+      window.clearTimeout(hideTimer.current);
+      document.removeEventListener("fullscreenchange", sync);
+      video?.removeEventListener("webkitbeginfullscreen", sync);
+      video?.removeEventListener("webkitendfullscreen", sync);
+      if (stage && document.fullscreenElement === stage) {
+        void document.exitFullscreen().catch(() => undefined);
+      }
+      const webkit = video ? asWebkitVideo(video) : null;
+      if (webkit?.webkitDisplayingFullscreen) {
+        webkit.webkitExitFullscreen?.();
+      }
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    if (video.paused) {
+      void video.play().catch(() => {
+        playingRef.current = false;
+        setPlaying(false);
+      });
+      return;
+    }
+
+    video.pause();
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  };
+
+  const toggleFullscreen = () => {
+    const stage = stageRef.current;
+    const video = videoRef.current;
+    if (!stage || !video) {
+      return;
+    }
+
+    const webkit = asWebkitVideo(video);
+    if (document.fullscreenElement === stage) {
+      void document.exitFullscreen().catch(() => undefined);
+      return;
+    }
+
+    if (webkit.webkitDisplayingFullscreen) {
+      webkit.webkitExitFullscreen?.();
+      return;
+    }
+
+    if (!document.fullscreenEnabled || !stage.requestFullscreen) {
+      webkit.webkitEnterFullscreen?.();
+      return;
+    }
+
+    void stage.requestFullscreen().catch(() => {
+      webkit.webkitEnterFullscreen?.();
+    });
+  };
+
+  const onSeekInput = (event: FormEvent<HTMLInputElement>) => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    const length = Number.isFinite(video.duration) ? video.duration : 0;
+    if (length <= 0) {
+      return;
+    }
+
+    const next = Math.min(Math.max(Number(event.currentTarget.value), 0), length);
+    pendingSeek.current = next;
+    pendingAt.current = performance.now();
+    video.currentTime = next;
+    paintFrameRef.current(next, length);
+  };
+
+  const beginScrub = (event: PointerEvent<HTMLInputElement>) => {
+    scrubbingRef.current = true;
+    clearHide();
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const endScrub = (event: PointerEvent<HTMLInputElement>) => {
+    scrubbingRef.current = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    scheduleHide();
+  };
+
+  const onVideoKeyDown = (event: KeyboardEvent<HTMLVideoElement>) => {
+    if (event.key !== " " && event.key !== "Enter") {
+      return;
+    }
+
+    event.preventDefault();
+    if (!openRef.current) {
+      reveal();
+      return;
+    }
+
+    togglePlay();
+  };
+
+  const onStageFocus = (event: FocusEvent<HTMLSpanElement>) => {
+    const transport = event.currentTarget.querySelector(".work-lightbox-transport");
+    const target = event.target;
+    const inTransport = target instanceof Node && Boolean(transport?.contains(target));
+    const keyboard = target instanceof Element && target.matches(":focus-visible");
+    engagedRef.current = inTransport || keyboard;
+    if (inTransport || keyboard) {
+      reveal();
+      return;
+    }
+    scheduleHide();
+  };
+
+  const onStageBlur = (event: FocusEvent<HTMLSpanElement>) => {
+    const next = event.relatedTarget;
+    if (next instanceof Node && stageRef.current?.contains(next)) {
+      return;
+    }
+
+    engagedRef.current = false;
+    scheduleHide();
+  };
+
+  const elapsed = clockLabel(clock.current);
+  const total = clockLabel(clock.duration);
+  const seekable = clock.duration > 0;
 
   return (
-    <div
-      className="work-lightbox-transport"
-      role="group"
-      aria-label="Playback"
-      onKeyDown={(event) => {
-        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-          event.stopPropagation();
-        }
+    <span
+      ref={stageRef}
+      className="work-lightbox-stage"
+      data-controls={controls}
+      onPointerMove={revealFromHover}
+      onPointerLeave={cancelHoverReveal}
+      onFocus={onStageFocus}
+      onBlur={onStageBlur}
+      onPointerUp={() => {
+        window.setTimeout(() => {
+          revealGesture.current = false;
+        }, 0);
       }}
     >
-      <button
-        type="button"
-        className="work-lightbox-step"
-        aria-label={playing ? "Pause" : "Play"}
-        onClick={onTogglePlay}
-      >
-        <HugeiconsIcon
-          icon={playing ? PauseIcon : PlayIcon}
-          size={18}
-          strokeWidth={1.5}
-          color="currentColor"
-          aria-hidden="true"
-        />
-      </button>
-      <input
-        className="work-lightbox-seek"
-        type="range"
-        min={0}
-        max={seekable ? duration : 0}
-        step={0.1}
-        value={seekable ? Math.min(current, duration) : 0}
-        disabled={!seekable}
-        aria-label="Seek"
-        aria-valuetext={`${elapsed} of ${total}`}
-        style={{ "--seek": `${progress}%` } as CSSProperties}
-        onChange={(event) => {
-          onSeek(Number(event.currentTarget.value));
+      <video
+        ref={videoRef}
+        className="work-lightbox-image"
+        src={tile.src}
+        poster={tile.poster}
+        aria-label={tile.alt}
+        tabIndex={0}
+        autoPlay={!reducedMotion}
+        loop
+        muted
+        playsInline
+        preload={reducedMotion ? "none" : "metadata"}
+        onPlay={() => {
+          playingRef.current = true;
+          setPlaying(true);
+          scheduleHide();
         }}
+        onPause={() => {
+          playingRef.current = false;
+          setPlaying(false);
+          clearHide();
+        }}
+        onLoadedMetadata={(event) => {
+          const next = event.currentTarget.duration;
+          paintFrameRef.current(
+            event.currentTarget.currentTime,
+            Number.isFinite(next) ? next : 0,
+          );
+        }}
+        onDurationChange={(event) => {
+          const next = event.currentTarget.duration;
+          paintFrameRef.current(
+            event.currentTarget.currentTime,
+            Number.isFinite(next) ? next : 0,
+          );
+        }}
+        onSeeked={(event) => {
+          const pending = pendingSeek.current;
+          if (pending == null) {
+            return;
+          }
+          if (Math.abs(event.currentTarget.currentTime - pending) < 0.35) {
+            pendingSeek.current = null;
+          }
+        }}
+        onVolumeChange={(event) => {
+          setMuted(event.currentTarget.muted);
+        }}
+        onPointerDown={() => {
+          cancelHoverReveal();
+          openAtPointerDown.current = openRef.current;
+          revealGesture.current = !openRef.current;
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (!openAtPointerDown.current) {
+            reveal();
+            return;
+          }
+          togglePlay();
+        }}
+        onKeyDown={onVideoKeyDown}
       />
-      <span className="work-lightbox-time">
-        <span className="play-a11y">Elapsed</span>
-        {elapsed}
-        <span aria-hidden="true"> / </span>
-        <span className="play-a11y">Duration</span>
-        {total}
-      </span>
-      <button
-        type="button"
-        className="work-lightbox-step"
-        aria-label={muted ? "Unmute" : "Mute"}
-        onClick={onToggleMute}
+      <span
+        className="work-lightbox-transport"
+        role="group"
+        aria-label="Playback"
+        onClickCapture={(event) => {
+          if (!revealGesture.current) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          revealGesture.current = false;
+        }}
+        onPointerEnter={(event) => {
+          if (!isFinePointer(event)) {
+            return;
+          }
+          hoveringControlsRef.current = true;
+          clearHide();
+        }}
+        onPointerLeave={(event) => {
+          if (!isFinePointer(event)) {
+            return;
+          }
+          hoveringControlsRef.current = false;
+          scheduleHide();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.stopPropagation();
+          }
+        }}
       >
-        <HugeiconsIcon
-          icon={muted ? VolumeOffIcon : VolumeHighIcon}
-          size={18}
-          strokeWidth={1.5}
-          color="currentColor"
-          aria-hidden="true"
-        />
-      </button>
-    </div>
+        <button
+          type="button"
+          className="work-lightbox-step"
+          aria-label={playing ? "Pause" : "Play"}
+          onClick={togglePlay}
+        >
+          <HugeiconsIcon
+            icon={playing ? PauseIcon : PlayIcon}
+            size={18}
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
+        </button>
+        <span className="work-lightbox-seek-track">
+          <span className="work-lightbox-seek-line" />
+          <span ref={fillRef} className="work-lightbox-seek-fill" />
+          <input
+            ref={seekRef}
+            className="work-lightbox-seek"
+            type="range"
+            min={0}
+            max={seekable ? clock.duration : 0}
+            step={0.01}
+            defaultValue={0}
+            disabled={!seekable}
+            aria-label="Seek"
+            aria-valuetext={`${elapsed} of ${total}`}
+            onInput={onSeekInput}
+            onPointerDown={beginScrub}
+            onPointerUp={endScrub}
+            onPointerCancel={endScrub}
+            onLostPointerCapture={() => {
+              scrubbingRef.current = false;
+              scheduleHide();
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+                return;
+              }
+              event.stopPropagation();
+              scrubbingRef.current = true;
+              clearHide();
+            }}
+            onKeyUp={(event) => {
+              if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+                return;
+              }
+              scrubbingRef.current = false;
+              scheduleHide();
+            }}
+          />
+        </span>
+        <span className="work-lightbox-time">
+          <span className="play-a11y">Elapsed</span>
+          {elapsed}
+          <span className="work-lightbox-duration">
+            <span aria-hidden="true"> / </span>
+            <span className="play-a11y">Duration</span>
+            {total}
+          </span>
+        </span>
+        <button
+          type="button"
+          className="work-lightbox-step"
+          aria-label={muted ? "Unmute" : "Mute"}
+          onClick={toggleMute}
+        >
+          <HugeiconsIcon
+            icon={muted ? VolumeOffIcon : VolumeHighIcon}
+            size={18}
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
+        </button>
+        <button
+          type="button"
+          className="work-lightbox-step"
+          aria-label={fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          onClick={toggleFullscreen}
+        >
+          <HugeiconsIcon
+            icon={fullscreen ? MinimizeScreenIcon : FullScreenIcon}
+            size={18}
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
+        </button>
+      </span>
+    </span>
   );
 }
 
-function LightboxVisual({
-  tile,
-  reducedMotion,
-  videoRef,
-  onVideoPlay,
-  onVideoPause,
-  onVideoTime,
-  onVideoDuration,
-  onVideoVolume,
-}: {
-  tile: GalleryItem;
-  reducedMotion: boolean;
-  videoRef?: Ref<HTMLVideoElement>;
-  onVideoPlay?: () => void;
-  onVideoPause?: () => void;
-  onVideoTime?: (seconds: number) => void;
-  onVideoDuration?: (seconds: number) => void;
-  onVideoVolume?: (muted: boolean) => void;
-}) {
-  switch (tile.media) {
-    case "image":
-      return (
-        <Image
-          key={tile.id}
-          src={tile.src}
-          alt={tile.alt}
-          width={tile.width}
-          height={tile.height}
-          sizes="100vw"
-          quality={90}
-          className="work-lightbox-image"
-          draggable={false}
-        />
-      );
-    case "video":
-      return (
-        <video
-          key={tile.id}
-          ref={videoRef}
-          className="work-lightbox-image"
-          src={tile.src}
-          poster={tile.poster}
-          aria-label={tile.alt}
-          autoPlay={!reducedMotion}
-          loop
-          muted
-          playsInline
-          preload={reducedMotion ? "none" : "metadata"}
-          onPlay={onVideoPlay}
-          onPause={onVideoPause}
-          onTimeUpdate={(event) => {
-            onVideoTime?.(event.currentTarget.currentTime);
-          }}
-          onLoadedMetadata={(event) => {
-            const next = event.currentTarget.duration;
-            onVideoDuration?.(Number.isFinite(next) ? next : 0);
-          }}
-          onDurationChange={(event) => {
-            const next = event.currentTarget.duration;
-            onVideoDuration?.(Number.isFinite(next) ? next : 0);
-          }}
-          onVolumeChange={(event) => {
-            onVideoVolume?.(event.currentTarget.muted);
-          }}
-        />
-      );
-    case "frame":
-      return (
-        <iframe
-          key={tile.id}
-          className={frameEmbedClass(tile.fit, "lightbox")}
-          src={tile.src}
-          title={tile.alt}
-        />
-      );
-    default: {
-      const unknownTile: never = tile;
-      return unknownTile;
-    }
-  }
+function LightboxEmbed({ tile }: { tile: GalleryFrame }) {
+  return (
+    <iframe
+      key={tile.id}
+      className={frameEmbedClass(tile.fit, "lightbox")}
+      src={tile.src}
+      title={tile.alt}
+    />
+  );
 }
 
 function StillStage({
@@ -679,56 +1091,6 @@ function LightboxView({
   onClose: () => void;
   onFadeEnd: () => void;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const [duration, setDuration] = useState(0);
-  const [current, setCurrent] = useState(0);
-
-  const togglePlay = () => {
-    const video = videoRef.current;
-    if (!video) {
-      return;
-    }
-
-    if (video.paused) {
-      void video.play().catch(() => setPlaying(false));
-      return;
-    }
-
-    video.pause();
-  };
-
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) {
-      return;
-    }
-
-    video.muted = !video.muted;
-    setMuted(video.muted);
-  };
-
-  const seek = (seconds: number) => {
-    const video = videoRef.current;
-    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) {
-      return;
-    }
-
-    const next = Math.min(Math.max(seconds, 0), video.duration);
-    video.currentTime = next;
-    setCurrent(next);
-  };
-
-  const [playbackTile, setPlaybackTile] = useState(tile.id);
-  if (playbackTile !== tile.id) {
-    setPlaybackTile(tile.id);
-    setPlaying(false);
-    setMuted(true);
-    setDuration(0);
-    setCurrent(0);
-  }
-
   const mark = isGalleryMark(tile);
   const chromeTransition = {
     duration: reducedMotion ? 0.18 : chromeOn ? 0.18 : 0.14,
@@ -800,38 +1162,16 @@ function LightboxView({
         >
           {tile.media === "image" ? (
             <StillStage tile={tile} reducedMotion={reducedMotion} />
-          ) : (
-            <LightboxVisual
+          ) : tile.media === "video" ? (
+            <LightboxPlayer
+              key={tile.id}
               tile={tile}
               reducedMotion={reducedMotion}
-              videoRef={tile.media === "video" ? videoRef : undefined}
-              onVideoPlay={() => setPlaying(true)}
-              onVideoPause={() => setPlaying(false)}
-              onVideoTime={setCurrent}
-              onVideoDuration={setDuration}
-              onVideoVolume={setMuted}
             />
+          ) : (
+            <LightboxEmbed tile={tile} />
           )}
         </span>
-        {tile.media === "video" ? (
-          <motion.div
-            className="work-lightbox-transport-slot"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: chromeOn ? 1 : 0 }}
-            transition={chromeTransition}
-            style={{ pointerEvents: chromeOn ? "auto" : "none" }}
-          >
-            <VideoTransport
-              playing={playing}
-              muted={muted}
-              duration={duration}
-              current={current}
-              onTogglePlay={togglePlay}
-              onToggleMute={toggleMute}
-              onSeek={seek}
-            />
-          </motion.div>
-        ) : null}
       </figure>
       <motion.div
         className="work-lightbox-chrome"
@@ -869,6 +1209,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   const flipRef = useRef<Animation | null>(null);
   const originRef = useRef<Box | null>(null);
   const entranceStarted = useRef(false);
+  const fullscreenGuard = useRef(false);
 
   useLayoutEffect(() => {
     const node = gridRef.current;
@@ -919,6 +1260,23 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     apply();
     media.addEventListener("change", apply);
     return () => media.removeEventListener("change", apply);
+  }, []);
+
+  useEffect(() => {
+    const onFullscreen = () => {
+      if (document.fullscreenElement) {
+        fullscreenGuard.current = false;
+        return;
+      }
+
+      fullscreenGuard.current = true;
+      window.setTimeout(() => {
+        fullscreenGuard.current = false;
+      }, 80);
+    };
+
+    document.addEventListener("fullscreenchange", onFullscreen);
+    return () => document.removeEventListener("fullscreenchange", onFullscreen);
   }, []);
 
   useEffect(() => {
@@ -1147,6 +1505,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
       return;
     }
 
+    leaveLightboxFullscreen(dialogRef.current);
     setChromeOn(false);
     closingRef.current = true;
     setClosing(true);
@@ -1172,6 +1531,16 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   };
 
   const onDialogKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
+    if (
+      event.key === "Escape" &&
+      (document.fullscreenElement || fullscreenGuard.current)
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      leaveLightboxFullscreen(dialogRef.current);
+      return;
+    }
+
     const target = event.target;
     if (
       target instanceof Element &&
@@ -1281,6 +1650,10 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
           aria-labelledby="work-lightbox-title"
           onCancel={(event) => {
             event.preventDefault();
+            if (document.fullscreenElement || fullscreenGuard.current) {
+              leaveLightboxFullscreen(dialogRef.current);
+              return;
+            }
             requestClose();
           }}
           onClose={() => {
