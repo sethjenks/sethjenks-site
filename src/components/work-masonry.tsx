@@ -5,6 +5,10 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Cancel01Icon,
+  PauseIcon,
+  PlayIcon,
+  VolumeHighIcon,
+  VolumeOffIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
@@ -15,6 +19,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type Ref,
 } from "react";
 import type { GalleryItem } from "@/lib/gallery";
 
@@ -164,12 +169,122 @@ function TileVisual({
   }
 }
 
+function clockLabel(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) {
+    return "0:00";
+  }
+
+  const whole = Math.floor(seconds);
+  const minutes = Math.floor(whole / 60);
+  const remain = whole % 60;
+  return `${minutes}:${remain.toString().padStart(2, "0")}`;
+}
+
+function VideoTransport({
+  playing,
+  muted,
+  duration,
+  current,
+  onTogglePlay,
+  onToggleMute,
+  onSeek,
+}: {
+  playing: boolean;
+  muted: boolean;
+  duration: number;
+  current: number;
+  onTogglePlay: () => void;
+  onToggleMute: () => void;
+  onSeek: (seconds: number) => void;
+}) {
+  const seekable = duration > 0;
+  const progress = seekable ? Math.min(100, (current / duration) * 100) : 0;
+  const elapsed = clockLabel(current);
+  const total = clockLabel(duration);
+
+  return (
+    <div
+      className="work-lightbox-transport"
+      role="group"
+      aria-label="Playback"
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          event.stopPropagation();
+        }
+      }}
+    >
+      <button
+        type="button"
+        className="work-lightbox-step"
+        aria-label={playing ? "Pause" : "Play"}
+        onClick={onTogglePlay}
+      >
+        <HugeiconsIcon
+          icon={playing ? PauseIcon : PlayIcon}
+          size={18}
+          strokeWidth={1.5}
+          color="currentColor"
+          aria-hidden="true"
+        />
+      </button>
+      <input
+        className="work-lightbox-seek"
+        type="range"
+        min={0}
+        max={seekable ? duration : 0}
+        step={0.1}
+        value={seekable ? Math.min(current, duration) : 0}
+        disabled={!seekable}
+        aria-label="Seek"
+        aria-valuetext={`${elapsed} of ${total}`}
+        style={{ "--seek": `${progress}%` } as CSSProperties}
+        onChange={(event) => {
+          onSeek(Number(event.currentTarget.value));
+        }}
+      />
+      <span className="work-lightbox-time">
+        <span className="play-a11y">Elapsed</span>
+        {elapsed}
+        <span aria-hidden="true"> / </span>
+        <span className="play-a11y">Duration</span>
+        {total}
+      </span>
+      <button
+        type="button"
+        className="work-lightbox-step"
+        aria-label={muted ? "Unmute" : "Mute"}
+        onClick={onToggleMute}
+      >
+        <HugeiconsIcon
+          icon={muted ? VolumeOffIcon : VolumeHighIcon}
+          size={18}
+          strokeWidth={1.5}
+          color="currentColor"
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  );
+}
+
 function LightboxVisual({
   tile,
   reducedMotion,
+  videoRef,
+  onVideoPlay,
+  onVideoPause,
+  onVideoTime,
+  onVideoDuration,
+  onVideoVolume,
 }: {
   tile: GalleryItem;
   reducedMotion: boolean;
+  videoRef?: Ref<HTMLVideoElement>;
+  onVideoPlay?: () => void;
+  onVideoPause?: () => void;
+  onVideoTime?: (seconds: number) => void;
+  onVideoDuration?: (seconds: number) => void;
+  onVideoVolume?: (muted: boolean) => void;
 }) {
   switch (tile.media) {
     case "image":
@@ -190,15 +305,32 @@ function LightboxVisual({
       return (
         <video
           key={tile.id}
+          ref={videoRef}
           className="work-lightbox-image"
           src={tile.src}
           poster={tile.poster}
-          controls
+          aria-label={tile.alt}
           autoPlay={!reducedMotion}
           loop
           muted
           playsInline
           preload={reducedMotion ? "none" : "metadata"}
+          onPlay={onVideoPlay}
+          onPause={onVideoPause}
+          onTimeUpdate={(event) => {
+            onVideoTime?.(event.currentTarget.currentTime);
+          }}
+          onLoadedMetadata={(event) => {
+            const next = event.currentTarget.duration;
+            onVideoDuration?.(Number.isFinite(next) ? next : 0);
+          }}
+          onDurationChange={(event) => {
+            const next = event.currentTarget.duration;
+            onVideoDuration?.(Number.isFinite(next) ? next : 0);
+          }}
+          onVolumeChange={(event) => {
+            onVideoVolume?.(event.currentTarget.muted);
+          }}
         />
       );
     case "frame":
@@ -215,6 +347,211 @@ function LightboxVisual({
       return unknownTile;
     }
   }
+}
+
+function LightboxTitle({
+  title,
+  tileCount,
+  onStep,
+}: {
+  title: string;
+  tileCount: number;
+  onStep: (delta: number) => void;
+}) {
+  return (
+    <div className="work-lightbox-bar">
+      {tileCount > 1 ? (
+        <button
+          type="button"
+          className="work-lightbox-step"
+          aria-label="Previous image"
+          onClick={() => onStep(-1)}
+        >
+          <HugeiconsIcon
+            icon={ArrowLeft01Icon}
+            size={18}
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
+      <p id="work-lightbox-title" className="work-lightbox-title">
+        {title}
+      </p>
+      {tileCount > 1 ? (
+        <button
+          type="button"
+          className="work-lightbox-step"
+          aria-label="Next image"
+          onClick={() => onStep(1)}
+        >
+          <HugeiconsIcon
+            icon={ArrowRight01Icon}
+            size={18}
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function LightboxView({
+  tile,
+  reducedMotion,
+  tileCount,
+  onStep,
+  onClose,
+}: {
+  tile: GalleryItem;
+  reducedMotion: boolean;
+  tileCount: number;
+  onStep: (delta: number) => void;
+  onClose: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [duration, setDuration] = useState(0);
+  const [current, setCurrent] = useState(0);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    if (video.paused) {
+      void video.play().catch(() => setPlaying(false));
+      return;
+    }
+
+    video.pause();
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  };
+
+  const seek = (seconds: number) => {
+    const video = videoRef.current;
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) {
+      return;
+    }
+
+    const next = Math.min(Math.max(seconds, 0), video.duration);
+    video.currentTime = next;
+    setCurrent(next);
+  };
+
+  return (
+    <div
+      className="work-lightbox-layout"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <button
+        type="button"
+        className="work-lightbox-close"
+        aria-label="Close"
+        onClick={onClose}
+      >
+        <HugeiconsIcon
+          icon={Cancel01Icon}
+          size={18}
+          strokeWidth={1.5}
+          color="currentColor"
+          aria-hidden="true"
+        />
+      </button>
+      <figure
+        className="work-lightbox-figure"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        {tile.media === "video" ? (
+          <div
+            className="work-lightbox-stack"
+            style={
+              {
+                "--lightbox-w": tile.width,
+                "--lightbox-h": tile.height,
+              } as CSSProperties
+            }
+          >
+            <span className="work-lightbox-frame" data-media="video">
+              <LightboxVisual
+                tile={tile}
+                reducedMotion={reducedMotion}
+                videoRef={videoRef}
+                onVideoPlay={() => setPlaying(true)}
+                onVideoPause={() => setPlaying(false)}
+                onVideoTime={setCurrent}
+                onVideoDuration={setDuration}
+                onVideoVolume={setMuted}
+              />
+            </span>
+            <VideoTransport
+              playing={playing}
+              muted={muted}
+              duration={duration}
+              current={current}
+              onTogglePlay={togglePlay}
+              onToggleMute={toggleMute}
+              onSeek={seek}
+            />
+            <LightboxTitle
+              title={tile.title}
+              tileCount={tileCount}
+              onStep={onStep}
+            />
+          </div>
+        ) : (
+          <span
+            className={
+              isGalleryMark(tile)
+                ? "work-lightbox-frame work-lightbox-mark"
+                : "work-lightbox-frame"
+            }
+            data-media={tile.media}
+            data-fit={tile.media === "frame" ? tile.fit : undefined}
+            style={
+              {
+                "--lightbox-w": tile.width,
+                "--lightbox-h": tile.height,
+              } as CSSProperties
+            }
+          >
+            <LightboxVisual tile={tile} reducedMotion={reducedMotion} />
+          </span>
+        )}
+      </figure>
+      {tile.media === "video" ? null : (
+        <div className="work-lightbox-caption">
+          <LightboxTitle
+            title={tile.title}
+            tileCount={tileCount}
+            onStep={onStep}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function WorkMasonry({ tiles }: WorkMasonryProps) {
@@ -320,6 +657,14 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   };
 
   const onDialogKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(".work-lightbox-transport")
+    ) {
+      return;
+    }
+
     if (event.key === "ArrowRight") {
       event.preventDefault();
       step(1);
@@ -420,94 +765,14 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
         }}
       >
         {openTile ? (
-          <div
-            className="work-lightbox-layout"
-            onClick={(event) => {
-              if (event.target === event.currentTarget) {
-                dialogRef.current?.close();
-              }
-            }}
-          >
-            <button
-              type="button"
-              className="work-lightbox-close"
-              aria-label="Close"
-              onClick={() => dialogRef.current?.close()}
-            >
-              <HugeiconsIcon
-                icon={Cancel01Icon}
-                size={18}
-                strokeWidth={1.5}
-                color="currentColor"
-                aria-hidden="true"
-              />
-            </button>
-            <figure
-              className="work-lightbox-figure"
-              onClick={(event) => {
-                if (event.target === event.currentTarget) {
-                  dialogRef.current?.close();
-                }
-              }}
-            >
-              <span
-                className={
-                  isGalleryMark(openTile)
-                    ? "work-lightbox-frame work-lightbox-mark"
-                    : "work-lightbox-frame"
-                }
-                data-media={openTile.media}
-                data-fit={
-                  openTile.media === "frame" ? openTile.fit : undefined
-                }
-                style={
-                  {
-                    "--lightbox-w": openTile.width,
-                    "--lightbox-h": openTile.height,
-                  } as CSSProperties
-                }
-              >
-                <LightboxVisual tile={openTile} reducedMotion={reducedMotion} />
-              </span>
-            </figure>
-            <div className="work-lightbox-bar">
-              {tiles.length > 1 ? (
-                <button
-                  type="button"
-                  className="work-lightbox-step"
-                  aria-label="Previous image"
-                  onClick={() => step(-1)}
-                >
-                  <HugeiconsIcon
-                    icon={ArrowLeft01Icon}
-                    size={18}
-                    strokeWidth={1.5}
-                    color="currentColor"
-                    aria-hidden="true"
-                  />
-                </button>
-              ) : null}
-              <p id="work-lightbox-title" className="work-lightbox-title">
-                {openTile.title}
-              </p>
-              {tiles.length > 1 ? (
-                <button
-                  type="button"
-                  className="work-lightbox-step"
-                  aria-label="Next image"
-                  onClick={() => step(1)}
-                >
-                  <HugeiconsIcon
-                    icon={ArrowRight01Icon}
-                    size={18}
-                    strokeWidth={1.5}
-                    color="currentColor"
-                    aria-hidden="true"
-                  />
-                </button>
-              ) : null}
-            </div>
-          </div>
+          <LightboxView
+            key={openTile.id}
+            tile={openTile}
+            reducedMotion={reducedMotion}
+            tileCount={tiles.length}
+            onStep={step}
+            onClose={() => dialogRef.current?.close()}
+          />
         ) : null}
       </dialog>
     </section>
