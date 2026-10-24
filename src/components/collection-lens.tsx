@@ -19,9 +19,9 @@ import {
 } from "@/lib/collection-lens-math";
 import {
   collectionIsPixelated,
-  loadCollection,
+  openCollection,
+  type CollectionCatalog,
   type CollectionId,
-  type CollectionManifest,
 } from "@/lib/collections";
 
 const GLIDE_MS = 280;
@@ -99,7 +99,8 @@ function CollectionLensView({
   const stageRef = useRef<HTMLSpanElement>(null);
   const heroRef = useRef<HTMLImageElement>(null);
   const hintRef = useRef<HTMLParagraphElement>(null);
-  const manifestRef = useRef<CollectionManifest | null>(null);
+  const manifestRef = useRef<CollectionCatalog | null>(null);
+  const labelName = useRef("");
   const reducedRef = useRef(reducedMotion);
   const revealedRef = useRef(revealed);
   const closingRef = useRef(closing);
@@ -148,15 +149,27 @@ function CollectionLensView({
 
   useEffect(() => {
     let active = true;
-    loadCollection(id).then(
+    let unsubscribe = () => {};
+    const opened = openCollection(id);
+    opened.catalog.then(
       (manifest) => {
         if (!active) {
           return;
         }
         manifestRef.current = manifest;
-        rootRef.current?.setAttribute("data-loaded", "true");
+        unsubscribe = manifest.subscribe(() => {
+          drawRef.current();
+        });
         prepareRef.current();
         drawRef.current();
+        void manifest.heroReady.then(() => {
+          if (!active) {
+            return;
+          }
+          rootRef.current?.setAttribute("data-loaded", "true");
+          prepareRef.current();
+          drawRef.current();
+        });
       },
       () => {
         if (active) {
@@ -166,6 +179,8 @@ function CollectionLensView({
     );
     return () => {
       active = false;
+      unsubscribe();
+      opened.release();
     };
   }, [id]);
 
@@ -187,16 +202,15 @@ function CollectionLensView({
       };
     };
 
-    const publishLabel = (index: number, manifest: CollectionManifest) => {
-      if (labelIndex.current === index) {
+    const publishLabel = (index: number, manifest: CollectionCatalog) => {
+      const piece = manifest.piece(index);
+      const name = piece?.name ?? fallbackRef.current;
+      if (labelIndex.current === index && labelName.current === name) {
         return;
       }
       labelIndex.current = index;
-      const piece = manifest.items[index];
-      if (!piece) {
-        return;
-      }
-      onLabelRef.current(piece.name, pieceCaption(index, manifest.items.length));
+      labelName.current = name;
+      onLabelRef.current(name, pieceCaption(index, manifest.count));
     };
 
     const takeSlot = (): Slot => {
@@ -222,8 +236,7 @@ function CollectionLensView({
       if (!field || !manifest) {
         return;
       }
-      const items = manifest.items;
-      const count = items.length;
+      const count = manifest.count;
       const { width, height, cell } = viewport.current;
       const bounds = boundsFor(count);
       const camera = viewCamera(bounds);
@@ -287,18 +300,19 @@ function CollectionLensView({
       const pressed = pressedRef.current;
 
       for (const item of placed) {
+        manifest.ensure(item.index);
         seen.add(item.index);
         let slot = slots.current.get(item.index);
         if (!slot) {
           slot = takeSlot();
           slot.index = item.index;
-          const piece = items[item.index];
-          if (piece && slot.img.dataset.src !== piece.src) {
-            slot.img.dataset.src = piece.src;
-            slot.img.src = piece.src;
-            slot.img.fetchPriority = item.index === focus ? "high" : "low";
-          }
           slots.current.set(item.index, slot);
+        }
+        const piece = manifest.piece(item.index);
+        if (piece && slot.img.dataset.src !== piece.src) {
+          slot.img.dataset.src = piece.src;
+          slot.img.src = piece.src;
+          slot.img.fetchPriority = item.index === focus ? "high" : "low";
         }
         if (!slot.el.isConnected) {
           field.append(slot.el);
@@ -330,7 +344,7 @@ function CollectionLensView({
         pool.current.push(slot);
       }
 
-      const piece = items[focus];
+      const piece = manifest.piece(focus);
       const focusSpot = placed.find((item) => item.index === focus);
       const focusScale = focusSpot?.scale ?? 1;
       focusRef.current = {
@@ -352,16 +366,16 @@ function CollectionLensView({
         return;
       }
       if (!centeredRef.current) {
-        const index = heroIndex(manifest.items.length);
-        const bounds = boundsFor(manifest.items.length);
+        const index = heroIndex(manifest.count);
+        const bounds = boundsFor(manifest.count);
         const point = worldPoint(index, bounds.cols, bounds.pitch);
         intent.current.x = point.x;
         intent.current.y = point.y;
         centeredRef.current = true;
       }
       const hero = heroRef.current;
-      const index = heroIndex(manifest.items.length);
-      const src = manifest.items[index]?.src;
+      const index = heroIndex(manifest.count);
+      const src = manifest.piece(index)?.src;
       if (hero && src && hero.dataset.src !== src) {
         hero.dataset.src = src;
         heroReady.current = false;
@@ -399,7 +413,7 @@ function CollectionLensView({
       if (!manifest) {
         return false;
       }
-      const bounds = boundsFor(manifest.items.length);
+      const bounds = boundsFor(manifest.count);
       if (reducedRef.current) {
         motionRef.current = { kind: "idle" };
         intent.current.x = clamp(intent.current.x, bounds.minX, bounds.maxX);
@@ -485,7 +499,7 @@ function CollectionLensView({
       if (!manifest) {
         return;
       }
-      const bounds = boundsFor(manifest.items.length);
+      const bounds = boundsFor(manifest.count);
       if (edgeSoft.current) {
         intent.current.x = applyRubber(intent.current.x, bounds.minX, bounds.maxX);
         intent.current.y = applyRubber(intent.current.y, bounds.minY, bounds.maxY);
@@ -594,7 +608,7 @@ function CollectionLensView({
       }
       const manifest = manifestRef.current;
       if (manifest && reducedRef.current) {
-        const bounds = boundsFor(manifest.items.length);
+        const bounds = boundsFor(manifest.count);
         intent.current.x = clamp(intent.current.x - dx, bounds.minX, bounds.maxX);
         intent.current.y = clamp(intent.current.y - dy, bounds.minY, bounds.maxY);
       } else {
@@ -621,7 +635,7 @@ function CollectionLensView({
         const focus = focusRef.current?.index;
         if (manifest && index != null && index !== focus) {
           hideHint();
-          const bounds = boundsFor(manifest.items.length);
+          const bounds = boundsFor(manifest.count);
           const target = worldPoint(index, bounds.cols, bounds.pitch);
           startGlide(target.x, target.y, reducedRef.current ? 0 : GLIDE_MS, easeInOut);
           return;
@@ -647,8 +661,8 @@ function CollectionLensView({
       if (!manifest || focus == null) {
         return;
       }
-      const bounds = boundsFor(manifest.items.length);
-      const next = neighborIndex(focus, dCol, dRow, bounds.cols, manifest.items.length);
+      const bounds = boundsFor(manifest.count);
+      const next = neighborIndex(focus, dCol, dRow, bounds.cols, manifest.count);
       if (next === focus) {
         return;
       }
@@ -690,7 +704,7 @@ function CollectionLensView({
       }
       const manifest = manifestRef.current;
       if (manifest && reducedRef.current) {
-        const bounds = boundsFor(manifest.items.length);
+        const bounds = boundsFor(manifest.count);
         intent.current.x = clamp(intent.current.x + dx, bounds.minX, bounds.maxX);
         intent.current.y = clamp(intent.current.y + dy, bounds.minY, bounds.maxY);
         edgeSoft.current = false;

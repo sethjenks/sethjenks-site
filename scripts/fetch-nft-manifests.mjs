@@ -1,7 +1,7 @@
 // Refresh public/collections/*.json from MintGarden thumbnail URLs.
 // Keep the ids in sync with src/lib/collections.ts. Does not download images.
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const COLLECTIONS = [
@@ -114,14 +114,39 @@ async function fetchCollection(entry) {
   };
 }
 
+const CHIA_CHUNK_SIZE = 800;
 const outDir = path.join(process.cwd(), "public", "collections");
 await mkdir(outDir, { recursive: true });
 
 const manifests = await Promise.all(COLLECTIONS.map((entry) => fetchCollection(entry)));
 
 for (const manifest of manifests) {
-  const file = path.join(outDir, `${manifest.id}.json`);
-  await writeFile(file, JSON.stringify(manifest));
+  const pieces = manifest.items.map((item) => ({ name: item.name, src: item.src }));
+  if (manifest.id === "chia-friends") {
+    const dir = path.join(outDir, "chia-friends");
+    await rm(path.join(outDir, "chia-friends.json"), { force: true });
+    await mkdir(dir, { recursive: true });
+    await writeFile(
+      path.join(dir, "index.json"),
+      JSON.stringify({
+        title: manifest.title,
+        count: pieces.length,
+        chunkSize: CHIA_CHUNK_SIZE,
+      }),
+    );
+    for (let start = 0; start < pieces.length; start += CHIA_CHUNK_SIZE) {
+      const chunk = start / CHIA_CHUNK_SIZE;
+      await writeFile(
+        path.join(dir, `${chunk}.json`),
+        JSON.stringify(pieces.slice(start, start + CHIA_CHUNK_SIZE)),
+      );
+    }
+  } else {
+    await writeFile(
+      path.join(outDir, `${manifest.id}.json`),
+      JSON.stringify({ title: manifest.title, items: pieces }),
+    );
+  }
   const sample = manifest.items[0]?.src ?? "";
   let bytes = 0;
   if (sample) {

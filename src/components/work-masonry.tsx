@@ -14,6 +14,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { motion } from "motion/react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
   useCallback,
@@ -29,19 +30,27 @@ import {
   type Ref,
 } from "react";
 import {
-  CollectionLens,
-  type CollectionMove,
-} from "@/components/collection-lens";
-import {
   collectionForGallery,
   type CollectionId,
-} from "@/lib/collections";
+} from "@/lib/collection-ids";
+import { prefetchCollection } from "@/lib/collections";
 import type {
   GalleryFrame,
   GalleryImage,
   GalleryItem,
   GalleryVideo,
 } from "@/lib/gallery";
+
+type CollectionMove = (columnDelta: number, rowDelta: number) => void;
+
+function loadCollectionLens() {
+  return import("@/components/collection-lens");
+}
+
+const CollectionLens = dynamic(
+  () => loadCollectionLens().then((mod) => mod.CollectionLens),
+  { ssr: false, loading: () => null },
+);
 
 const SHARED_EASE = [0.23, 1, 0.32, 1] as const;
 const FLIP_EASE = "cubic-bezier(0.23, 1, 0.32, 1)";
@@ -1357,16 +1366,20 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   const [heldId, setHeldId] = useState<string | null>(null);
   const [closing, setClosing] = useState(false);
   const [chromeOn, setChromeOn] = useState(false);
+  const [frameReady, setFrameReady] = useState(0);
   const closingRef = useRef(false);
   const closeTimer = useRef<number | null>(null);
   const finishCloseRef = useRef<() => void>(() => {});
   const frameRef = useRef<HTMLSpanElement>(null);
-  const onFrame = useCallback((node: HTMLSpanElement | null) => {
-    frameRef.current = node;
-  }, []);
   const collectionMoveRef = useRef<CollectionMove>(() => {});
   const flipRef = useRef<Animation | null>(null);
   const originRef = useRef<Box | null>(null);
+  const onFrame = useCallback((node: HTMLSpanElement | null) => {
+    frameRef.current = node;
+    if (node && originRef.current) {
+      setFrameReady((value) => value + 1);
+    }
+  }, []);
   const entranceStarted = useRef(false);
   const fullscreenGuard = useRef(false);
 
@@ -1580,7 +1593,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
         setChromeOn(true);
       }
     });
-  }, [openIndex, reducedMotion]);
+  }, [openIndex, reducedMotion, frameReady]);
 
   useLayoutEffect(() => {
     if (!closing || reducedMotion) {
@@ -1651,6 +1664,11 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     }
 
     const tile = tiles[index];
+    const collectionId = collectionForGallery(tile?.id);
+    if (collectionId) {
+      prefetchCollection(collectionId);
+      void loadCollectionLens();
+    }
     const source = gridRef.current?.querySelector<HTMLElement>(
       `[data-tile-id="${CSS.escape(tile?.id ?? "")}"]`,
     );
@@ -1748,6 +1766,13 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
             } as CSSProperties;
             const mark = isGalleryMark(tile);
             const held = heldId === tile.id;
+            const collectionId = collectionForGallery(tile.id);
+            const warm = collectionId
+              ? () => {
+                  prefetchCollection(collectionId);
+                  void loadCollectionLens();
+                }
+              : undefined;
             const surface = (
               <span
                 className="work-masonry-shell"
@@ -1810,6 +1835,9 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
                 aria-expanded={openIndex === index}
                 aria-controls="work-lightbox"
                 onClick={() => openAt(index)}
+                onPointerEnter={warm}
+                onFocus={warm}
+                onTouchStart={warm}
               >
                 {surface}
               </button>
