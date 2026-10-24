@@ -16,6 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -27,6 +28,14 @@ import {
   type PointerEvent,
   type Ref,
 } from "react";
+import {
+  CollectionLens,
+  type CollectionMove,
+} from "@/components/collection-lens";
+import {
+  collectionForGallery,
+  type CollectionId,
+} from "@/lib/collections";
 import type {
   GalleryFrame,
   GalleryImage,
@@ -1070,13 +1079,137 @@ function LightboxTitle({
   );
 }
 
+function CollectionLightbox({
+  tile,
+  collectionId,
+  reducedMotion,
+  chromeOn,
+  fading,
+  closing,
+  onFrame,
+  moveRef,
+  onClose,
+  onFadeEnd,
+}: {
+  tile: GalleryVideo;
+  collectionId: CollectionId;
+  reducedMotion: boolean;
+  chromeOn: boolean;
+  fading: boolean;
+  closing: boolean;
+  onFrame: (node: HTMLSpanElement | null) => void;
+  moveRef: { current: CollectionMove };
+  onClose: () => void;
+  onFadeEnd: () => void;
+}) {
+  const [label, setLabel] = useState(tile.title);
+  const [caption, setCaption] = useState("");
+  const [live, setLive] = useState("");
+  const liveTimer = useRef<number | null>(null);
+  const chromeTransition = {
+    duration: reducedMotion ? 0.18 : chromeOn ? 0.18 : 0.14,
+    delay: !reducedMotion && chromeOn ? 0.08 : 0,
+    ease: SHARED_EASE,
+  };
+
+  const onLabel = useCallback((name: string, nextCaption: string) => {
+    setLabel(name);
+    setCaption(nextCaption);
+    if (liveTimer.current != null) {
+      window.clearTimeout(liveTimer.current);
+    }
+    liveTimer.current = window.setTimeout(() => {
+      setLive(`${name}. ${nextCaption}`);
+    }, 280);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (liveTimer.current != null) {
+        window.clearTimeout(liveTimer.current);
+      }
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="work-lightbox-layout"
+      data-collection=""
+      initial={false}
+      animate={{ opacity: fading ? 0 : 1 }}
+      transition={{
+        duration: reducedMotion ? 0.18 : 0,
+        ease: SHARED_EASE,
+      }}
+      onAnimationComplete={() => {
+        if (fading) {
+          onFadeEnd();
+        }
+      }}
+    >
+      <motion.button
+        type="button"
+        className="work-lightbox-close"
+        aria-label="Close"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: chromeOn ? 1 : 0 }}
+        transition={chromeTransition}
+        style={{ pointerEvents: chromeOn ? "auto" : "none" }}
+        onClick={onClose}
+      >
+        <HugeiconsIcon
+          icon={Cancel01Icon}
+          size={18}
+          strokeWidth={1.5}
+          color="currentColor"
+          aria-hidden="true"
+        />
+      </motion.button>
+      <CollectionLens
+        key={tile.id}
+        id={collectionId}
+        poster={tile.poster}
+        fallbackTitle={tile.title}
+        reducedMotion={reducedMotion}
+        revealed={chromeOn || reducedMotion}
+        closing={closing}
+        onFrame={onFrame}
+        moveRef={moveRef}
+        onLabel={onLabel}
+      />
+      <motion.div
+        className="work-lightbox-chrome"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: chromeOn ? 1 : 0 }}
+        transition={chromeTransition}
+        style={{ pointerEvents: chromeOn ? "auto" : "none" }}
+      >
+        <div className="work-lightbox-bar">
+          <div className="collection-readout">
+            <p id="work-lightbox-title" className="work-lightbox-title">
+              {label}
+            </p>
+            {caption ? <p className="collection-caption">{caption}</p> : null}
+          </div>
+          <p className="collection-live" aria-live="polite">
+            {live}
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function LightboxView({
   tile,
   reducedMotion,
   tileCount,
   chromeOn,
   fading,
+  closing,
   frameRef,
+  onFrame,
+  moveRef,
   onStep,
   onClose,
   onFadeEnd,
@@ -1086,11 +1219,33 @@ function LightboxView({
   tileCount: number;
   chromeOn: boolean;
   fading: boolean;
+  closing: boolean;
   frameRef: Ref<HTMLSpanElement>;
+  onFrame: (node: HTMLSpanElement | null) => void;
+  moveRef: { current: CollectionMove };
   onStep: (delta: number) => void;
   onClose: () => void;
   onFadeEnd: () => void;
 }) {
+  const collectionId = collectionForGallery(tile.id);
+  if (collectionId && tile.media === "video") {
+    return (
+      <CollectionLightbox
+        key={tile.id}
+        tile={tile}
+        collectionId={collectionId}
+        reducedMotion={reducedMotion}
+        chromeOn={chromeOn}
+        fading={fading}
+        closing={closing}
+        onFrame={onFrame}
+        moveRef={moveRef}
+        onClose={onClose}
+        onFadeEnd={onFadeEnd}
+      />
+    );
+  }
+
   const mark = isGalleryMark(tile);
   const chromeTransition = {
     duration: reducedMotion ? 0.18 : chromeOn ? 0.18 : 0.14,
@@ -1206,6 +1361,10 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   const closeTimer = useRef<number | null>(null);
   const finishCloseRef = useRef<() => void>(() => {});
   const frameRef = useRef<HTMLSpanElement>(null);
+  const onFrame = useCallback((node: HTMLSpanElement | null) => {
+    frameRef.current = node;
+  }, []);
+  const collectionMoveRef = useRef<CollectionMove>(() => {});
   const flipRef = useRef<Animation | null>(null);
   const originRef = useRef<Box | null>(null);
   const entranceStarted = useRef(false);
@@ -1449,13 +1608,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     });
   }, [closing, heldId, reducedMotion]);
 
-  if (tiles.length === 0) {
-    return null;
-  }
-
-  const openTile = openIndex == null ? null : tiles[openIndex] ?? null;
-
-  const finishClose = () => {
+  const finishClose = useCallback(() => {
     if (!closingRef.current) {
       return;
     }
@@ -1475,9 +1628,17 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     if (dialog?.open) {
       dialog.close();
     }
-  };
+  }, []);
 
-  finishCloseRef.current = finishClose;
+  useLayoutEffect(() => {
+    finishCloseRef.current = finishClose;
+  }, [finishClose]);
+
+  if (tiles.length === 0) {
+    return null;
+  }
+
+  const openTile = openIndex == null ? null : tiles[openIndex] ?? null;
 
   const openAt = (index: number) => {
     if (closingRef.current) {
@@ -1547,6 +1708,18 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
       target.closest(".work-lightbox-transport")
     ) {
       return;
+    }
+
+    if (collectionForGallery(openTile?.id)) {
+      const column =
+        event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+      const row =
+        event.key === "ArrowDown" ? 1 : event.key === "ArrowUp" ? -1 : 0;
+      if (column !== 0 || row !== 0) {
+        event.preventDefault();
+        collectionMoveRef.current(column, row);
+        return;
+      }
     }
 
     if (event.key === "ArrowRight") {
@@ -1686,7 +1859,10 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
               tileCount={tiles.length}
               chromeOn={chromeOn}
               fading={reducedMotion && closing}
+              closing={closing}
               frameRef={frameRef}
+              onFrame={onFrame}
+              moveRef={collectionMoveRef}
               onStep={step}
               onClose={requestClose}
               onFadeEnd={finishClose}

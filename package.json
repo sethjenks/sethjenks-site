@@ -7,7 +7,8 @@
     "studio": "npm --prefix studio/ascii run dev",
     "build": "next build",
     "start": "next start --port 43127",
-    "lint": "eslint"
+    "lint": "eslint",
+    "manifests": "node scripts/fetch-nft-manifests.mjs"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",

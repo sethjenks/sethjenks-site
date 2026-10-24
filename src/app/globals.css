@@ -3050,6 +3050,214 @@
     color: var(--quiet);
     text-align: center;
   }
+
+  .work-lightbox-layout[data-collection] {
+    display: block;
+  }
+
+  .work-lightbox-layout[data-collection] .work-lightbox-close {
+    z-index: 5;
+  }
+
+  .work-lightbox-layout[data-collection] .work-lightbox-chrome {
+    position: absolute;
+    z-index: 4;
+    inset-inline: 0;
+    inset-block-end: 0;
+    padding-block-end: max(16px, env(safe-area-inset-bottom, 0px));
+    pointer-events: none;
+  }
+
+  .work-lightbox-layout[data-collection] .work-lightbox-bar {
+    pointer-events: auto;
+  }
+
+  .collection-readout {
+    grid-column: 1 / -1;
+    display: flex;
+    min-width: 0;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .collection-readout .work-lightbox-title {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .collection-caption {
+    max-width: 100%;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--quiet);
+  }
+
+  .collection-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: clip;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .collection-lens {
+    --cell: 148px;
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
+  }
+
+  .collection-lens[data-dragging] {
+    cursor: grabbing;
+  }
+
+  .collection-field {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 240ms var(--ease-out) 60ms;
+  }
+
+  .collection-lens[data-loaded] .collection-field {
+    opacity: 1;
+  }
+
+  .collection-lens[data-closing] .collection-field {
+    opacity: 0;
+    transition: opacity 140ms var(--ease-out);
+  }
+
+  .collection-cell {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--cell);
+    height: var(--cell);
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--aluminum-dim);
+    transform-origin: center center;
+    contain: layout paint;
+  }
+
+  .collection-cell img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .collection-cell[data-active] {
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 22%, transparent);
+  }
+
+  .collection-lens[data-pixelated] .collection-cell img,
+  .collection-lens[data-pixelated] .collection-stage img[data-hero] {
+    image-rendering: pixelated;
+  }
+
+  .collection-stage {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    width: var(--cell);
+    height: var(--cell);
+    margin-top: calc(var(--cell) / -2);
+    margin-left: calc(var(--cell) / -2);
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--paper);
+    pointer-events: none;
+  }
+
+  .collection-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      opacity 180ms var(--ease-out),
+      filter 180ms var(--ease-out);
+  }
+
+  .collection-stage img[data-poster] {
+    opacity: 1;
+  }
+
+  .collection-stage img[data-hero] {
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  .collection-stage[data-landed] img[data-poster] {
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  .collection-stage[data-landed] img[data-hero] {
+    opacity: 1;
+    filter: none;
+  }
+
+  .collection-stage[data-hide] {
+    opacity: 0;
+  }
+
+  .collection-stage[data-instant],
+  .collection-stage[data-instant] img {
+    transition: none;
+  }
+
+  .collection-lens[data-reduced] .collection-stage {
+    opacity: 0;
+  }
+
+  .collection-hint {
+    position: absolute;
+    z-index: 4;
+    right: 24px;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    left: 24px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--quiet);
+    pointer-events: none;
+    transition: opacity 200ms var(--ease-out);
+  }
+
+  .collection-hint[data-hide] {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
