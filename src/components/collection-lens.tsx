@@ -26,6 +26,7 @@ import {
 
 const GLIDE_MS = 280;
 const RUBBER_MS = 260;
+const ZOOM_MS = 320;
 const MAX_CELLS = 420;
 const DRAG_SLOP = 8;
 const TAP_SLOP = 8;
@@ -69,6 +70,14 @@ type Focus = {
   src: string;
 };
 
+type ZoomAnim = {
+  from: number;
+  to: number;
+  value: number;
+  start: number;
+  duration: number;
+};
+
 export type CollectionMove = (columnDelta: number, rowDelta: number) => void;
 
 type CollectionLensProps = {
@@ -80,6 +89,8 @@ type CollectionLensProps = {
   closing: boolean;
   onFrame: (node: HTMLSpanElement | null) => void;
   moveRef: { current: CollectionMove };
+  /** Returns true when Escape collapsed the enlarged piece instead of closing. */
+  escapeRef: { current: () => boolean };
   onLabel: (name: string, caption: string) => void;
 };
 
@@ -92,6 +103,7 @@ function CollectionLensView({
   closing,
   onFrame,
   moveRef,
+  escapeRef,
   onLabel,
 }: CollectionLensProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -129,6 +141,8 @@ function CollectionLensView({
   const drawRef = useRef<() => void>(() => {});
   const prepareRef = useRef<() => void>(() => {});
   const moveImpl = useRef<CollectionMove>(() => {});
+  const escapeImpl = useRef<() => boolean>(() => false);
+  const zoomRef = useRef<ZoomAnim | null>(null);
   const pointerDownRef = useRef<(event: PointerEvent) => void>(() => {});
   const pointerMoveRef = useRef<(event: PointerEvent) => void>(() => {});
   const pointerUpRef = useRef<(event: PointerEvent) => void>(() => {});
@@ -298,6 +312,9 @@ function CollectionLensView({
       placedRef.current = placed;
       const seen = new Set<number>();
       const pressed = pressedRef.current;
+      const zoom = zoomRef.current?.value ?? 0;
+      const heroSide = Math.min(width - 32, Math.max(cell, height - 160));
+      const heroScale = heroSide / cell;
 
       for (const item of placed) {
         manifest.ensure(item.index);
@@ -317,17 +334,33 @@ function CollectionLensView({
         if (!slot.el.isConnected) {
           field.append(slot.el);
         }
-        const press = pressed === item.index ? 0.97 : 1;
+        const press = zoom > 0 || pressed !== item.index ? 1 : 0.97;
         const hidden = closingRef.current && item.index === focus;
-        slot.el.style.transform = `translate3d(${item.x - cell / 2}px, ${item.y - cell / 2}px, 0) scale(${item.scale * press})`;
-        slot.el.style.opacity = hidden ? "0" : String(item.opacity);
+        let displayScale = item.scale * press;
+        let opacity = item.opacity;
+        if (zoom > 0) {
+          if (item.index === focus) {
+            displayScale = item.scale + (heroScale - item.scale) * zoom;
+            opacity = 1;
+          } else {
+            opacity = item.opacity * (1 - zoom);
+          }
+        }
+        slot.el.style.transform = `translate3d(${item.x - cell / 2}px, ${item.y - cell / 2}px, 0) scale(${displayScale})`;
+        slot.el.style.opacity = hidden ? "0" : String(opacity);
+        if (zoom > 0 && item.index === focus) {
+          slot.el.style.borderRadius = `${16 / displayScale}px`;
+        } else if (slot.el.style.borderRadius) {
+          slot.el.style.borderRadius = "";
+        }
         const rank = String(Math.round(item.scale * 100));
         if (slot.el.dataset.z !== rank) {
           slot.el.dataset.z = rank;
           slot.el.style.zIndex = rank;
         }
-        if ((slot.el.dataset.active === "true") !== (item.index === focus)) {
-          if (item.index === focus) {
+        const active = item.index === focus && zoom < 0.2;
+        if ((slot.el.dataset.active === "true") !== active) {
+          if (active) {
             slot.el.dataset.active = "true";
           } else {
             delete slot.el.dataset.active;
@@ -346,7 +379,8 @@ function CollectionLensView({
 
       const piece = manifest.piece(focus);
       const focusSpot = placed.find((item) => item.index === focus);
-      const focusScale = focusSpot?.scale ?? 1;
+      const focusLens = focusSpot?.scale ?? 1;
+      const focusScale = focusLens + (heroScale - focusLens) * zoom;
       focusRef.current = {
         index: focus,
         x: focusSpot?.x ?? width / 2,
@@ -392,12 +426,35 @@ function CollectionLensView({
     prepareRef.current = prepare;
 
     let lastFrame = 0;
+    const stepZoom = (now: number) => {
+      const zoom = zoomRef.current;
+      if (!zoom || zoom.duration <= 0) {
+        return false;
+      }
+      const amount = reducedRef.current
+        ? 1
+        : Math.min(1, (now - zoom.start) / zoom.duration);
+      zoom.value = zoom.from + (zoom.to - zoom.from) * easeOut(amount);
+      if (amount < 1) {
+        return true;
+      }
+      zoom.value = zoom.to;
+      if (zoom.to <= 0) {
+        zoomRef.current = null;
+        root.removeAttribute("data-zoomed");
+        root.setAttribute("aria-expanded", "false");
+      }
+      return false;
+    };
+
     const frame = (now: number) => {
       const dt = Math.min(34, now - lastFrame);
       lastFrame = now;
-      const moving = stepMotion(now, dt);
+      const movingCamera = stepMotion(now, dt);
+      const movingZoom = stepZoom(now);
       draw();
-      rafRef.current = moving ? window.requestAnimationFrame(frame) : 0;
+      rafRef.current =
+        movingCamera || movingZoom ? window.requestAnimationFrame(frame) : 0;
     };
 
     const kick = () => {
@@ -406,6 +463,46 @@ function CollectionLensView({
       }
       lastFrame = performance.now();
       rafRef.current = window.requestAnimationFrame(frame);
+    };
+
+    const zoomEngaged = () => {
+      const zoom = zoomRef.current;
+      return zoom != null && (zoom.value > 0.001 || zoom.to > 0);
+    };
+
+    const startZoom = (to: number) => {
+      const current = zoomRef.current?.value ?? 0;
+      if (Math.abs(current - to) < 0.001 && (zoomRef.current?.to ?? to) === to) {
+        return;
+      }
+      if (to > 0) {
+        const stage = stageRef.current;
+        if (stage) {
+          stage.dataset.hide = "true";
+          settledRef.current = true;
+        }
+        root.dataset.zoomed = "true";
+        root.setAttribute("aria-expanded", "true");
+      }
+      if (reducedRef.current) {
+        if (to <= 0) {
+          zoomRef.current = null;
+          delete root.dataset.zoomed;
+          root.setAttribute("aria-expanded", "false");
+        } else {
+          zoomRef.current = { from: 1, to: 1, value: 1, start: 0, duration: 0 };
+        }
+        draw();
+        return;
+      }
+      zoomRef.current = {
+        from: current,
+        to,
+        value: current,
+        start: performance.now(),
+        duration: ZOOM_MS,
+      };
+      kick();
     };
 
     const stepMotion = (now: number, dt: number) => {
@@ -536,6 +633,17 @@ function CollectionLensView({
     };
 
     const hitTest = (x: number, y: number) => {
+      if (zoomEngaged()) {
+        const focus = focusRef.current;
+        if (!focus) {
+          return null;
+        }
+        const half = focus.size / 2 + TAP_SLOP;
+        if (Math.abs(x - focus.x) <= half && Math.abs(y - focus.y) <= half) {
+          return focus.index;
+        }
+        return null;
+      }
       let best: number | null = null;
       let bestDistance = Number.POSITIVE_INFINITY;
       for (const item of placedRef.current) {
@@ -558,15 +666,21 @@ function CollectionLensView({
     let lastX = 0;
     let lastY = 0;
     let dragging = false;
+    let gestureZoomed = false;
 
     pointerDownRef.current = (event: PointerEvent) => {
       if (event.button !== 0 || activePointer.current != null) {
         return;
       }
       activePointer.current = event.pointerId;
-      root.setPointerCapture(event.pointerId);
+      try {
+        root.setPointerCapture(event.pointerId);
+      } catch {
+        // The pointer can end before capture, and the tap should still land.
+      }
+      gestureZoomed = zoomEngaged();
       motionRef.current = { kind: "idle" };
-      if (rafRef.current) {
+      if (!gestureZoomed && rafRef.current) {
         window.cancelAnimationFrame(rafRef.current);
         rafRef.current = 0;
       }
@@ -577,7 +691,9 @@ function CollectionLensView({
       lastY = event.clientY;
       samples.length = 0;
       samples.push({ x: event.clientX, y: event.clientY, t: performance.now() });
-      edgeSoft.current = true;
+      if (!gestureZoomed) {
+        edgeSoft.current = true;
+      }
       const point = localPoint(event);
       pressedRef.current = hitTest(point.x, point.y);
       draw();
@@ -595,6 +711,9 @@ function CollectionLensView({
         pressedRef.current = null;
       }
       dragging = true;
+      if (gestureZoomed) {
+        return;
+      }
       hideHint();
       root.dataset.dragging = "true";
       const dx = event.clientX - lastX;
@@ -626,13 +745,21 @@ function CollectionLensView({
       pressedRef.current = null;
       delete root.dataset.dragging;
       const wasDrag = dragging;
+      const wasZoomed = gestureZoomed;
       dragging = false;
+      gestureZoomed = false;
       if (!wasDrag) {
         edgeSoft.current = false;
         const point = localPoint(event);
         const index = hitTest(point.x, point.y);
         const manifest = manifestRef.current;
         const focus = focusRef.current?.index;
+        if (wasZoomed) {
+          if (index != null && index === focus) {
+            startZoom(0);
+          }
+          return;
+        }
         if (manifest && index != null && index !== focus) {
           hideHint();
           const bounds = boundsFor(manifest.count);
@@ -640,7 +767,15 @@ function CollectionLensView({
           startGlide(target.x, target.y, reducedRef.current ? 0 : GLIDE_MS, easeInOut);
           return;
         }
+        if (manifest && index != null && index === focus) {
+          hideHint();
+          startZoom(1);
+          return;
+        }
         draw();
+        return;
+      }
+      if (wasZoomed) {
         return;
       }
       let vx = 0;
@@ -658,7 +793,7 @@ function CollectionLensView({
     moveImpl.current = (dCol: number, dRow: number) => {
       const manifest = manifestRef.current;
       const focus = focusRef.current?.index;
-      if (!manifest || focus == null) {
+      if (!manifest || focus == null || zoomEngaged()) {
         return;
       }
       const bounds = boundsFor(manifest.count);
@@ -675,6 +810,18 @@ function CollectionLensView({
       draw();
     };
 
+    escapeImpl.current = () => {
+      const zoom = zoomRef.current;
+      if (!zoom || (zoom.value <= 0.001 && zoom.to <= 0)) {
+        return false;
+      }
+      if (zoom.to <= 0) {
+        return false;
+      }
+      startZoom(0);
+      return true;
+    };
+
     const onPointerDown = (event: PointerEvent) => {
       event.preventDefault();
       pointerDownRef.current(event);
@@ -687,6 +834,9 @@ function CollectionLensView({
     };
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
+      if (zoomEngaged()) {
+        return;
+      }
       hideHint();
       motionRef.current = { kind: "idle" };
       let dx = event.deltaX;
@@ -753,6 +903,13 @@ function CollectionLensView({
       moveRef.current = () => {};
     };
   }, [moveRef]);
+
+  useLayoutEffect(() => {
+    escapeRef.current = () => escapeImpl.current();
+    return () => {
+      escapeRef.current = () => false;
+    };
+  }, [escapeRef]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -848,6 +1005,7 @@ function CollectionLensView({
       role="application"
       aria-label={`${fallbackTitle} collection`}
       aria-describedby="collection-hint"
+      aria-expanded="false"
     >
       <div ref={fieldRef} className="collection-field" />
       <span ref={setStageNode} className="collection-stage">
@@ -858,7 +1016,7 @@ function CollectionLensView({
         <img ref={heroRef} data-hero alt="" draggable={false} />
       </span>
       <p ref={hintRef} className="collection-hint" id="collection-hint">
-        Drag, scroll, or use arrow keys.
+        Drag, scroll, or tap a piece.
       </p>
     </div>
   );

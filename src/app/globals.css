@@ -3132,6 +3132,11 @@
     cursor: grabbing;
   }
 
+  .collection-lens[data-zoomed],
+  .collection-lens[data-zoomed][data-dragging] {
+    cursor: zoom-out;
+  }
+
   .collection-field {
     position: absolute;
     inset: 0;

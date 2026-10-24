@@ -42,6 +42,7 @@ import type {
 } from "@/lib/gallery";
 
 type CollectionMove = (columnDelta: number, rowDelta: number) => void;
+type CollectionEscape = () => boolean;
 
 function loadCollectionLens() {
   return import("@/components/collection-lens");
@@ -1097,6 +1098,7 @@ function CollectionLightbox({
   closing,
   onFrame,
   moveRef,
+  escapeRef,
   onClose,
   onFadeEnd,
 }: {
@@ -1108,6 +1110,7 @@ function CollectionLightbox({
   closing: boolean;
   onFrame: (node: HTMLSpanElement | null) => void;
   moveRef: { current: CollectionMove };
+  escapeRef: { current: CollectionEscape };
   onClose: () => void;
   onFadeEnd: () => void;
 }) {
@@ -1184,6 +1187,7 @@ function CollectionLightbox({
         closing={closing}
         onFrame={onFrame}
         moveRef={moveRef}
+        escapeRef={escapeRef}
         onLabel={onLabel}
       />
       <motion.div
@@ -1219,6 +1223,7 @@ function LightboxView({
   frameRef,
   onFrame,
   moveRef,
+  escapeRef,
   onStep,
   onClose,
   onFadeEnd,
@@ -1232,6 +1237,7 @@ function LightboxView({
   frameRef: Ref<HTMLSpanElement>;
   onFrame: (node: HTMLSpanElement | null) => void;
   moveRef: { current: CollectionMove };
+  escapeRef: { current: CollectionEscape };
   onStep: (delta: number) => void;
   onClose: () => void;
   onFadeEnd: () => void;
@@ -1249,6 +1255,7 @@ function LightboxView({
         closing={closing}
         onFrame={onFrame}
         moveRef={moveRef}
+        escapeRef={escapeRef}
         onClose={onClose}
         onFadeEnd={onFadeEnd}
       />
@@ -1372,6 +1379,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   const finishCloseRef = useRef<() => void>(() => {});
   const frameRef = useRef<HTMLSpanElement>(null);
   const collectionMoveRef = useRef<CollectionMove>(() => {});
+  const collectionEscapeRef = useRef<CollectionEscape>(() => false);
   const flipRef = useRef<Animation | null>(null);
   const originRef = useRef<Box | null>(null);
   const onFrame = useCallback((node: HTMLSpanElement | null) => {
@@ -1855,6 +1863,9 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
               leaveLightboxFullscreen(dialogRef.current);
               return;
             }
+            if (collectionForGallery(openTile?.id) && collectionEscapeRef.current()) {
+              return;
+            }
             requestClose();
           }}
           onClose={() => {
@@ -1891,6 +1902,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
               frameRef={frameRef}
               onFrame={onFrame}
               moveRef={collectionMoveRef}
+              escapeRef={collectionEscapeRef}
               onStep={step}
               onClose={requestClose}
               onFadeEnd={finishClose}
