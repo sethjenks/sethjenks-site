@@ -160,6 +160,9 @@
 
   body {
     @apply bg-background font-sans text-foreground antialiased;
+    /* Containing block for the lightbox scrim. It has to be absolute,
+       anchored to the page, so iOS 26 paints it under the browser chrome. */
+    position: relative;
     margin: 0;
     min-block-size: 100svh;
     padding-top: env(safe-area-inset-top, 0px);
@@ -1037,6 +1040,7 @@
 
   .work-lightbox {
     position: fixed;
+    z-index: 90;
     inset: 0;
     width: 100%;
     height: 100%;
@@ -1047,17 +1051,31 @@
     border: 0;
     background: transparent;
     color: var(--ink);
+    overscroll-behavior: none;
   }
 
   .work-lightbox::backdrop {
     background: transparent;
   }
 
+  /* iOS 26 Safari clips position:fixed and dialog::backdrop to the layout
+     viewport, so the status bar and address bar keep showing the page.
+     This scrim is portaled onto the body (position: relative) and covers
+     the document. The spread paints into overscroll and the browser-chrome
+     strips without adding scrollable overflow. It stays transparent on
+     ::backdrop so the shared-element fade is a single layer. */
   .work-lightbox-scrim {
     position: absolute;
+    z-index: 80;
     inset: 0;
     background: var(--background);
-    pointer-events: none;
+    box-shadow: 0 0 0 100lvh var(--background);
+    pointer-events: auto;
+  }
+
+  html:has(dialog.work-lightbox:modal) {
+    overflow: hidden;
+    overscroll-behavior-y: none;
   }
 
   .work-lightbox-layout {
