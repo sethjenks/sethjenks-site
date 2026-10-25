@@ -2258,26 +2258,6 @@
     margin-block-start: 4.5rem;
   }
 
-  .create-strip {
-    overflow: hidden;
-    background: #000;
-    color: #fff;
-    padding-block: 0.4rem;
-  }
-
-  .create-strip-track {
-    display: flex;
-    width: max-content;
-    gap: 1.75rem;
-    margin: 0;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-
   .message-board {
     position: relative;
     width: 100%;
