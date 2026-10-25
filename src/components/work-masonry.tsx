@@ -16,6 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { motion } from "motion/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import {
   useCallback,
   useEffect,
@@ -1666,11 +1667,6 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
       return;
     }
 
-    const dialog = dialogRef.current;
-    if (dialog && !dialog.open) {
-      dialog.showModal();
-    }
-
     const tile = tiles[index];
     const collectionId = collectionForGallery(tile?.id);
     if (collectionId) {
@@ -1680,8 +1676,16 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
     const source = gridRef.current?.querySelector<HTMLElement>(
       `[data-tile-id="${CSS.escape(tile?.id ?? "")}"]`,
     );
+    // Measure before showModal. Opening the dialog locks document scroll,
+    // and the shared-element flight needs the tile's box from this frame.
     originRef.current =
       reducedMotion || !source ? null : toBox(source.getBoundingClientRect());
+
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
+
     setChromeOn(reducedMotion);
     setHeldId(reducedMotion || !tile ? null : tile.id);
     setOpenIndex(index);
@@ -1882,15 +1886,6 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
             }
           }}
         >
-          <motion.div
-            className="work-lightbox-scrim"
-            initial={false}
-            animate={{ opacity: openTile && !closing ? 1 : 0 }}
-            transition={{
-              duration: reducedMotion ? 0.18 : 0.26,
-              ease: SHARED_EASE,
-            }}
-          />
           {openTile ? (
             <LightboxView
               tile={openTile}
@@ -1909,6 +1904,21 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
             />
           ) : null}
         </dialog>
+        {openTile
+          ? createPortal(
+              <motion.div
+                className="work-lightbox-scrim"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: closing ? 0 : 1 }}
+                transition={{
+                  duration: reducedMotion ? 0.18 : 0.26,
+                  ease: SHARED_EASE,
+                }}
+                onClick={requestClose}
+              />,
+              document.body,
+            )
+          : null}
       </section>
   );
 }
