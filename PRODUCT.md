@@ -46,7 +46,8 @@ Binding visual lock (see DESIGN.md): near-white ground `#fafafa`, ink `#111111`,
 ## Evidence on Hand
 
 - Sample entries under `content/entries/` (domain lock, Paper-as-media, Claire Vo notebook reference).
-- No testimonials, metrics, or press. Do not invent them.
+- Testimonials are real quotes in `content/testimonials.json` (`id`, `quote`, `author`, `role`, optional `context`, optional `href`). Do not invent quotes, roles, or links.
+- No metrics or press. Do not invent them.
 
 ## Product Principles
 
