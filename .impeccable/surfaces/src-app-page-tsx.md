@@ -9,25 +9,25 @@ related_targets: ["src/components/testimonials.tsx"]
 
 ## Scope
 
-Home page section between the work masonry and the project list, above the shared drawing wall. Visitor mode: Experience. One real testimonial now; the same sheet scales to a short stack.
+Home page section between the work masonry and the project list, above the shared drawing wall. Visitor mode: Experience. One real testimonial now; each later entry in `content/testimonials.json` is another bubble in the same field.
 
 ## Audience
 
-Someone reading Seth’s home page after the gallery. They are not asked to act. The job is to hear a specific person, in her words, without a quote wall.
+Someone reading Seth’s home page after the gallery. They are not asked to act. The job is to notice a quiet object, then hear a specific person in her words.
 
 ## Constraints
 
-Light field, ink type, Geist Sans for the quote and name, quiet role line. No serif, no glass panel, no quotation-mark chrome. Motion honors `prefers-reduced-motion`. Do not disturb the masonry lightbox, NFT fisheye, video controls, or the drawing wall.
+Light field, ink type, Geist Sans for the quote and name, quiet role line. Glass is only the bubble: a light hairline and a soft translucent fill, never a dark panel. Motion honors `prefers-reduced-motion` (no drift, no push slide). Do not disturb the masonry lightbox, NFT fisheye, video controls, or the drawing wall.
 
 ## Direction contract
 
-THESIS: A loose sheet of paper you can lean on, not a testimonial carousel. The category default — logo, stars, and a row of identical quotes — is refused.
+THESIS: A few glass bubbles drifting in the margin, not a testimonial card and not a quote wall. The category default — logo, stars, and a row of identical quotes — is refused.
 
-OWN-WORLD: Near-white ground, a white sheet, one hairline, ink at reading size. Depth appears only while the sheet is lifted. Extra notes, when they exist, are paper edges behind the front sheet.
+OWN-WORLD: Near-white ground, ink at reading size, one 80px bubble per person. The bubble is a hairline droplet. The quote appears beside it, in the same column, only while that bubble is open.
 
-STORY: Ingrid Cruz, who hired Seth at Ivanti and SecurityScorecard, says why she would trust him to lead a design organization. The visitor can tilt the sheet, press it, and drag it a little. Later notes shuffle forward by drag, by the paper edge, or by the keyboard.
+STORY: Ingrid Cruz, who hired Seth at Ivanti and SecurityScorecard, is the first bubble. It sits to the left of her name when her note is open. Hover, click, or tap opens a note; leaving it, clicking it again, or tapping outside closes it so the next bubble can be found. Other bubbles move aside. Later notes use the same field without a new layout.
 
-FIRST VIEWPORT: A “Notes” title in the same column and type as Projects, then one sheet about 42rem wide. The quote is the body. Her name is the link. The role and the two companies sit under it in quiet type. No pager.
+FIRST VIEWPORT: No title. A bubble in the column under the gallery, above Projects. Her words stay folded until the bubble is opened.
 
 FORM: Local extension of the home page, shaped directly from the brief. No concept-seed.
 
