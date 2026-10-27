@@ -11,6 +11,10 @@ import { INTRO } from "@/lib/intro";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
 
+// Next.js 16 resolves metadataBase for og:image, not og:video.
+// A relative video path is emitted unchanged, so crawlers need this absolute URL.
+const spacebaseVideoUrl = "https://www.sethjenks.com/media/work/spacebase.mp4";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -32,6 +36,15 @@ export const metadata: Metadata = {
     description: INTRO.description,
     siteName: "Seth Jenks",
     type: "website",
+    videos: [
+      {
+        url: spacebaseVideoUrl,
+        secureUrl: spacebaseVideoUrl,
+        type: "video/mp4",
+        width: 1024,
+        height: 1024,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
