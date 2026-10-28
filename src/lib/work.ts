@@ -42,6 +42,7 @@ export type WorkItem = {
   tags?: string[];
   alt?: string;
   blocks?: WorkBlock[];
+  caseStudy?: boolean;
 };
 
 const DISPLAY_ORDER = [
@@ -153,7 +154,7 @@ function isWorkItem(value: unknown): value is WorkItem {
     return false;
   }
 
-  const { id, title, year, role, src, width, height, summary, sections, tags, alt, blocks } =
+  const { id, title, year, role, src, width, height, summary, sections, tags, alt, blocks, caseStudy } =
     value;
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
@@ -203,6 +204,10 @@ function isWorkItem(value: unknown): value is WorkItem {
     if (!Array.isArray(blocks) || blocks.length === 0 || !blocks.every(isWorkBlock)) {
       return false;
     }
+  }
+
+  if (caseStudy !== undefined && typeof caseStudy !== "boolean") {
+    return false;
   }
 
   return true;
@@ -279,7 +284,12 @@ function toWorkItem(item: WorkItem): WorkItem {
     ...(item.tags ? { tags: item.tags.map((tag) => tag.trim()) } : {}),
     ...(item.alt ? { alt: item.alt.trim() } : {}),
     ...(item.blocks ? { blocks: item.blocks.map(toWorkBlock) } : {}),
+    ...(item.caseStudy === false ? { caseStudy: false } : {}),
   };
+}
+
+export function isCaseStudy(item: WorkItem): boolean {
+  return item.caseStudy !== false;
 }
 
 function yearRank(year: string): number {
@@ -359,5 +369,5 @@ export async function getWorkItem(id: string): Promise<WorkItem | undefined> {
 
 export async function getRelatedWork(id: string): Promise<WorkItem[]> {
   const items = await getWorkItems();
-  return items.filter((item) => item.id !== id);
+  return items.filter((item) => item.id !== id && isCaseStudy(item));
 }

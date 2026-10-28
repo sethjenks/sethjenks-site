@@ -8,7 +8,7 @@ import { getGalleryItems } from "@/lib/gallery";
 import { getLogoItems, sortLogoItems } from "@/lib/logos";
 import { getProjectItems } from "@/lib/projects";
 import { INTRO } from "@/lib/intro";
-import { getWorkItems, sortWorkForDisplay } from "@/lib/work";
+import { getWorkItems, isCaseStudy, sortWorkForDisplay } from "@/lib/work";
 
 export default async function Home() {
   const [work, logos, projects, gallery] = await Promise.all([
@@ -26,7 +26,11 @@ export default async function Home() {
         paragraphs={INTRO.paragraphs}
         links={INTRO.links}
       />
-      <WorkRows id="work" heading="Case Studies" items={sortWorkForDisplay(work)} />
+      <WorkRows
+        id="work"
+        heading="Case Studies"
+        items={sortWorkForDisplay(work.filter(isCaseStudy))}
+      />
       <LogoRows id="logos" heading="Brands" items={sortLogoItems(logos)} />
       <WorkMasonry tiles={gallery} />
       <ProjectList items={projects} />
