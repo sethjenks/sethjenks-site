@@ -34,7 +34,7 @@ type WorkRowsProps = {
   id?: string;
 };
 
-export function WorkRows({ items, heading = "Work", id = "work" }: WorkRowsProps) {
+export function WorkRows({ items, heading = "Case Studies", id = "work" }: WorkRowsProps) {
   const headingId = `${id}-heading`;
 
   if (items.length === 0) {

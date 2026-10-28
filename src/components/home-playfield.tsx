@@ -1,7 +1,14 @@
 "use client";
 
 import { animate, motion, useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef } from "react";
+import { EmployerMark, employerMarks } from "@/components/employer-marks";
+import {
+  destroyEmployerSparks,
+  mountEmployerSparks,
+  stepEmployerSparks,
+  type SparkField,
+} from "@/lib/employer-sparks";
 import {
   applyHeaderPlay,
   applySoftBodyHome,
@@ -142,6 +149,7 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
   const voiceActiveRef = useRef(false);
   const voiceGenRef = useRef(0);
   const deckRef = useRef(createVoiceDeck(VOICE_MESSAGES));
+  const sparkRef = useRef<SparkField | null>(null);
   const roleRef = useRef(role);
   const prefersReduced = useReducedMotion() === true;
   roleRef.current = role;
@@ -803,6 +811,26 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       }
 
       paintBodies(bodiesRef.current, nodesRef.current);
+      const sparks = sparkRef.current ?? mountEmployerSparks();
+      sparkRef.current = sparks;
+      const hiddenSparks = new Set<string>();
+      for (const body of bodiesRef.current) {
+        if (!body.bullet) {
+          continue;
+        }
+        const node = nodesRef.current.get(body.id);
+        if (!node || node.style.display === "none") {
+          hiddenSparks.add(body.id);
+        }
+      }
+      stepEmployerSparks(
+        sparks,
+        bodiesRef.current,
+        dt,
+        headerRect,
+        suspendPhysics,
+        hiddenSparks,
+      );
       frame = requestAnimationFrame(tick);
     };
 
@@ -822,6 +850,10 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       window.__headerEntering = false;
       window.__headerHoming = false;
       armedRef.current = false;
+      if (sparkRef.current) {
+        destroyEmployerSparks(sparkRef.current);
+        sparkRef.current = null;
+      }
       button?.removeEventListener("pointerdown", onButtonDown);
       window.removeEventListener("pointermove", onButtonMove);
       window.removeEventListener("pointerup", onButtonUp);
@@ -875,11 +907,14 @@ function PlayLine({
   lineId: string;
   links?: Readonly<Record<string, string>>;
 }) {
+  const tokens = splitPlayTokens(text);
+  const marks = employerMarks(tokens);
+
   return (
     <motion.p className={className} variants={introPiece}>
       <span className="play-a11y">{text}</span>
       <span aria-hidden="true">
-        {splitPlayTokens(text).map((token, index) => {
+        {tokens.map((token, index) => {
           if (token.kind === "space") {
             return (
               <span key={`${lineId}-s${index}`} className="play-space">
@@ -891,11 +926,13 @@ function PlayLine({
           const bare = token.value.replace(/[.,]$/, "");
           const punct = token.value.slice(bare.length);
           const href = links?.[bare];
-          return (
+          const employer = marks.get(index);
+          const word = (
             <span
               key={`${lineId}-w${index}`}
               className="play-word"
               data-play-word={`${lineId}-${index}`}
+              data-employer={employer ? "" : undefined}
             >
               {href ? (
                 <>
@@ -908,6 +945,24 @@ function PlayLine({
                 token.value
               )}
             </span>
+          );
+
+          if (!employer?.start) {
+            return word;
+          }
+
+          return (
+            <Fragment key={`${lineId}-e${index}`}>
+              <span
+                className="play-word employer-mark"
+                data-play-word={`mark-${lineId}-${employer.id}`}
+                data-employer=""
+                data-employer-mark=""
+              >
+                <EmployerMark id={employer.id} />
+              </span>
+              {word}
+            </Fragment>
           );
         })}
       </span>
@@ -1072,6 +1127,9 @@ function beginRoleVoice(
 
   const fromHeight = Math.ceil(Number.parseFloat(line.style.minHeight) || line.getBoundingClientRect().height);
   const toHeight = Math.ceil(measure.getBoundingClientRect().height);
+  visual.querySelectorAll<HTMLElement>("[data-employer-mark]").forEach((node) => {
+    node.style.display = "none";
+  });
   return {
     phrase: message.text,
     line,
@@ -1169,6 +1227,12 @@ function releaseRoleVoice(root: HTMLElement, text: string) {
   visual.querySelector(".play-voice-measure")?.remove();
   const tokens = splitPlayTokens(text);
   visual.querySelectorAll<HTMLElement>("[data-play-word]").forEach((node) => {
+    if (node.hasAttribute("data-employer-mark")) {
+      clearFlyerStyle(node);
+      node.style.display = "";
+      return;
+    }
+
     const index = Number(node.dataset.playWord?.slice(5));
     const token = tokens[index];
     if (token?.kind === "word") {
@@ -1266,21 +1330,30 @@ function collectBodies(
   const seen = new Set<string>();
   for (const [id, rest] of next) {
     seen.add(id);
+    const node = nextNodes.get(id);
+    const bullet = node?.hasAttribute("data-employer-mark") ?? false;
+    const lively = bullet || (node?.hasAttribute("data-employer") ?? false);
+    const letters = node?.textContent?.replace(/\s/g, "").length ?? 1;
+    let mass = 1 + Math.min(12, letters) * 0.22;
+    if (id === "journal") {
+      mass = 8;
+    } else if (bullet) {
+      mass = 0.3;
+    } else if (lively) {
+      mass = 0.4;
+    }
     const existing = bodies.find((body) => body.id === id);
     if (existing) {
       syncPlayRest(existing, rest);
+      existing.lively = lively;
+      existing.bullet = bullet;
+      if (!existing.loose) {
+        existing.mass = mass;
+      }
       continue;
     }
 
-    const letters = nextNodes.get(id)?.textContent?.replace(/\s/g, "").length ?? 1;
-    bodies.push(
-      createPlayBody(
-        id,
-        id === "journal" ? "button" : "glyph",
-        rest,
-        id === "journal" ? 8 : 1 + Math.min(12, letters) * 0.22,
-      ),
-    );
+    bodies.push(createPlayBody(id, id === "journal" ? "button" : "glyph", rest, mass, lively, bullet));
   }
 
   for (let index = bodies.length - 1; index >= 0; index -= 1) {

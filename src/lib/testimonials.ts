@@ -11,6 +11,7 @@ export type Testimonial = {
   role: string;
   context?: string;
   href?: string;
+  portrait?: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -26,12 +27,16 @@ function isHttpUrl(value: string): boolean {
   }
 }
 
+function isPortraitPath(value: string): boolean {
+  return /^\/media\/[a-z0-9][a-z0-9/_-]*\.(?:png|jpe?g|webp)$/.test(value);
+}
+
 function isTestimonial(value: unknown): value is Testimonial {
   if (!isRecord(value)) {
     return false;
   }
 
-  const { id, quote, author, role, context, href } = value;
+  const { id, quote, author, role, context, href, portrait } = value;
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
     return false;
@@ -57,6 +62,10 @@ function isTestimonial(value: unknown): value is Testimonial {
     return false;
   }
 
+  if (portrait !== undefined && (typeof portrait !== "string" || !isPortraitPath(portrait))) {
+    return false;
+  }
+
   return true;
 }
 
@@ -74,6 +83,7 @@ export async function getTestimonials(): Promise<Testimonial[]> {
     role: item.role.trim(),
     ...(item.context ? { context: item.context.trim() } : {}),
     ...(item.href ? { href: item.href.trim() } : {}),
+    ...(item.portrait ? { portrait: item.portrait } : {}),
   }));
   const seenIds = new Set<string>();
 

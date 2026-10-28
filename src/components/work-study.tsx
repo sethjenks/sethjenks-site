@@ -26,7 +26,7 @@ export function WorkStudy({ item, related }: WorkStudyProps) {
                 <Link href="/">Home</Link>
               </li>
               <li>
-                <Link href="/#work">Work</Link>
+                <Link href="/#work">Case Studies</Link>
               </li>
               <li aria-current="page">{item.title}</li>
             </ol>

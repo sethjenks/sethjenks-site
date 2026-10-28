@@ -750,6 +750,9 @@
     width: 100%;
     min-width: 0;
     margin-block-start: var(--space-work);
+  }
+
+  .work-masonry-body {
     padding-inline: 24px;
   }
 
@@ -2218,6 +2221,46 @@
     text-underline-offset: 3px;
   }
 
+  .play-word[data-employer] {
+    color: var(--quiet);
+  }
+
+  .play-word[data-employer] .intro-link {
+    color: var(--quiet);
+  }
+
+  .employer-mark {
+    --employer-descent: 0.198em;
+    --employer-span: calc(1cap + var(--employer-descent));
+    --employer-scale: 1.0816;
+    --employer-mark: calc(var(--employer-span) * var(--employer-scale));
+    display: inline-block;
+    inline-size: var(--employer-mark);
+    block-size: var(--employer-mark);
+    margin-inline-end: 0.18em;
+    border-radius: calc(var(--employer-mark) * 0.267);
+    background: var(--glass);
+    box-shadow: inset 0 0 0 1px var(--glass-border);
+    color: var(--quiet);
+    line-height: 0;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: calc((var(--employer-descent) + var(--employer-span) * (var(--employer-scale) - 1) / 2) * -1 + 2px);
+  }
+
+  .employer-mark svg {
+    display: inline-block;
+    inline-size: calc(var(--employer-mark) * 0.648);
+    block-size: calc(var(--employer-mark) * 0.648);
+    margin-block-start: calc(var(--employer-mark) * 0.176);
+  }
+
+  .employer-sparks {
+    position: fixed;
+    z-index: 6;
+    pointer-events: none;
+  }
+
   .intro-copy,
   .log-summary {
     max-width: 65ch;
@@ -2280,42 +2323,38 @@
 
   .testimonials {
     width: 100%;
-    max-width: 42rem;
-    margin-inline: auto;
     margin-block-start: var(--space-work);
-    padding-inline: var(--space-page);
     color: var(--ink);
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .note-field {
     position: relative;
-    min-block-size: 7.75rem;
+    min-block-size: 200px;
   }
 
   .testimonial-note {
     position: absolute;
-    display: flex;
-    align-items: flex-start;
-    column-gap: 0.85rem;
-    inline-size: max-content;
-    max-inline-size: var(--room, 80px);
-    transform: translateY(var(--push-y));
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 80px;
+    block-size: 80px;
     z-index: 0;
   }
 
   .testimonial-note[data-open="true"] {
-    inline-size: var(--room);
-    z-index: 1;
+    z-index: 2;
   }
 
-  .testimonial-note[data-side="left"] {
-    flex-direction: row-reverse;
-  }
-
-  .note-float {
-    flex: none;
-    inline-size: 80px;
-    block-size: 80px;
+  .note-bubble,
+  .note-panel {
+    border: 1px solid color-mix(in oklch, white 78%, transparent);
+    background: color-mix(in oklch, var(--paper) 88%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, white 88%, transparent),
+      inset 0 0 0 1px color-mix(in oklch, var(--ink) 6%, transparent),
+      0 10px 28px color-mix(in oklch, var(--ink) 8%, transparent);
   }
 
   .note-bubble {
@@ -2324,35 +2363,30 @@
     inline-size: 80px;
     block-size: 80px;
     padding: 0;
-    border: 0;
     border-radius: 999px;
     color: var(--ink);
-    background: color-mix(in oklch, var(--ink) 4.5%, white);
-    box-shadow:
-      inset 0 0 0 1px color-mix(in oklch, var(--ink) 22%, transparent),
-      inset 0 1px 0 color-mix(in oklch, white 85%, transparent),
-      inset 0 -16px 18px color-mix(in oklch, var(--ink) 7%, transparent),
-      0 8px 16px -8px color-mix(in oklch, var(--ink) 24%, transparent);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     touch-action: manipulation;
+    overflow: hidden;
   }
 
-  .note-bubble::after {
-    content: "";
-    position: absolute;
-    inset-block-start: 10px;
-    inset-inline: 14px;
-    block-size: 22px;
-    border-radius: 999px;
-    background: color-mix(in oklch, white 88%, transparent);
-    pointer-events: none;
+  .note-portrait {
+    object-fit: cover;
+    object-position: center 22%;
   }
 
   .note-panel {
-    flex: 1 1 auto;
-    min-inline-size: 0;
-    padding-block-start: 1.65rem;
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: calc(80px + 0.85rem);
+    inline-size: min(32rem, var(--room, 32rem));
+    padding-block: 14px 16px;
+    padding-inline: 16px;
+    border-radius: 20px;
+  }
+
+  .note-panel[data-side="left"] {
+    inset-inline-start: auto;
+    inset-inline-end: calc(80px + 0.85rem);
   }
 
   .note-name {
@@ -2404,47 +2438,25 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .note-bubble {
+    button.note-bubble {
       cursor: pointer;
     }
 
-    .note-bubble:hover {
+    button.note-bubble:hover {
       box-shadow:
-        inset 0 0 0 1px color-mix(in oklch, var(--ink) 34%, transparent),
-        inset 0 1px 0 color-mix(in oklch, white 90%, transparent),
-        inset 0 -16px 18px color-mix(in oklch, var(--ink) 8%, transparent),
-        0 10px 18px -8px color-mix(in oklch, var(--ink) 22%, transparent);
+        inset 0 1px 0 color-mix(in oklch, white 88%, transparent),
+        inset 0 0 0 1px color-mix(in oklch, var(--ink) 8%, transparent),
+        0 12px 28px color-mix(in oklch, var(--ink) 12%, transparent);
     }
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .testimonial-note {
-      transition: --push-y 280ms var(--ease-out);
-    }
-
-    .testimonial-note:not([data-open="true"]) .note-float {
-      animation: note-drift var(--drift-dur, 9s) var(--ease-in-out) var(--drift-delay, 0s) infinite;
-    }
-
     .note-bubble {
-      transition:
-        transform 160ms var(--ease-out),
-        box-shadow 180ms var(--ease-out);
+      transition: box-shadow 180ms var(--ease-out);
     }
 
     .testimonial-note[data-open="true"] .note-panel {
       animation: note-reveal 240ms var(--ease-out) both;
-    }
-  }
-
-  @keyframes note-drift {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0);
-    }
-
-    50% {
-      transform: translate3d(var(--drift-x, 4px), var(--drift-y, -5px), 0);
     }
   }
 
@@ -2459,23 +2471,23 @@
   }
 
   @media (prefers-reduced-transparency: reduce) {
-    .note-bubble {
-      background: var(--paper);
+    .note-bubble,
+    .note-panel {
+      background: color-mix(in oklch, var(--paper) 94%, transparent);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
   }
 
   @media (forced-colors: active) {
-    .note-bubble {
+    .note-bubble,
+    .note-panel {
       background: Canvas;
       border: 1px solid CanvasText;
       box-shadow: none;
       forced-color-adjust: none;
-    }
-
-    .note-bubble::after {
-      display: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
   }
 
@@ -3493,7 +3505,9 @@
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .collection-readout,
-  .collection-hint {
+  .collection-hint,
+  .note-bubble,
+  .note-panel {
     background:
       linear-gradient(
         165deg,
@@ -3508,7 +3522,9 @@
 
 @media (prefers-reduced-transparency: reduce) {
   .collection-readout,
-  .collection-hint {
+  .collection-hint,
+  .note-bubble,
+  .note-panel {
     background: color-mix(in oklch, var(--paper) 94%, transparent);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -3517,7 +3533,9 @@
 
 @media (forced-colors: active) {
   .collection-readout,
-  .collection-hint {
+  .collection-hint,
+  .note-bubble,
+  .note-panel {
     border-color: CanvasText;
     background: Canvas;
     box-shadow: none;

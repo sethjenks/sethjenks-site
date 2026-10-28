@@ -11,7 +11,7 @@ export default function NotFound() {
       <h1>Nothing here.</h1>
       <p>That page is not on this site.</p>
       <nav aria-label="Recover">
-        <Link href="/#work">Work</Link>
+        <Link href="/#work">Case Studies</Link>
         <Link href="/journal">Journal</Link>
       </nav>
     </main>

@@ -1766,12 +1766,18 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   } as CSSProperties;
 
   return (
-      <section className="work-masonry" aria-label="Gallery">
-        <div
-          ref={gridRef}
-          className="work-masonry-grid"
-          style={gridStyle}
-        >
+      <section className="work-masonry" aria-labelledby="work-gallery-heading">
+        <div className="work-section-head">
+          <h2 id="work-gallery-heading" className="work-section-title">
+            Work
+          </h2>
+        </div>
+        <div className="work-masonry-body">
+          <div
+            ref={gridRef}
+            className="work-masonry-grid"
+            style={gridStyle}
+          >
           {tiles.map((tile, index) => {
             const cardStyle = {
               gridRow: `span ${rowSpan(tile, layout.columnWidth)}`,
@@ -1855,6 +1861,7 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
               </button>
             );
           })}
+          </div>
         </div>
         <dialog
           ref={dialogRef}

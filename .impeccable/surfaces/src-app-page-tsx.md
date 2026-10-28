@@ -9,7 +9,7 @@ related_targets: ["src/components/testimonials.tsx"]
 
 ## Scope
 
-Home page section between the work masonry and the project list, above the shared drawing wall. Visitor mode: Experience. One real testimonial now; each later entry in `content/testimonials.json` is another bubble in the same field.
+Home page section under the project list, above the shared drawing wall. Visitor mode: Experience. One real testimonial now; each later entry in `content/testimonials.json` is another bubble in the same field.
 
 ## Audience
 
@@ -23,11 +23,11 @@ Light field, ink type, Geist Sans for the quote and name, quiet role line. Glass
 
 THESIS: A few glass bubbles drifting in the margin, not a testimonial card and not a quote wall. The category default — logo, stars, and a row of identical quotes — is refused.
 
-OWN-WORLD: Near-white ground, ink at reading size, one 80px bubble per person. The bubble is a hairline droplet. The quote appears beside it, in the same column, only while that bubble is open.
+OWN-WORLD: Near-white ground, ink at reading size, one 80px bubble per person. Ingrid’s bubble holds her portrait inside the hairline droplet. The quote appears beside it, in the same column, only while that bubble is open.
 
 STORY: Ingrid Cruz, who hired Seth at Ivanti and SecurityScorecard, is the first bubble. It sits to the left of her name when her note is open. Hover, click, or tap opens a note; leaving it, clicking it again, or tapping outside closes it so the next bubble can be found. Other bubbles move aside. Later notes use the same field without a new layout.
 
-FIRST VIEWPORT: No title. A bubble in the column under the gallery, above Projects. Her words stay folded until the bubble is opened.
+FIRST VIEWPORT: No title. A bubble in the column under Projects. Her words stay folded until the bubble is opened.
 
 FORM: Local extension of the home page, shaped directly from the brief. No concept-seed.
 
