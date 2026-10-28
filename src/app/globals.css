@@ -2238,7 +2238,7 @@
     inline-size: var(--employer-mark);
     block-size: var(--employer-mark);
     margin-inline-end: 0.18em;
-    border-radius: calc(var(--employer-mark) * 0.267);
+    border-radius: 50%;
     background: var(--glass);
     box-shadow: inset 0 0 0 1px var(--glass-border);
     color: var(--quiet);

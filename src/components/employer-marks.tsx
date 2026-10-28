@@ -105,9 +105,12 @@ export function EmployerMark({ id }: { id: EmployerId }) {
       );
     case "ivanti":
       return (
-        <MarkSvg viewBox="-3 16 38 170">
-          <rect x="0" y="20.4" width="30.5" height="30.52" fill="#ff1515" />
-          <rect x="0" y="77.6" width="30.5" height="104.35" fill="#ff1515" />
+        <MarkSvg viewBox="-17.14 -16.5 114.29 110">
+          <path
+            fill="#ff1515"
+            fillRule="evenodd"
+            d="M0 0H80V77H0Z M0 29H48V77H31V48H0Z"
+          />
         </MarkSvg>
       );
     case "arcana":
