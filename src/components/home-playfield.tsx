@@ -4,12 +4,6 @@ import { animate, motion, useReducedMotion } from "motion/react";
 import { Fragment, useEffect, useLayoutEffect, useRef } from "react";
 import { EmployerMark, employerMarks } from "@/components/employer-marks";
 import {
-  destroyEmployerSparks,
-  mountEmployerSparks,
-  stepEmployerSparks,
-  type SparkField,
-} from "@/lib/employer-sparks";
-import {
   applyHeaderPlay,
   applySoftBodyHome,
   compactHeaderPlay,
@@ -149,7 +143,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
   const voiceActiveRef = useRef(false);
   const voiceGenRef = useRef(0);
   const deckRef = useRef(createVoiceDeck(VOICE_MESSAGES));
-  const sparkRef = useRef<SparkField | null>(null);
   const roleRef = useRef(role);
   const prefersReduced = useReducedMotion() === true;
   roleRef.current = role;
@@ -811,26 +804,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       }
 
       paintBodies(bodiesRef.current, nodesRef.current);
-      const sparks = sparkRef.current ?? mountEmployerSparks();
-      sparkRef.current = sparks;
-      const hiddenSparks = new Set<string>();
-      for (const body of bodiesRef.current) {
-        if (!body.bullet) {
-          continue;
-        }
-        const node = nodesRef.current.get(body.id);
-        if (!node || node.style.display === "none") {
-          hiddenSparks.add(body.id);
-        }
-      }
-      stepEmployerSparks(
-        sparks,
-        bodiesRef.current,
-        dt,
-        headerRect,
-        suspendPhysics,
-        hiddenSparks,
-      );
       frame = requestAnimationFrame(tick);
     };
 
@@ -850,10 +823,6 @@ export function HomePlayfield({ name, role, paragraphs, links }: HomePlayfieldPr
       window.__headerEntering = false;
       window.__headerHoming = false;
       armedRef.current = false;
-      if (sparkRef.current) {
-        destroyEmployerSparks(sparkRef.current);
-        sparkRef.current = null;
-      }
       button?.removeEventListener("pointerdown", onButtonDown);
       window.removeEventListener("pointermove", onButtonMove);
       window.removeEventListener("pointerup", onButtonUp);
@@ -1331,13 +1300,13 @@ function collectBodies(
   for (const [id, rest] of next) {
     seen.add(id);
     const node = nextNodes.get(id);
-    const bullet = node?.hasAttribute("data-employer-mark") ?? false;
-    const lively = bullet || (node?.hasAttribute("data-employer") ?? false);
+    const logo = node?.hasAttribute("data-employer-mark") ?? false;
+    const lively = logo || (node?.hasAttribute("data-employer") ?? false);
     const letters = node?.textContent?.replace(/\s/g, "").length ?? 1;
     let mass = 1 + Math.min(12, letters) * 0.22;
     if (id === "journal") {
       mass = 8;
-    } else if (bullet) {
+    } else if (logo) {
       mass = 0.3;
     } else if (lively) {
       mass = 0.4;
@@ -1346,14 +1315,13 @@ function collectBodies(
     if (existing) {
       syncPlayRest(existing, rest);
       existing.lively = lively;
-      existing.bullet = bullet;
       if (!existing.loose) {
         existing.mass = mass;
       }
       continue;
     }
 
-    bodies.push(createPlayBody(id, id === "journal" ? "button" : "glyph", rest, mass, lively, bullet));
+    bodies.push(createPlayBody(id, id === "journal" ? "button" : "glyph", rest, mass, lively));
   }
 
   for (let index = bodies.length - 1; index >= 0; index -= 1) {

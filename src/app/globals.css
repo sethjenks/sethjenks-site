@@ -2255,12 +2255,6 @@
     margin-block-start: calc(var(--employer-mark) * 0.176);
   }
 
-  .employer-sparks {
-    position: fixed;
-    z-index: 6;
-    pointer-events: none;
-  }
-
   .intro-copy,
   .log-summary {
     max-width: 65ch;

@@ -34,8 +34,6 @@ export type PlayBody = {
   hitting: boolean;
   mass: number;
   lively: boolean;
-  bullet: boolean;
-  glanced: boolean;
   homeFrom?: PlayHomeFrom;
 };
 
@@ -55,12 +53,6 @@ const LIVELY_BOUNCE = 0.9;
 const LIVELY_SPIN = 2.2;
 const GLYPH_IMPULSE = 620;
 const BUTTON_IMPULSE = 380;
-const BULLET_DAMPING = 0.9992;
-const BULLET_SPIN_DAMPING = 0.994;
-const BULLET_BOUNCE = 1;
-const BULLET_IMPULSE = 760;
-const BULLET_SPEED_FLOOR = 1680;
-const BULLET_SPEED_CAP = 2280;
 
 export function createPlayBody(
   id: string,
@@ -68,7 +60,6 @@ export function createPlayBody(
   rest: PlayRest,
   mass = kind === "button" ? 8 : 1,
   lively = false,
-  bullet = false,
 ): PlayBody {
   return {
     id,
@@ -84,8 +75,6 @@ export function createPlayBody(
     hitting: false,
     mass,
     lively,
-    bullet,
-    glanced: false,
   };
 }
 
@@ -120,12 +109,10 @@ export function stepPlayfield(
     }
 
     if (body.loose) {
-      const bullet = body.bullet;
-      body.vy += (bullet ? 0 : GRAVITY) * clamped;
-      const damp = bullet ? BULLET_DAMPING : DAMPING;
-      body.vx *= damp;
-      body.vy *= damp;
-      body.vr *= bullet ? BULLET_SPIN_DAMPING : SPIN_DAMPING;
+      body.vy += GRAVITY * clamped;
+      body.vx *= DAMPING;
+      body.vy *= DAMPING;
+      body.vr *= SPIN_DAMPING;
       body.x += body.vx * clamped;
       body.y += body.vy * clamped;
       body.rotate += body.vr * clamped;
@@ -177,7 +164,6 @@ export function finishPlayHome(bodies: PlayBody[]) {
     body.vr = 0;
     body.loose = false;
     body.hitting = false;
-    body.glanced = false;
     delete body.homeFrom;
   }
 }
@@ -193,36 +179,22 @@ function bounceWalls(body: PlayBody, bounds: PlayBounds) {
   const maxX = bounds.x + bounds.w - body.rest.w;
   const minY = bounds.y;
   const maxY = bounds.y + bounds.h - body.rest.h;
-  let bounce = BOUNCE;
-  if (body.bullet) {
-    bounce = BULLET_BOUNCE;
-  } else if (body.lively) {
-    bounce = LIVELY_BOUNCE;
-  }
-  let hit = false;
+  const bounce = body.lively ? LIVELY_BOUNCE : BOUNCE;
 
   if (body.x < minX) {
     body.x = minX;
     body.vx = Math.abs(body.vx) * bounce;
-    hit = true;
   } else if (body.x > maxX) {
     body.x = maxX;
     body.vx = -Math.abs(body.vx) * bounce;
-    hit = true;
   }
 
   if (body.y < minY) {
     body.y = minY;
     body.vy = Math.abs(body.vy) * bounce;
-    hit = true;
   } else if (body.y > maxY) {
     body.y = maxY;
     body.vy = -Math.abs(body.vy) * bounce;
-    hit = true;
-  }
-
-  if (hit && body.bullet) {
-    ricochet(body);
   }
 }
 
@@ -258,43 +230,12 @@ function collideBust(body: PlayBody, bust: BustCollider): boolean {
   nx /= length;
   ny /= length;
 
-  if (body.bullet) {
-    const tangent = (Math.random() - 0.5) * 0.7;
-    const speed = BULLET_IMPULSE / body.mass;
-    body.vx += (nx - ny * tangent) * speed;
-    body.vy += (ny + nx * tangent) * speed;
-    body.vr += (Math.random() - 0.5) * 640;
-    clampBulletSpeed(body);
-    return true;
-  }
-
   const impulse = (body.kind === "button" ? BUTTON_IMPULSE : GLYPH_IMPULSE) / body.mass;
   const spin = nx * 18 + (Math.random() - 0.5) * 14;
   body.vx += nx * impulse;
   body.vy += ny * impulse - 80 / body.mass;
   body.vr += (spin * (body.lively ? LIVELY_SPIN : 1)) / body.mass;
   return true;
-}
-
-function ricochet(body: PlayBody) {
-  const speed = Math.hypot(body.vx, body.vy) || 1;
-  const boosted = Math.min(BULLET_SPEED_CAP, Math.max(BULLET_SPEED_FLOOR, speed * BULLET_BOUNCE));
-  const angle = Math.atan2(body.vy, body.vx) + (Math.random() - 0.5) * 0.46;
-  body.vx = Math.cos(angle) * boosted;
-  body.vy = Math.sin(angle) * boosted;
-  body.vr += (Math.random() - 0.5) * 360;
-  body.glanced = true;
-}
-
-function clampBulletSpeed(body: PlayBody) {
-  const speed = Math.hypot(body.vx, body.vy);
-  if (speed <= BULLET_SPEED_CAP || speed === 0) {
-    return;
-  }
-
-  const scale = BULLET_SPEED_CAP / speed;
-  body.vx *= scale;
-  body.vy *= scale;
 }
 
 function ellipseHitsRect(
