@@ -1,27 +1,21 @@
 [
   {
-    "id": "chia-friends",
-    "title": "Chia Friends",
-    "line": "10,000 pixel-art characters for the Chia NFT1 release.",
-    "href": "/work/chia-friends"
+    "id": "resumes",
+    "title": "Resumes",
+    "line": "Resume templates. Copy a prompt, then paste a career under Content.",
+    "href": "https://resumes.sethjenks.com"
   },
   {
-    "id": "trashformers",
-    "title": "Trashformers",
-    "line": "Official SpaceBucks NFTs. Each dumpster unboxes a Trashformer.",
-    "href": "https://trashformers.xyz/"
+    "id": "inspired-design-skills",
+    "title": "Inspired Design Skills",
+    "line": "How you tell an agent what is wrong with a screen.",
+    "href": "https://inspired.sethjenks.com"
   },
   {
     "id": "paper-tips",
     "title": "Paper.tips",
     "line": "An unofficial field guide to Paper.",
     "href": "https://github.com/sethjenks/paper-tips"
-  },
-  {
-    "id": "batgan",
-    "title": "BatGAN",
-    "line": "AI-based NFTs started in 2021 with the first version of Imagen.",
-    "href": "https://mintgarden.io/collections/col146kk92ny6vyeaypwqmp3q8lgep53r35fajgt9wvmhpnuq3xx4flqlfqzwl?filter=Palette&filter_value=Ooze"
   },
   {
     "id": "weirdness-engine",
