@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import {
   applyHeaderPlay,
   compactHeaderPlay,
   COMPACT_HOME_MS,
   headScreenBounds,
+  pinSoftBodyRest,
   PLAY_HOME_MS,
   screenToGrabPlane,
   syncSoftBody,
@@ -16,7 +16,6 @@ import {
 
 const RUNTIME_SRC = "/soft-matter/runtime.d631aa3ec6122788.js";
 const EFFECT_SRC = "/soft-matter/effect.b9030f95b969b94d.js";
-const DRAG_THRESHOLD_PX = 8;
 
 type AstraEvent =
   | { type: "ready"; backend?: string }
@@ -164,7 +163,7 @@ function flattenPlayfield(compiled: string) {
     )
     .replaceAll(
       "e.camera.position.set(3.2*p,2.8*p+1.1,7.2*p)",
-      "e.camera.fov=window.__headerPlay&&window.__headerPlay.camZ>4?10:35,e.camera.position.set(1.55*p,window.__headerPlay&&window.__headerPlay.camZ>4?window.__headerPlay.lookY-(window.__headerEnterShift||0):(window.__headerPlay?window.__headerPlay.camY:1.35)*p+(window.__headerPlay?window.__headerPlay.camLift:1.2)-(window.__headerEnterShift||0),(window.__headerPlay?window.__headerPlay.camZ:3.45)*p)",
+      "e.camera.fov=window.__headerPlay&&window.__headerPlay.camZ>4?10:35,e.camera.position.set(1.55*p,window.__headerPlay&&window.__headerPlay.camZ>4?window.__headerPlay.lookY-(window.__headerEnterShift||0):(window.__headerPlay?window.__headerPlay.camY:1.15)*p+(window.__headerPlay?window.__headerPlay.camLift:0)-(window.__headerEnterShift||0),(window.__headerPlay?window.__headerPlay.camZ:3.9)*p)",
     )
     .replaceAll(
       "e.camera.lookAt(0,Math.max(1.05,r.height*.52),0)",
@@ -252,11 +251,9 @@ type GrabHold = {
 };
 
 export function SoftMatterMark({ home }: SoftMatterMarkProps) {
-  const router = useRouter();
   const stageRef = useRef<HTMLDivElement>(null);
   const grabPadRef = useRef<HTMLDivElement>(null);
   const holdRef = useRef<GrabHold | null>(null);
-  const dragRef = useRef({ startX: 0, startY: 0, dragged: false });
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -341,19 +338,76 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
 
   useEffect(() => {
     const play = window.__headerPlay;
-    if (!play) {
+    if (home) {
+      if (play) {
+        play.homeMs = PLAY_HOME_MS;
+      }
       return;
     }
 
-    play.homeMs = home ? PLAY_HOME_MS : COMPACT_HOME_MS;
-    if (!home) {
-      const compact = compactHeaderPlay();
-      applyHeaderPlay(compact);
+    window.__headerEnterShift = 0;
+    window.__headerEntering = false;
+    const compact = compactHeaderPlay();
+    applyHeaderPlay(compact);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let frame = 0;
+    let tries = 0;
+    const settle = () => {
       syncSoftBody(compact);
-    }
+      const stage = stageRef.current;
+      const host = stage?.shadowRoot?.querySelector<HTMLElement>("[data-stage-host]");
+      const canvas = stage?.shadowRoot?.querySelector<HTMLElement>("canvas");
+      if (stage) {
+        stage.style.pointerEvents = "none";
+      }
+      if (host) {
+        host.style.pointerEvents = "none";
+      }
+      if (canvas) {
+        canvas.style.pointerEvents = "none";
+      }
+      const body = window.__headerSoftBody;
+      if (!body && tries < 90) {
+        tries += 1;
+        frame = requestAnimationFrame(settle);
+        return;
+      }
+      if (!body) {
+        return;
+      }
+      body.release?.();
+      body.grabNodes = [];
+      if (reduced) {
+        body.spinStart = 0;
+        pinSoftBodyRest(body);
+      } else if (!body.spinStart) {
+        body.spinStart = performance.now();
+      }
+    };
+    settle();
+
+    return () => {
+      cancelAnimationFrame(frame);
+      const stage = stageRef.current;
+      const host = stage?.shadowRoot?.querySelector<HTMLElement>("[data-stage-host]");
+      const canvas = stage?.shadowRoot?.querySelector<HTMLElement>("canvas");
+      if (stage) {
+        stage.style.pointerEvents = "";
+      }
+      if (host) {
+        host.style.pointerEvents = "";
+      }
+      if (canvas) {
+        canvas.style.pointerEvents = "";
+      }
+    };
   }, [home]);
 
   useEffect(() => {
+    if (!home) {
+      return;
+    }
+
     const pad = grabPadRef.current;
     if (!pad) {
       return;
@@ -444,34 +498,7 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
         delete document.documentElement.dataset.headerGrab;
       }
     };
-  }, []);
-
-  const onPointerDown = (event: PointerEvent<HTMLElement>) => {
-    dragRef.current = {
-      startX: event.clientX,
-      startY: event.clientY,
-      dragged: false,
-    };
-  };
-
-  const onPointerMove = (event: PointerEvent<HTMLElement>) => {
-    const dx = event.clientX - dragRef.current.startX;
-    const dy = event.clientY - dragRef.current.startY;
-    if (Math.hypot(dx, dy) > DRAG_THRESHOLD_PX) {
-      dragRef.current.dragged = true;
-    }
-  };
-
-  const onClick = (event: MouseEvent<HTMLElement>) => {
-    if (dragRef.current.dragged) {
-      event.preventDefault();
-      return;
-    }
-
-    if (!home) {
-      router.push("/");
-    }
-  };
+  }, [home]);
 
   const onGrabDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) {
@@ -508,26 +535,25 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
 
   return (
     <span
-      className="site-mark"
+      className={home ? "site-mark" : "site-mark site-mark-compact"}
       data-ready={ready && !failed ? "true" : undefined}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onClick={onClick}
     >
       {home ? (
         <h1 className="site-mark-label">Seth Jenks</h1>
       ) : (
-        <Link href="/" className="site-mark-label" onClick={onClick}>
-          Seth Jenks
+        <Link href="/" className="site-mark-home" aria-label="Seth Jenks, home">
+          <span className="site-mark-label">Seth Jenks</span>
         </Link>
       )}
       <div ref={stageRef} className="soft-matter-stage" aria-hidden="true" />
-      <div
-        ref={grabPadRef}
-        className="head-grab"
-        aria-hidden="true"
-        onPointerDown={onGrabDown}
-      />
+      {home ? (
+        <div
+          ref={grabPadRef}
+          className="head-grab"
+          aria-hidden="true"
+          onPointerDown={onGrabDown}
+        />
+      ) : null}
     </span>
   );
 }

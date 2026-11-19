@@ -22,7 +22,7 @@ export default function Error({
         <button type="button" onClick={() => retry()}>
           Try again
         </button>
-        <Link href="/#work">Case Studies</Link>
+        <Link href="/#work">Work</Link>
         <Link href="/journal">Journal</Link>
       </nav>
     </main>

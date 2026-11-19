@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import {
   AlignWidget,
   FrameWidget,
@@ -14,17 +13,9 @@ const VOICE_SAMPLE = "Ask more questions in the moment you feel defensive.";
 
 export const metadata: Metadata = {
   title: "Lab",
-  robots: {
-    index: false,
-    follow: false,
-  },
 };
 
 export default function LabPage() {
-  if (process.env.NODE_ENV === "production") {
-    notFound();
-  }
-
   return (
     <main className="lab-page">
       <h1>Lab</h1>

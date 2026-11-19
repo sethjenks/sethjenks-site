@@ -1,0 +1,30 @@
+[
+  {
+    "id": "boardwalk-bots",
+    "mark": "philo",
+    "name": "Boardwalk Bots",
+    "headline": "Boardwalk Bots",
+    "caption": "An AI desk for the morning call. It scores which projects to call today. Lookup stays locked until someone asks.",
+    "placeholder": true
+  },
+  {
+    "id": "cybersecurity",
+    "mark": "field",
+    "name": "A Cybersecurity Project",
+    "headline": "A Cybersecurity Project",
+    "caption": "An AI-first security product, still in the build.",
+    "placeholder": true
+  },
+  {
+    "id": "chia-signer",
+    "mark": "chia",
+    "name": "Transaction Signer",
+    "headline": "Keys off the paper.",
+    "caption": "Signing keys live in the Secure Enclave. The transaction is made somewhere else.",
+    "href": "/work/chia-signer",
+    "src": "/media/work/chia-signer-hero.jpg",
+    "width": 2200,
+    "height": 1650,
+    "alt": "Chia Signer phone screens for keys, a signature request, QR codes, and the Secure Enclave."
+  }
+]

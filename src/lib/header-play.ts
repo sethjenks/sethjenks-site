@@ -1,9 +1,9 @@
 export const COMPACT_HEADER_PX = 86;
 export const COMPACT_Y_MAX = 3.6;
-export const COMPACT_CAM_Y = 1.35;
-export const COMPACT_CAM_LIFT = 1.2;
-export const COMPACT_CAM_Z = 3.45;
-export const COMPACT_LOOK_Y = 1.05;
+export const COMPACT_CAM_Y = 1.15;
+export const COMPACT_CAM_LIFT = 0;
+export const COMPACT_CAM_Z = 3.9;
+export const COMPACT_LOOK_Y = 1.15;
 export const COMPACT_HOME_MS = 5000;
 export const PLAY_HOME_MS = 6500;
 export const HOME_RETURN_MS = 2000;

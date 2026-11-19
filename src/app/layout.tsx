@@ -2,14 +2,17 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { EscapeHome } from "@/components/escape-home";
 import { MotionRoot } from "@/components/motion-root";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { PortfolioEnter } from "@/components/portfolio-enter";
+import { SiteChrome } from "@/components/site-chrome";
+import { getQuietPaths } from "@/lib/work";
 import { geistPixelSquare } from "@/lib/pixel-font";
 import { timelessSans } from "@/lib/timeless-sans";
 import { INTRO } from "@/lib/intro";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
+import "./home-board.css";
 
 // Next.js 16 resolves metadataBase for og:image, not og:video.
 // A relative video path is emitted unchanged, so crawlers need this absolute URL.
@@ -53,7 +56,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const quietPaths = await getQuietPaths();
+
   return (
     <html
       lang="en"
@@ -71,13 +76,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script src="/soft-matter/runtime.d631aa3ec6122788.js" strategy="beforeInteractive" />
         <Script src="/soft-matter/effect.b9030f95b969b94d.js" strategy="beforeInteractive" />
         <Script src="/soft-matter/head-skin.js?v=4" strategy="beforeInteractive" />
-        <Script src="/soft-matter/header-boot.js?v=play23" strategy="beforeInteractive" />
+        <Script src="/soft-matter/header-boot.js?v=play24" strategy="beforeInteractive" />
       </head>
       <body className="flex min-h-svh flex-col bg-background font-sans text-foreground">
+        <EscapeHome />
         <MotionRoot>
-          <SiteHeader />
-          <div className="flex min-w-0 flex-1 flex-col">{children}</div>
-          <SiteFooter />
+          <PortfolioEnter>
+            <SiteChrome quietPaths={quietPaths}>{children}</SiteChrome>
+          </PortfolioEnter>
         </MotionRoot>
       </body>
     </html>

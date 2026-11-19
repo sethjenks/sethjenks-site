@@ -1,5 +1,16 @@
 [
   {
+    "id": "philo",
+    "title": "Philo",
+    "media": "site",
+    "src": "/media/work/philo.mp4",
+    "poster": "/media/work/philo-poster.jpg",
+    "frame": "/media/work/philo.html",
+    "width": 1440,
+    "height": 900,
+    "alt": "A jump cut through the Philo Ventures site, from the homepage through Explore, Build, Companies, and Team."
+  },
+  {
     "id": "embarc",
     "title": "Embarc",
     "media": "video",
@@ -306,15 +317,6 @@
     "alt": "A montage of Faultline Keep Fighting: tees and hoodies, then hoodies and sweatpants, each with the figure printed on the back."
   },
   {
-    "id": "context-defensibility",
-    "title": "Context Matrix",
-    "media": "frame",
-    "src": "/media/work/context-defensibility-matrix.html",
-    "width": 900,
-    "height": 1200,
-    "alt": "The Context Defensibility Matrix, a two-axis map of whether rivals and models can copy a company's context."
-  },
-  {
     "id": "batgan",
     "title": "BatGAN",
     "media": "video",
@@ -388,12 +390,10 @@
   {
     "id": "trashformers",
     "title": "Trashformers",
-    "media": "video",
-    "src": "/media/work/trashformers.mp4",
-    "poster": "/media/work/trashformers-poster.jpg",
+    "src": "/media/work/trashformers-poster.jpg",
     "width": 1024,
     "height": 1024,
-    "alt": "A loop of Trashformers, voxel robots built from dumpsters and junk."
+    "alt": "A voxel robot built like a dumpster truck, with a cab, a gas panel, and tank treads."
   },
   {
     "id": "la-strong",

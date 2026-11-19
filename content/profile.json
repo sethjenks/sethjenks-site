@@ -1,0 +1,38 @@
+{
+  "leadership": [
+    { "value": "15 years", "label": "Product design" },
+    { "value": "7 years", "label": "Leading design" },
+    { "value": "England, India", "label": "International teams" },
+    { "value": "Principals", "label": "Designers I managed" },
+    { "value": "Spark", "label": "Design system" }
+  ],
+  "timeline": [
+    {
+      "company": "Philo Ventures",
+      "role": "Designer in Residence",
+      "when": "Now",
+      "result": "The studio site, from the homepage through the team."
+    },
+    {
+      "company": "SecurityScorecard",
+      "role": "Led design",
+      "result": "Led the design team."
+    },
+    {
+      "company": "Chia Network",
+      "role": "Led design",
+      "result": "Offer Builder, the signer, and the reference wallet."
+    },
+    {
+      "company": "Ivanti",
+      "role": "Led design",
+      "result": "Led the design team."
+    },
+    {
+      "company": "Arcana",
+      "role": "Co-founder",
+      "result": "Branding and product, with Brian Collier.",
+      "href": "https://arcana.agency"
+    }
+  ]
+}

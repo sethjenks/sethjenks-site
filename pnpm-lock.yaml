@@ -20,6 +20,9 @@ importers:
       geist:
         specifier: ^1.7.2
         version: 1.7.2(next@16.3.5(@babel/core@7.29.7)(@types/node@20.19.43)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))
+      gsap:
+        specifier: ^3.15.1
+        version: 3.15.1
       motion:
         specifier: ^14.0.0
         version: 14.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -35,6 +38,12 @@ importers:
       shadcn:
         specifier: ^4.21.0
         version: 4.21.0(typescript@5.9.3)
+      shaders:
+        specifier: ^4.0.7
+        version: 4.0.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      three:
+        specifier: ^0.170.0
+        version: 0.170.0
       tldraw:
         specifier: ^5.5.2
         version: 5.5.2(@floating-ui/dom@1.8.0)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -2612,6 +2621,9 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
+  gsap@3.15.1:
+    resolution: {integrity: sha512-63yjWRFWj3QRP1UOuD8kcidCcy3nxb1mMRpwHr/xJRvPfm9GtWOXFAYUiL0ro1fgPq2nY53LR+98pAgy9BumBg==}
+
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
     engines: {node: '>= 0.4'}
@@ -3645,6 +3657,27 @@ packages:
     engines: {node: '>=20.18.1'}
     hasBin: true
 
+  shaders@4.0.7:
+    resolution: {integrity: sha512-v/EQv2U6TQccRuoWX0D5lhkJsIizigCRVadsavY8olKLwb4uhHFi+JlIREEMYD4pvywjLnwVpMNpTtJgzR/FwQ==}
+    hasBin: true
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      solid-js: ^1.8.0
+      svelte: ^5
+      vue: ^3.5.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      solid-js:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+
   sharp@0.35.4:
     resolution: {integrity: sha512-n++8XWcj+jCOr2IOl7h8LbKnGBDY4aPbmprMONBNFdn0ImXqpGVv5zliDs0V9HbmbCQLpbuo2ej9rAoOQTvMDA==}
     engines: {node: '>=20.9.0'}
@@ -3808,8 +3841,15 @@ packages:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
 
+  three@0.170.0:
+    resolution: {integrity: sha512-FQK+LEpYc0fBD+J8g6oSEyyNzjp+Q7Ks1C568WWaoMRLW+TkNNWmenWeGgJjV105Gd+p/2ql1ZcjYvNiPZBhuQ==}
+
   tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
+
+  tinyest@0.3.4:
+    resolution: {integrity: sha512-81EcMHTCQ2IPweOGk9SpMgjbenR9ZJRsAE84btEv0DhvVKwhe7qBy28hWgatoXa9ppWzmtpHiJ+e86SiaAtY6w==}
+    engines: {node: '>=12.20.0'}
 
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
@@ -3849,6 +3889,9 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
+  tsover-runtime@0.0.7:
+    resolution: {integrity: sha512-FHHwMJzZbnP23+fU1PxXljy7j0RRRosL2r1/CRUNTqfW+l7m35JsUkM615x/cAzw4GqRdXPIl3axKMj9qzpZtQ==}
+
   tw-animate-css@1.4.0:
     resolution: {integrity: sha512-7bziOlRqH0hJx80h/3mbicLW7o8qLsH5+RaLR2t+OHM3D0JlWGODQKQ4cxbK7WlvmUxpcj6Kgu6EKqjrGFe3QQ==}
 
@@ -3875,6 +3918,14 @@ packages:
   typed-array-length@1.0.8:
     resolution: {integrity: sha512-phPGCwqr2+Qo0fwniCE8e4pKnGu/yFb5nD5Y8bf0EEeiI5GklnACYA9GFy/DrAeRrKHXvHn+1SUsOWgJp6RO+g==}
     engines: {node: '>= 0.4'}
+
+  typed-binary@4.3.5:
+    resolution: {integrity: sha512-irziT9zxcyZs8TawuZBab1kQTACM3Q6wGWDh/a5IB2iWbueu+jbkN5ofoSvp28Em1w4ZEa7y44Jx7pHmgBGZdw==}
+
+  typegpu@0.12.3:
+    resolution: {integrity: sha512-zYwQEhnPPwhq5vQKmollXRK1LCVjStOnL+2B0PiebqvAzYPr25rPNR4r3olLoow5sKKjyj3kzHKEcpD5SyDzGQ==}
+    engines: {node: '>=12.20.0'}
+    hasBin: true
 
   typescript-eslint@8.70.0:
     resolution: {integrity: sha512-P/W5cz70/cQAuKfY3xwQMWWTV7BvJ0mAQmi+9mBcsVPaBUpd6Ohpa+fECv9rBFrQcig86jAiNBFNWUqnTjr4pw==}
@@ -6862,6 +6913,8 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
+  gsap@3.15.1: {}
+
   has-bigints@1.1.0: {}
 
   has-flag@4.0.0: {}
@@ -7960,6 +8013,13 @@ snapshots:
       - supports-color
       - typescript
 
+  shaders@4.0.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      typegpu: 0.12.3
+    optionalDependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+
   sharp@0.35.4(@types/node@20.19.43):
     dependencies:
       '@img/colour': 1.1.0
@@ -8154,7 +8214,11 @@ snapshots:
 
   tapable@2.3.3: {}
 
+  three@0.170.0: {}
+
   tiny-invariant@1.3.3: {}
+
+  tinyest@0.3.4: {}
 
   tinyglobby@0.2.17:
     dependencies:
@@ -8217,6 +8281,8 @@ snapshots:
 
   tslib@2.8.1: {}
 
+  tsover-runtime@0.0.7: {}
+
   tw-animate-css@1.4.0: {}
 
   type-check@0.4.0:
@@ -8261,6 +8327,14 @@ snapshots:
       is-typed-array: 1.1.15
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
+
+  typed-binary@4.3.5: {}
+
+  typegpu@0.12.3:
+    dependencies:
+      tinyest: 0.3.4
+      tsover-runtime: 0.0.7
+      typed-binary: 4.3.5
 
   typescript-eslint@8.70.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3):
     dependencies:

@@ -58,7 +58,7 @@
       )
       .replaceAll(
         "e.camera.position.set(3.2*p,2.8*p+1.1,7.2*p)",
-        "e.camera.fov=window.__headerPlay&&window.__headerPlay.camZ>4?10:35,e.camera.position.set(1.55*p,window.__headerPlay&&window.__headerPlay.camZ>4?window.__headerPlay.lookY-(window.__headerEnterShift||0):(window.__headerPlay?window.__headerPlay.camY:1.35)*p+(window.__headerPlay?window.__headerPlay.camLift:1.2)-(window.__headerEnterShift||0),(window.__headerPlay?window.__headerPlay.camZ:3.45)*p)",
+        "e.camera.fov=window.__headerPlay&&window.__headerPlay.camZ>4?10:35,e.camera.position.set(1.55*p,window.__headerPlay&&window.__headerPlay.camZ>4?window.__headerPlay.lookY-(window.__headerEnterShift||0):(window.__headerPlay?window.__headerPlay.camY:1.15)*p+(window.__headerPlay?window.__headerPlay.camLift:0)-(window.__headerEnterShift||0),(window.__headerPlay?window.__headerPlay.camZ:3.9)*p)",
       )
       .replaceAll(
         "e.camera.lookAt(0,Math.max(1.05,r.height*.52),0)",

@@ -1,40 +1,16 @@
-import { HomePlayfield } from "@/components/home-playfield";
-import { LogoRows } from "@/components/logo-rows";
-import { MessageBoardSlot } from "@/components/message-board-slot";
-import { ProjectList } from "@/components/project-list";
-import { WorkMasonry } from "@/components/work-masonry";
-import { WorkRows } from "@/components/work-rows";
-import { getGalleryItems } from "@/lib/gallery";
-import { getLogoItems, sortLogoItems } from "@/lib/logos";
-import { getProjectItems } from "@/lib/projects";
+import { HomeBoard } from "@/components/home-board";
 import { INTRO } from "@/lib/intro";
-import { getWorkItems, isCaseStudy, sortWorkForDisplay } from "@/lib/work";
+import { getHomeBoard } from "@/lib/home";
 
 export default async function Home() {
-  const [work, logos, projects, gallery] = await Promise.all([
-    getWorkItems(),
-    getLogoItems(),
-    getProjectItems(),
-    getGalleryItems(),
-  ]);
+  const board = await getHomeBoard();
 
   return (
-    <main className="home-page flex min-w-0 flex-1 flex-col">
-      <HomePlayfield
-        name={INTRO.name}
-        role={INTRO.role}
-        paragraphs={INTRO.paragraphs}
-        links={INTRO.links}
-      />
-      <WorkRows
-        id="work"
-        heading="Case Studies"
-        items={sortWorkForDisplay(work.filter(isCaseStudy))}
-      />
-      <LogoRows id="logos" heading="Brands" items={sortLogoItems(logos)} />
-      <WorkMasonry tiles={gallery} />
-      <ProjectList items={projects} />
-      <MessageBoardSlot />
-    </main>
+    <HomeBoard
+      board={board}
+      name={INTRO.name}
+      headline="Designer who builds."
+      bio={INTRO.paragraphs[0] ?? ""}
+    />
   );
 }

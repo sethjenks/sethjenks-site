@@ -1,0 +1,749 @@
+{
+  "columns": [
+    [
+      {
+        "kind": "work",
+        "id": "offer-builder",
+        "filter": "product",
+        "label": "Offer Builder",
+        "frame": "tall",
+        "hover": {
+          "duration": 450,
+          "background": {
+            "to": {
+              "scale": 1.025
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "orientation",
+        "filter": "product",
+        "frame": "phone",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        },
+        "background": {
+          "type": "color",
+          "color": "#eeeeee"
+        },
+        "foreground": {
+          "type": "html",
+          "src": "/media/work/orientation.html",
+          "title": "Orientation"
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "credentials",
+        "filter": "product",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "work",
+        "id": "philo",
+        "filter": "brand",
+        "frame": "poster",
+        "hover": {
+          "duration": 500,
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "embarc",
+        "filter": "brand",
+        "frame": "mark",
+        "fit": "contain",
+        "foreground": {
+          "type": "video",
+          "src": "/media/work/embarc.mp4",
+          "poster": "/media/work/embarc-poster.jpg",
+          "fit": "contain",
+          "play": "always"
+        },
+        "hover": {
+          "duration": 600,
+          "background": {
+            "to": {
+              "opacity": 0
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-hoodie",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "sunset",
+        "filter": "brand",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "work-your-ass-off",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "philo-sticker-set",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "work",
+        "id": "paper-tips",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "xf",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-rebuild",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "merch-makers",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "skillhack",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "trashformers",
+        "filter": "play",
+        "frame": "short",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.03,
+              "y": -12
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "jacket",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "slot",
+        "id": "open-1",
+        "label": "Untitled",
+        "filter": "play",
+        "frame": "tall"
+      }
+    ],
+    [
+      {
+        "kind": "work",
+        "id": "chia-signer",
+        "filter": "product",
+        "label": "Transaction Signer",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.025
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "farming",
+        "filter": "brand",
+        "frame": "short",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "intermission-iron",
+        "filter": "product",
+        "frame": "phone",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "sage",
+        "filter": "brand",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "final-card",
+        "filter": "brand",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "fatherhood",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-do-it-afraid",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "lift-the-world",
+        "filter": "brand",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "philo-headshots",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "timelord",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "icons",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "what-a-life",
+        "filter": "play",
+        "frame": "short",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "security-scorecard",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "sweatshirt",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "vision",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "batgan",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "crayon-illustrations",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "slot",
+        "id": "open-2",
+        "label": "Untitled",
+        "filter": "play",
+        "frame": "short"
+      },
+      {
+        "kind": "slot",
+        "id": "open-3",
+        "label": "Untitled",
+        "filter": "play",
+        "frame": "short"
+      }
+    ],
+    [
+      {
+        "kind": "work",
+        "id": "chia-wallet",
+        "filter": "product",
+        "label": "Chia Wallet",
+        "frame": "tall",
+        "hover": {
+          "duration": 500,
+          "background": {
+            "to": {
+              "scale": 1.02,
+              "y": 12
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "study-icons",
+        "filter": "product",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "xymo",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        },
+        "background": {
+          "type": "color",
+          "color": "#eeeeee"
+        },
+        "foreground": {
+          "type": "html",
+          "src": "/media/work/xymo.html",
+          "title": "Xymo"
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "sulek",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        },
+        "background": {
+          "type": "color",
+          "color": "#eeeeee"
+        },
+        "foreground": {
+          "type": "vector",
+          "src": "/media/work/sulek.svg",
+          "alt": "Orange Sulek mark with a stepped tower, scattered stars, and a geometric wordmark.",
+          "fit": "contain"
+        },
+        "fit": "contain"
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-gloves",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "philo-stickers",
+        "filter": "brand",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "la-strong",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-afraid-tee",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "zip-hoodie",
+        "filter": "brand",
+        "frame": "short",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "philo-vision",
+        "filter": "brand",
+        "frame": "short",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "spacebase",
+        "filter": "play",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "sage-advice",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "keep-fighting-tee",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-anomaly",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "work",
+        "id": "chia-friends",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.015,
+              "y": -8
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "keep-fighting",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-demons-tee",
+        "filter": "brand",
+        "frame": "tall",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "slot",
+        "id": "open-4",
+        "label": "Untitled",
+        "filter": "play",
+        "frame": "poster"
+      },
+      {
+        "kind": "slot",
+        "id": "open-5",
+        "label": "Untitled",
+        "filter": "play",
+        "frame": "poster"
+      }
+    ]
+  ],
+  "projects": [
+    "arcana",
+    "offramp",
+    "paper-tips",
+    "trashformers",
+    "batgan"
+  ]
+}

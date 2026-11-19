@@ -3,6 +3,7 @@ import path from "node:path";
 
 const WORK_PATH = path.join(process.cwd(), "content", "work.json");
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const PLATE_SRC_PATTERN = /^\/media\/work\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
 
 export type WorkSection = {
   heading: string;
@@ -29,6 +30,14 @@ export type WorkBlock =
   | { type: "frame"; frame: WorkFrame; narrow?: boolean }
   | { type: "facts"; items: WorkFact[] };
 
+export type WorkPlate = {
+  label: string;
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+};
+
 export type WorkItem = {
   id: string;
   title: string;
@@ -42,13 +51,14 @@ export type WorkItem = {
   tags?: string[];
   alt?: string;
   blocks?: WorkBlock[];
+  plates?: WorkPlate[];
   caseStudy?: boolean;
 };
 
 const DISPLAY_ORDER = [
   "offer-builder",
-  "chia-signer",
   "chia-wallet",
+  "chia-signer",
   "chia-friends",
 ];
 
@@ -131,6 +141,25 @@ function isWorkBlock(value: unknown): value is WorkBlock {
   }
 }
 
+function isWorkPlate(value: unknown): value is WorkPlate {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { label, src, width, height, alt } = value;
+
+  return (
+    isNonEmptyString(label) &&
+    isNonEmptyString(src) &&
+    PLATE_SRC_PATTERN.test(src) &&
+    typeof width === "number" &&
+    width > 0 &&
+    typeof height === "number" &&
+    height > 0 &&
+    isNonEmptyString(alt)
+  );
+}
+
 function isWorkSection(value: unknown): value is WorkSection {
   if (!isRecord(value)) {
     return false;
@@ -154,7 +183,7 @@ function isWorkItem(value: unknown): value is WorkItem {
     return false;
   }
 
-  const { id, title, year, role, src, width, height, summary, sections, tags, alt, blocks, caseStudy } =
+  const { id, title, year, role, src, width, height, summary, sections, tags, alt, blocks, plates, caseStudy } =
     value;
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
@@ -203,6 +232,20 @@ function isWorkItem(value: unknown): value is WorkItem {
   if (blocks !== undefined) {
     if (!Array.isArray(blocks) || blocks.length === 0 || !blocks.every(isWorkBlock)) {
       return false;
+    }
+  }
+
+  if (plates !== undefined) {
+    if (!Array.isArray(plates) || plates.length === 0 || !plates.every(isWorkPlate)) {
+      return false;
+    }
+
+    const labels = new Set<string>();
+    for (const plate of plates) {
+      if (labels.has(plate.label.trim())) {
+        return false;
+      }
+      labels.add(plate.label.trim());
     }
   }
 
@@ -284,8 +327,28 @@ function toWorkItem(item: WorkItem): WorkItem {
     ...(item.tags ? { tags: item.tags.map((tag) => tag.trim()) } : {}),
     ...(item.alt ? { alt: item.alt.trim() } : {}),
     ...(item.blocks ? { blocks: item.blocks.map(toWorkBlock) } : {}),
+    ...(item.plates
+      ? {
+          plates: item.plates.map((plate) => ({
+            label: plate.label.trim(),
+            src: plate.src.trim(),
+            width: plate.width,
+            height: plate.height,
+            alt: plate.alt.trim(),
+          })),
+        }
+      : {}),
     ...(item.caseStudy === false ? { caseStudy: false } : {}),
   };
+}
+
+export async function getQuietPaths(): Promise<string[]> {
+  const items = await getWorkItems();
+  const studies = items
+    .filter((item) => item.plates !== undefined && item.plates.length > 0)
+    .map((item) => `/work/${item.id}`);
+
+  return ["/", ...studies];
 }
 
 export function isCaseStudy(item: WorkItem): boolean {

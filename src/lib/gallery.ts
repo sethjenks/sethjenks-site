@@ -35,7 +35,14 @@ export type GalleryFrame = GalleryBase & {
   mark?: true;
 };
 
-export type GalleryItem = GalleryImage | GalleryVideo | GalleryFrame;
+export type GallerySite = GalleryBase & {
+  media: "site";
+  src: string;
+  poster: string;
+  frame: string;
+};
+
+export type GalleryItem = GalleryImage | GalleryVideo | GalleryFrame | GallerySite;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -136,6 +143,27 @@ function parseGalleryItem(value: unknown): GalleryItem | null {
       src: value.src,
       ...(value.fit === "screen" || value.fit === "poster" ? { fit: value.fit } : {}),
       ...(value.mark === true ? { mark: true } : {}),
+    };
+  }
+
+  if (media === "site") {
+    if (
+      typeof value.src !== "string" ||
+      !VIDEO_PATTERN.test(value.src) ||
+      typeof value.poster !== "string" ||
+      !IMAGE_PATTERN.test(value.poster) ||
+      typeof value.frame !== "string" ||
+      !FRAME_PATTERN.test(value.frame)
+    ) {
+      return null;
+    }
+
+    return {
+      ...base,
+      media: "site",
+      src: value.src,
+      poster: value.poster,
+      frame: value.frame,
     };
   }
 

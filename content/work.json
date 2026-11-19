@@ -152,6 +152,43 @@
           "caption": "The original offers interface and the updated Offer Builder."
         }
       }
+    ],
+    "plates": [
+      {
+        "label": "Builder",
+        "src": "/media/work/offer-builder-expire.jpg",
+        "width": 2200,
+        "height": 1451,
+        "alt": "Offer Builder in the Seedling Wallet, with a seven-day expiration and Offering and Requesting columns."
+      },
+      {
+        "label": "Original",
+        "src": "/media/work/offer-builder-compare.jpg",
+        "width": 2200,
+        "height": 1591,
+        "alt": "The original Create an Offer form beside the updated Offer Builder."
+      },
+      {
+        "label": "Assets",
+        "src": "/media/work/offer-builder-categories.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Offering and Requesting columns with XCH, tokens, and NFTs at the top level."
+      },
+      {
+        "label": "Columns",
+        "src": "/media/work/offer-builder-columns.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Two-column offer concept, one side for assets you own and one for assets you want."
+      },
+      {
+        "label": "Earlier",
+        "src": "/media/work/offer-builder-early.jpg",
+        "width": 2200,
+        "height": 1276,
+        "alt": "Early NFT offer screens, based on the token trading layout."
+      }
     ]
   },
   {
@@ -166,6 +203,43 @@
     "alt": "Chia Signer phone screens for keys, a signature request, QR codes, and the Secure Enclave.",
     "tags": [
       "Chia"
+    ],
+    "plates": [
+      {
+        "label": "Screens",
+        "src": "/media/work/chia-signer-hero.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Chia Signer phone screens for keys, a signature request, QR codes, and the Secure Enclave."
+      },
+      {
+        "label": "Keys",
+        "src": "/media/work/chia-signer-keys.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Chia Signer screens listing hot, recovery, and cold keys beside a transaction history."
+      },
+      {
+        "label": "Scan",
+        "src": "/media/work/chia-signer-qr.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Chia Signer scanning a QR code from an air-gapped machine to accept a spend request."
+      },
+      {
+        "label": "Brand",
+        "src": "/media/work/chia-signer-brand.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Chia Signer wordmark studies using the Chia leaf with the product name."
+      },
+      {
+        "label": "Mark",
+        "src": "/media/work/chia-signer-mark.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Chia Signer app icon, a split green mark on a dark rounded square."
+      }
     ],
     "sections": [
       {
@@ -267,125 +341,39 @@
   },
   {
     "id": "chia-wallet",
-    "title": "Chia Reference Wallet",
-    "year": "2022–2023",
+    "title": "Chia Wallet",
+    "year": "2023",
     "role": "UI/UX",
     "src": "/media/work/chia-wallet-hero.jpg",
     "width": 2200,
     "height": 1433,
-    "summary": "A showcase of the feature primitives enabled by the Chia blockchain and Chialisp.",
-    "alt": "Chia reference wallet on macOS, showing a token balance, a chart, and pending clawback transactions.",
+    "summary": "XCH, tokens, and NFTs in one wallet, with every transaction in view.",
+    "alt": "The Chia wallet, with the XCH balance, a token list, and a transaction history including a pending clawback.",
     "tags": [
       "Chia"
     ],
     "sections": [
       {
-        "heading": "A reference, not a pitch",
+        "heading": "Every asset in one place",
         "body": [
-          "In order for developers to understand what is possible in a new programming environment and open-source blockchain ecosystem, there needs to be a reference implementation of features and primitives that developers can use as a guide in creating their own applications.",
-          "The Chia Reference Wallet is a reference implementation of almost all of the primitives on the Chia blockchain, including farming, plotting, pooling, tokens, Chia Offers, NFTs, verifiable credentials, decentralized identifiers, transaction clawback, contacts, and more. I worked on many of these features from zero to one, developing the UI and UX from scratch."
+          "The Chia wallet holds XCH, tokens, and NFTs, and lists each transaction, including ones still clawing back."
         ]
       }
     ],
-    "blocks": [
+    "plates": [
       {
-        "type": "bleed",
-        "frame": {
-          "src": "/media/work/chia-wallet-hero.jpg",
-          "width": 2200,
-          "height": 1433,
-          "alt": "Chia reference wallet on macOS, showing a token balance, a chart, and pending clawback transactions."
-        }
+        "label": "NFTs",
+        "src": "/media/work/chia-wallet-nft-grid.jpg",
+        "width": 2200,
+        "height": 1602,
+        "alt": "The wallet's NFT gallery, a grid of Chia Friends."
       },
       {
-        "type": "statement",
-        "label": "The challenge",
-        "text": "In order for developers to understand what is possible in a new programming environment and open-source blockchain ecosystem, there needs to be a reference implementation of features and primitives."
-      },
-      {
-        "type": "essay",
-        "heading": "From zero to one",
-        "body": [
-          "In order for developers to understand what is possible in a new programming environment and open-source blockchain ecosystem, there needs to be a reference implementation of features and primitives that developers can use as a guide in creating their own applications.",
-          "The Chia Reference Wallet is a reference implementation of almost all of the primitives on the Chia blockchain, including farming, plotting, pooling, tokens, Chia Offers, NFTs, verifiable credentials, decentralized identifiers, transaction clawback, contacts, and more. I worked on many of these features from zero to one, developing the UI and UX from scratch."
-        ]
-      },
-      {
-        "type": "essay",
-        "heading": "Already in the wallet",
-        "body": [
-          "In the future, your crypto wallet will hold your identity, access to your certificates, diplomas, and other credentials, connect to your bank account, and hold any crypto assets you might have, including digital collectibles, tickets, securities, and investments.",
-          "The Chia Reference Wallet already has several of these advanced capabilities."
-        ],
-        "list": [
-          "Offers. Zero-trust multi-asset trading between peers without marketplaces.",
-          "Asset undo. Set a time window to undo a transaction and claw back the funds.",
-          "Verifiable credentials. Unique on-chain assets that can verify data about a person without revealing their identity.",
-          "NFTs. Unique digital assets that can represent unique real-world assets or verifiably unique digital assets."
-        ]
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/chia-wallet-nfts.jpg",
-          "width": 2200,
-          "height": 1365,
-          "alt": "Chia Friends displayed in the Seedling Wallet NFT gallery."
-        }
-      },
-      {
-        "type": "facts",
-        "items": [
-          {
-            "label": "Year",
-            "lines": [
-              "2022–2023"
-            ]
-          },
-          {
-            "label": "Timeframe",
-            "lines": [
-              "Ongoing"
-            ]
-          },
-          {
-            "label": "Tools",
-            "lines": [
-              "Figma",
-              "React"
-            ]
-          }
-        ]
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/chia-wallet-clawback.jpg",
-          "width": 2200,
-          "height": 1369,
-          "alt": "Wallet transaction list with a pending clawback.",
-          "caption": "Transactions can have a time period in which the creator can revoke a transaction."
-        }
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-expire.jpg",
-          "width": 2200,
-          "height": 1451,
-          "alt": "The Offer Builder inside the Chia wallet.",
-          "caption": "The Chia Offer Builder that I designed. You can trade assets with anyone without having to trust who they are. This technology has the potential to completely revolutionize markets."
-        }
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/chia-wallet-nft-grid.jpg",
-          "width": 2200,
-          "height": 1602,
-          "alt": "A grid of Chia Friends in the wallet NFT view.",
-          "caption": "You can trade NFTs directly with other people without a marketplace using the Chia wallet."
-        }
+        "label": "Clawback",
+        "src": "/media/work/chia-wallet-clawback.jpg",
+        "width": 2200,
+        "height": 1369,
+        "alt": "The wallet summary with a pending clawback transaction highlighted."
       }
     ]
   },
@@ -498,6 +486,120 @@
           "alt": "Progression from sketch to finished variants of the K32 character.",
           "caption": "Progression from sketch to finished variants of the K32 character."
         }
+      }
+    ]
+  },
+  {
+    "id": "paper-tips",
+    "title": "Paper.tips",
+    "year": "2026",
+    "role": "Design",
+    "src": "/media/work/paper-tips-hero.jpg",
+    "width": 2880,
+    "height": 2000,
+    "summary": "An unofficial field guide to Paper. Every shortcut worth knowing, plus how to put agents to work.",
+    "alt": "Paper.tips, with the title and the twelve shortcuts for getting started in Paper.",
+    "tags": ["Paper"],
+    "sections": [
+      {
+        "heading": "Get fast in Paper",
+        "body": [
+          "Paper.tips is an unofficial field guide: the shortcuts worth knowing, and how to put an agent to work in the file you have open."
+        ]
+      }
+    ],
+    "plates": [
+      {
+        "label": "Canvas",
+        "src": "/media/work/paper-tips-canvas.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Canvas section of Paper.tips, with the layer list and shortcuts for panning, zooming, and hiding the UI."
+      },
+      {
+        "label": "Type",
+        "src": "/media/work/paper-tips-type.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The typography section, a table of the modifier keys for size, weight, letter spacing, and line height."
+      },
+      {
+        "label": "Shaders",
+        "src": "/media/work/paper-tips-shaders.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The shader library in Paper.tips, a grid of Mesh Gradient, Liquid Metal, Halftone, Fluted Glass, and the rest."
+      },
+      {
+        "label": "Figma",
+        "src": "/media/work/paper-tips-figma.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Figma migration section, split into what transfers cleanly and what does not."
+      },
+      {
+        "label": "Agents",
+        "src": "/media/work/paper-tips-agents.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The MCP and agents section, with one-click setup and the local server address."
+      }
+    ]
+  },
+  {
+    "id": "philo",
+    "title": "Philo",
+    "year": "2026",
+    "role": "Design",
+    "src": "/media/work/philo-hero.jpg",
+    "width": 2880,
+    "height": 2000,
+    "summary": "Philo helps founders go from \u22121 to 1, from the first spark of an idea to first revenue.",
+    "alt": "Philo homepage, the headline Builders backing builders above an illustration of a workshop and a rocket.",
+    "tags": ["Philo"],
+    "sections": [
+      {
+        "heading": "Builders backing builders",
+        "body": [
+          "The site is the firm: the programs, the portfolio, and the crew, from the first spark of an idea to first revenue."
+        ]
+      }
+    ],
+    "plates": [
+      {
+        "label": "Approach",
+        "src": "/media/work/philo-approach.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Philo approach, an isometric workshop and rocket beside the Connect program."
+      },
+      {
+        "label": "Explore",
+        "src": "/media/work/philo-explore.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Explore program page, two funded months to find what's worth building."
+      },
+      {
+        "label": "Build",
+        "src": "/media/work/philo-build.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Build program page, the fastest path from 0 to 1."
+      },
+      {
+        "label": "Portfolio",
+        "src": "/media/work/philo-companies.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Philo portfolio, a grid of company marks including Altaport, Alysio, bby, and Bloomlogic."
+      },
+      {
+        "label": "Team",
+        "src": "/media/work/philo-team.jpg",
+        "width": 2880,
+        "height": 2000,
+        "alt": "The Philo team page, inception-stage experts in the work with you, with counts for specialists and portfolio companies."
       }
     ]
   }

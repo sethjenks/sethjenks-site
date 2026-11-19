@@ -1,7 +1,9 @@
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
-import { heroAlt, isPhoneStill, sortWorkForDisplay, type WorkBlock, type WorkFrame, type WorkItem } from "@/lib/work";
-import { normalizeTag } from "@/lib/entries";
+import { Fragment } from "react";
+import { heroAlt, isPhoneStill, sortWorkForDisplay, type WorkBlock, type WorkFrame, type WorkItem, type WorkPlate } from "@/lib/work";
 
 type WorkStudyProps = {
   item: WorkItem;
@@ -10,50 +12,33 @@ type WorkStudyProps = {
 
 export function WorkStudy({ item, related }: WorkStudyProps) {
   const blocks = item.blocks ?? fallbackBlocks(item);
-  const extraTags = (item.tags ?? []).filter(
-    (tag) => normalizeTag(tag) !== item.role.toLowerCase(),
-  );
   const more = nextWorks(item, related);
+  const opened = item.plates !== undefined && item.plates.length > 0;
 
   return (
-    <main className="study">
+    <main className={opened ? "study study-opened" : "study"}>
+      {opened ? <StudyMosaic item={item} /> : <StudyBar item={item} />}
+      {opened ? null : (
       <header className="study-intro">
         <h1 className="study-title">{item.title}</h1>
         <div className="study-meta">
-          <nav className="study-crumb" aria-label="Breadcrumb">
-            <ol>
-              <li>
-                <Link href="/">Home</Link>
-              </li>
-              <li>
-                <Link href="/#work">Case Studies</Link>
-              </li>
-              <li aria-current="page">{item.title}</li>
-            </ol>
-          </nav>
           <p className="study-role">{item.role}</p>
         </div>
-        <p className="study-lede">{item.summary}</p>
       </header>
+      )}
 
-      {blocks.map((block, index) => (
-        <StudyBlock key={blockKey(block, index)} block={block} />
-      ))}
-
-      {extraTags.length > 0 ? (
-        <ul className="study-tags">
-          {extraTags.map((tag) => (
-            <li key={tag}>{normalizeTag(tag)}</li>
-          ))}
-        </ul>
-      ) : null}
-
+      {opened ? null : <StudyScreens blocks={blocks} />}
+      <div className={opened ? "study-rest" : undefined}>
       {more.length > 0 ? (
         <aside className="study-related" aria-label="More work">
           <h2>More work</h2>
           <div className="study-related-row">
             {more.map((entry) => (
-              <Link key={entry.id} href={`/work/${entry.id}`}>
+              <Link
+                key={entry.id}
+                href={`/work/${entry.id}`}
+                aria-label={`${entry.title}, ${entry.role}`}
+              >
                 <span
                   className="study-related-frame"
                   data-canvas={isPhoneStill(entry) ? "phone" : undefined}
@@ -67,68 +52,117 @@ export function WorkStudy({ item, related }: WorkStudyProps) {
                     className="study-related-image"
                   />
                 </span>
-                <span className="study-related-copy">
-                  <span className="study-related-title">{entry.title}</span>
-                  <span className="study-related-role">{entry.role}</span>
-                </span>
               </Link>
             ))}
           </div>
         </aside>
       ) : null}
+      </div>
     </main>
   );
 }
 
-function StudyBlock({ block }: { block: WorkBlock }) {
-  switch (block.type) {
-    case "statement":
-      return (
-        <section className="study-statement">
-          <p className="study-kicker">{block.label}</p>
-          <p>{block.text}</p>
+function StudyBar({
+  item,
+  overlay = false,
+}: {
+  item: WorkItem;
+  overlay?: boolean;
+}) {
+  const title = item.title.replace(/^Chia\s+/, "");
+  const tags = item.tags ?? [];
+
+  return (
+    <div className={overlay ? "mosaic-chip" : "study-bar"}>
+      <div className="mosaic-chip-bar">
+        <span className="mosaic-chip-title">{title}</span>
+        <span className="mosaic-chip-year">{item.year}</span>
+        {tags.length > 0 ? (
+          <span className="mosaic-chip-tags">
+            {tags.map((tag, index) => (
+              <Fragment key={tag}>
+                {index > 0 ? <span aria-hidden="true" /> : null}
+                <span>{tag}</span>
+              </Fragment>
+            ))}
+          </span>
+        ) : null}
+        <Link className="mosaic-close" href={overlay ? "/" : "/#work"} aria-label="Close">
+          <HugeiconsIcon
+            icon={Cancel01Icon}
+            size={16}
+            strokeWidth={1.5}
+            color="currentColor"
+            aria-hidden="true"
+          />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function StudyMosaic({ item }: { item: WorkItem }) {
+  const plates = item.plates ?? [];
+  const heading = item.sections[0]?.heading ?? item.title;
+  const headline = /[.!?]$/.test(heading) ? heading : `${heading}.`;
+  const meta = [item.tags?.[0], item.year].filter((part) => part !== undefined).join(", ");
+
+  return (
+    <div className="study-mosaic">
+      <StudyBar item={item} overlay />
+      <div className="study-scroll">
+        <section className="mosaic-statement">
+          <h1>{headline}</h1>
+          <div className="mosaic-statement-copy">
+            <p className="mosaic-summary">{item.summary}</p>
+            {meta ? <p className="mosaic-meta">{meta}</p> : null}
+          </div>
         </section>
-      );
-    case "essay":
-      return (
-        <section className="study-essay">
-          <h2>{block.heading}</h2>
-          {block.body.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          {block.list ? (
-            <ul>
-              {block.list.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
-      );
-    case "bleed":
-      return <StudyFigure frame={block.frame} bleed />;
-    case "frame":
-      return <StudyFigure frame={block.frame} narrow={block.narrow} />;
-    case "facts":
-      return (
-        <dl className="study-facts">
-          {block.items.map((fact) => (
-            <div key={fact.label}>
-              <dt>{fact.label}</dt>
-              <dd>
-                {fact.lines.map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      );
-    default: {
-      const unknownBlock: never = block;
-      return unknownBlock;
-    }
+        {plates.map((plate) => (
+          <MosaicPlate key={`${plate.label}-${plate.src}`} plate={plate} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MosaicPlate({ plate }: { plate: WorkPlate }) {
+  return (
+    <figure className="study-scroll-plate">
+      <Image
+        src={plate.src}
+        alt={plate.alt}
+        width={plate.width}
+        height={plate.height}
+        sizes="(max-width: 720px) 100vw, 1280px"
+        style={{ width: "100%", height: "auto" }}
+      />
+      <figcaption className="mosaic-plate-label">{plate.label}</figcaption>
+    </figure>
+  );
+}
+
+function StudyScreens({ blocks }: { blocks: WorkBlock[] }) {
+  const frames = blocks.filter(
+    (block): block is Extract<WorkBlock, { type: "bleed" | "frame" }> =>
+      block.type === "bleed" || block.type === "frame",
+  );
+
+  if (frames.length === 0) {
+    return null;
   }
+
+  return (
+    <div className="study-screens">
+      {frames.map((block) => (
+        <StudyFigure
+          key={block.frame.src}
+          frame={block.frame}
+          narrow={block.type === "frame" ? block.narrow : false}
+        />
+      ))}
+    </div>
+  );
 }
 
 function StudyFigure({
@@ -164,7 +198,6 @@ function StudyFigure({
           className="study-image"
         />
       </div>
-      {frame.caption ? <figcaption>{frame.caption}</figcaption> : null}
     </figure>
   );
 }
@@ -196,39 +229,5 @@ function fallbackBlocks(item: WorkItem): WorkBlock[] {
       ? { type: "frame", frame, narrow: isPhoneStill(item) || ratio < 0.9 }
       : { type: "bleed", frame };
 
-  return [
-    hero,
-    ...item.sections.map(
-      (section): WorkBlock => ({
-        type: "essay",
-        heading: section.heading,
-        body: section.body,
-      }),
-    ),
-    {
-      type: "facts",
-      items: [
-        { label: "Year", lines: [item.year] },
-        { label: "Type", lines: [item.role] },
-      ],
-    },
-  ];
-}
-
-function blockKey(block: WorkBlock, index: number): string {
-  switch (block.type) {
-    case "statement":
-      return `statement-${block.label}`;
-    case "essay":
-      return `essay-${block.heading}`;
-    case "bleed":
-    case "frame":
-      return `${block.type}-${block.frame.src}`;
-    case "facts":
-      return `facts-${index}`;
-    default: {
-      const unknownBlock: never = block;
-      return unknownBlock;
-    }
-  }
+  return [hero];
 }

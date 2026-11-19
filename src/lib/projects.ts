@@ -9,6 +9,7 @@ export type ProjectItem = {
   title: string;
   line?: string;
   href?: string;
+  icon?: string;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -20,7 +21,7 @@ function isProjectItem(value: unknown): value is ProjectItem {
     return false;
   }
 
-  const { id, title, line, href } = value;
+  const { id, title, line, href, icon } = value;
 
   if (typeof id !== "string" || !ID_PATTERN.test(id)) {
     return false;
@@ -35,6 +36,13 @@ function isProjectItem(value: unknown): value is ProjectItem {
   }
 
   if (href !== undefined && (typeof href !== "string" || href.trim().length === 0)) {
+    return false;
+  }
+
+  if (
+    icon !== undefined &&
+    (typeof icon !== "string" || !icon.startsWith("/") || icon.includes(".."))
+  ) {
     return false;
   }
 
@@ -53,6 +61,7 @@ export async function getProjectItems(): Promise<ProjectItem[]> {
     title: item.title.trim(),
     ...(item.line ? { line: item.line.trim() } : {}),
     ...(item.href ? { href: item.href.trim() } : {}),
+    ...(item.icon ? { icon: item.icon.trim() } : {}),
   }));
   const seenIds = new Set<string>();
 

@@ -222,6 +222,7 @@ function isGalleryMark(tile: GalleryItem): boolean {
     case "frame":
       return tile.mark === true;
     case "video":
+    case "site":
       return false;
     default: {
       const unknownTile: never = tile;
@@ -272,6 +273,8 @@ function rowSpan(tile: GalleryItem, width: number): number {
 
 type WorkMasonryProps = {
   tiles: GalleryItem[];
+  heading?: string;
+  id?: string;
 };
 
 function MasonryImage({
@@ -385,6 +388,8 @@ function TileVisual({
       return <MasonryImage tile={tile} eager={eager} />;
     case "video":
       return <MasonryVideo tile={tile} eager={eager} />;
+    case "site":
+      return <MasonryVideo tile={{ ...tile, media: "video" }} eager={eager} />;
     case "frame":
       return <MasonryEmbed tile={tile} eager={eager} />;
     default: {
@@ -947,6 +952,47 @@ function LightboxEmbed({ tile }: { tile: GalleryFrame }) {
   );
 }
 
+function LightboxStage({
+  tile,
+  reducedMotion,
+}: {
+  tile: GalleryItem;
+  reducedMotion: boolean;
+}) {
+  switch (tile.media) {
+    case "image":
+      return <StillStage tile={tile} reducedMotion={reducedMotion} />;
+    case "video":
+      return (
+        <LightboxPlayer
+          key={tile.id}
+          tile={tile}
+          reducedMotion={reducedMotion}
+        />
+      );
+    case "frame":
+      return <LightboxEmbed tile={tile} />;
+    case "site":
+      return (
+        <LightboxEmbed
+          tile={{
+            id: tile.id,
+            title: tile.title,
+            width: tile.width,
+            height: tile.height,
+            alt: tile.alt,
+            media: "frame",
+            src: tile.frame,
+          }}
+        />
+      );
+    default: {
+      const unknownTile: never = tile;
+      return unknownTile;
+    }
+  }
+}
+
 function StillStage({
   tile,
   reducedMotion,
@@ -1328,21 +1374,11 @@ function LightboxView({
         <span
           ref={frameRef}
           className={frameClass}
-          data-media={tile.media}
+          data-media={tile.media === "site" ? "frame" : tile.media}
           data-fit={tile.media === "frame" ? tile.fit : undefined}
           style={frameStyle}
         >
-          {tile.media === "image" ? (
-            <StillStage tile={tile} reducedMotion={reducedMotion} />
-          ) : tile.media === "video" ? (
-            <LightboxPlayer
-              key={tile.id}
-              tile={tile}
-              reducedMotion={reducedMotion}
-            />
-          ) : (
-            <LightboxEmbed tile={tile} />
-          )}
+          <LightboxStage tile={tile} reducedMotion={reducedMotion} />
         </span>
       </figure>
       <motion.div
@@ -1362,7 +1398,11 @@ function LightboxView({
   );
 }
 
-export function WorkMasonry({ tiles }: WorkMasonryProps) {
+export function WorkMasonry({
+  tiles,
+  heading = "Play",
+  id = "play",
+}: WorkMasonryProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -1766,10 +1806,10 @@ export function WorkMasonry({ tiles }: WorkMasonryProps) {
   } as CSSProperties;
 
   return (
-      <section className="work-masonry" aria-labelledby="work-gallery-heading">
+      <section id={id} className="work-masonry" aria-labelledby={`${id}-heading`}>
         <div className="work-section-head">
-          <h2 id="work-gallery-heading" className="work-section-title">
-            Work
+          <h2 id={`${id}-heading`} className="work-section-title">
+            {heading}
           </h2>
         </div>
         <div className="work-masonry-body">
