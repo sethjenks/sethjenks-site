@@ -52,10 +52,10 @@ import {
 } from "three/tsl";
 
 const ABSORPTION = 4;
-const ROUGHNESS = 0.355;
-const IOR = 1.7;
-const REFLECTIONS = 1.25;
-const THICKNESS = 8;
+const ROUGHNESS = 0.78;
+const IOR = 1.18;
+const REFLECTIONS = 0.32;
+const THICKNESS = 2.2;
 const BACKGROUND = "#fafafa";
 
 export type BoardRenderer = {
@@ -91,9 +91,9 @@ function studioEnvironment() {
     for (let x = 0; x < width; x += 1) {
       const u = x / width;
       const v = y / height;
-      const windowA = Math.exp(-(((u - 0.22) / 0.014) ** 2) - (((v - 0.4) / 0.24) ** 8)) * 9;
-      const windowB = Math.exp(-(((u - 0.73) / 0.009) ** 2) - (((v - 0.42) / 0.28) ** 8)) * 12;
-      const ceiling = Math.exp(-(((v - 0.15) / 0.15) ** 2)) * 1.1;
+      const windowA = Math.exp(-(((u - 0.22) / 0.08) ** 2) - (((v - 0.4) / 0.32) ** 2)) * 1.4;
+      const windowB = Math.exp(-(((u - 0.73) / 0.1) ** 2) - (((v - 0.42) / 0.36) ** 2)) * 1.1;
+      const ceiling = Math.exp(-(((v - 0.15) / 0.22) ** 2)) * 0.55;
       const shade = Math.exp(-(((u - 0.48) / 0.15) ** 4) - (((v - 0.48) / 0.35) ** 8)) * 0.25;
       const value = 0.36 + ceiling + windowA + windowB - shade;
       const index = (y * width + x) * 4;
@@ -199,6 +199,7 @@ export async function createBoardGel(canvas: HTMLCanvasElement): Promise<BoardGe
 
   const piece = (color: string, geometry: BufferGeometry) => {
     const absorption = uniform(absorptionOf(color));
+    const tint = uniform(new Color(color));
     const center = new Vector3();
     const centerNode = uniform(center);
     const material = new MeshBasicNodeMaterial();
@@ -278,7 +279,7 @@ export async function createBoardGel(canvas: HTMLCanvasElement): Promise<BoardGe
       radiance.addAssign(
         exp(absorption.mul(traveled.mul(thickness).negate())).mul(transmit).mul(shade(ray, origin, centerNode)),
       );
-      return radiance.max(vec3(0));
+      return mix(radiance, tint, float(0.78)).max(vec3(0));
     })();
 
     let back = new GelMesh(geometry, backMaterial);
@@ -288,17 +289,17 @@ export async function createBoardGel(canvas: HTMLCanvasElement): Promise<BoardGe
     const gelPiece: GelPiece = {
       material,
       sync(mesh) {
-        back.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-        back.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
-        back.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+        back.position.copy(mesh.position);
+        back.quaternion.copy(mesh.quaternion);
+        back.scale.copy(mesh.scale);
         center.set(mesh.position.x, mesh.position.y, mesh.position.z);
       },
       retarget(next) {
         const replacement = new GelMesh(next, backMaterial);
         replacement.frustumCulled = false;
-        replacement.position.set(back.position.x, back.position.y, back.position.z);
-        replacement.rotation.set(back.rotation.x, back.rotation.y, back.rotation.z);
-        replacement.scale.set(back.scale.x, back.scale.y, back.scale.z);
+        replacement.position.copy(back.position);
+        replacement.quaternion.copy(back.quaternion);
+        replacement.scale.copy(back.scale);
         backScene.remove(back);
         backScene.add(replacement);
         back = replacement;
@@ -323,8 +324,8 @@ export async function createBoardGel(canvas: HTMLCanvasElement): Promise<BoardGe
       const light = normalize(vec3(0.32, 0.86, 0.48));
       const wrap = dot(normal, light).mul(0.5).add(0.5);
       const halfDir = normalize(light.add(view));
-      const spec = pow(max(dot(normal, halfDir), float(0)), float(64));
-      return ink.mul(float(0.62).add(wrap.mul(0.9))).add(vec3(spec.mul(0.55)));
+      const spec = pow(max(dot(normal, halfDir), float(0)), float(28));
+      return ink.mul(float(0.84).add(wrap.mul(0.2))).add(vec3(spec.mul(0.08)));
     })();
     const gelPiece: GelPiece = {
       material,

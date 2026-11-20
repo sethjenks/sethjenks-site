@@ -1594,8 +1594,10 @@
     transition: transform 480ms ease;
   }
 
-  .selected-card:hover .selected-image {
-    transform: scale(1.035);
+  @media (hover: hover) and (pointer: fine) {
+    .selected-card:hover .selected-image {
+      transform: scale(1.035);
+    }
   }
 
   .selected-overlay {

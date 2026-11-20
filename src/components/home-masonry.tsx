@@ -5,18 +5,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 
+import { BoardFilterBar, useBoardFilter, type BoardFilter } from "@/components/board-filters";
 import { BoardStage } from "@/components/board-stage";
 import { prefetchCollection } from "@/lib/collections";
 import type { HomeCard, TileBackground, TileForeground, TileHover } from "@/lib/home";
-
-const FILTERS = [
-  { id: "product", label: "Product" },
-  { id: "brand", label: "Brand" },
-  { id: "play", label: "Play" },
-  { id: "all", label: "All" },
-] as const;
-
-type BoardFilter = (typeof FILTERS)[number]["id"];
 
 const WIDE_BOARD = "(min-width: 1100px)";
 const HOVER_GROW = 2.8;
@@ -33,7 +25,7 @@ type OpenCard = {
 };
 
 export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
-  const [filter, setFilter] = useState<BoardFilter>("product");
+  const { filter, revision } = useBoardFilter();
   const [open, setOpen] = useState<OpenCard | null>(null);
   const [releasing, setReleasing] = useState(false);
   const masonryRef = useRef<HTMLDivElement>(null);
@@ -42,8 +34,9 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
     .filter((column) => column.length > 0);
 
   useEffect(() => {
+    setOpen(null);
     releaseBoard(masonryRef.current, false);
-  }, [filter]);
+  }, [filter, revision]);
 
   useEffect(() => {
     const root = masonryRef.current;
@@ -102,22 +95,7 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
 
   return (
     <>
-      <div className="board-filters" role="group" aria-label="Filter work">
-        {FILTERS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className="board-filter"
-            aria-pressed={filter === item.id}
-            onClick={() => {
-              setOpen(null);
-              setFilter(item.id);
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <BoardFilterBar placement="top" />
       <div
         className="board-masonry"
         data-cols={visible.length}

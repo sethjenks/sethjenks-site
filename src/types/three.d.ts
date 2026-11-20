@@ -13,7 +13,26 @@ declare module "three" {
     y: number;
     z: number;
     set(x: number, y: number, z: number): this;
+    copy(vector: Vector3): this;
     unproject(camera: Camera): this;
+  }
+
+  export class Euler {
+    constructor(x?: number, y?: number, z?: number, order?: string);
+    x: number;
+    y: number;
+    z: number;
+  }
+
+  export class Quaternion {
+    constructor(x?: number, y?: number, z?: number, w?: number);
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    set(x: number, y: number, z: number, w: number): this;
+    copy(quaternion: Quaternion): this;
+    setFromEuler(euler: Euler): this;
   }
 
   export class Color {
@@ -40,9 +59,17 @@ declare module "three" {
     getDelta(): number;
   }
 
+  export class BufferAttribute {
+    count: number;
+    getX(index: number): number;
+    getY(index: number): number;
+    getZ(index: number): number;
+  }
+
   export class BufferGeometry {
     dispose(): void;
     computeVertexNormals(): void;
+    getAttribute(name: string): BufferAttribute | undefined;
   }
 
   export class Material {
@@ -99,6 +126,7 @@ declare module "three" {
 
   export class Object3D {
     position: Vector3;
+    quaternion: Quaternion;
     rotation: Vector3 & { set(x: number, y: number, z: number): void };
     scale: Vector3 & { setScalar(scale: number): void };
     renderOrder: number;

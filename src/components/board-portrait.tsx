@@ -1,9 +1,63 @@
 "use client";
 
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion, useSpring } from "motion/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+
+type AdapterOptions = {
+  powerPreference?: "low-power" | "high-performance";
+};
+
+type GpuAdapterHost = {
+  requestAdapter: (options?: AdapterOptions) => Promise<unknown>;
+};
+
+const patchedGpuAdapters = new WeakSet<GpuAdapterHost>();
+
+// Phones often have WebGPU but return no adapter when powerPreference is
+// high-performance. Retry without that preference, then with low-power.
+function preferAnyWebGPUAdapter() {
+  const gpu = readGpu(navigator);
+  if (!gpu || patchedGpuAdapters.has(gpu)) return;
+  patchedGpuAdapters.add(gpu);
+  const requestAdapter = gpu.requestAdapter.bind(gpu);
+  gpu.requestAdapter = async (options) => {
+    const first = await requestQuiet(requestAdapter, options);
+    if (first || !options?.powerPreference) return first;
+    const relaxed = await requestQuiet(requestAdapter, omitPowerPreference(options));
+    if (relaxed) return relaxed;
+    return requestQuiet(requestAdapter, {
+      ...omitPowerPreference(options),
+      powerPreference: "low-power",
+    });
+  };
+}
+
+function readGpu(host: Navigator): GpuAdapterHost | undefined {
+  const candidate = host as Navigator & { gpu?: { requestAdapter?: unknown } };
+  if (!candidate.gpu || typeof candidate.gpu.requestAdapter !== "function") return undefined;
+  return candidate.gpu as GpuAdapterHost;
+}
+
+function omitPowerPreference(options: AdapterOptions): AdapterOptions {
+  const rest: AdapterOptions = { ...options };
+  delete rest.powerPreference;
+  return rest;
+}
+
+async function requestQuiet(
+  requestAdapter: GpuAdapterHost["requestAdapter"],
+  options?: AdapterOptions,
+) {
+  try {
+    return await requestAdapter(options);
+  } catch {
+    return null;
+  }
+}
+
+if (typeof navigator !== "undefined") preferAnyWebGPUAdapter();
 
 function loadPortraitShader() {
   return import("@/components/board-portrait-shader");
@@ -15,6 +69,8 @@ const PortraitShader = dynamic(
 );
 
 type PlayPhase = "still" | "hover" | "liquid";
+
+const PORTRAIT_SPRING = { visualDuration: 0.22, bounce: 0.3 };
 
 const RIPPLE_DECAY = 7;
 const RIPPLE_SETTLE_MS = rippleSettleMs(RIPPLE_DECAY);
@@ -28,6 +84,8 @@ function rippleSettleMs(decay: number) {
 
 export function BoardPortrait({ src }: { src?: string }) {
   const reduced = useReducedMotion();
+  const portraitRef = useRef<HTMLDivElement>(null);
+  const size = useSpring(0, PORTRAIT_SPRING);
   const [gpu, setGpu] = useState(false);
   const [failed, setFailed] = useState(false);
   const [phase, setPhase] = useState<PlayPhase>("still");
@@ -41,6 +99,66 @@ export function BoardPortrait({ src }: { src?: string }) {
   useEffect(() => {
     setGpu("gpu" in navigator);
   }, []);
+
+  useLayoutEffect(() => {
+    const portrait = portraitRef.current;
+    if (!portrait || reduced !== false) {
+      portrait?.style.removeProperty("--portrait-p");
+      return;
+    }
+
+    const board = portrait.closest(".home-board");
+    if (!(board instanceof HTMLElement)) return;
+
+    const readLeave = () => {
+      const rail = Number.parseFloat(getComputedStyle(board).getPropertyValue("--rail"));
+      if (!Number.isFinite(rail)) return 0;
+      return Math.min(1, Math.max(0, rail * 10));
+    };
+
+    const apply = (value: number) => {
+      portrait.style.setProperty("--portrait-p", value.toFixed(4));
+    };
+
+    const desktop = window.matchMedia("(min-width: 720px)");
+    let target = readLeave();
+    let following = desktop.matches;
+    if (following) {
+      size.jump(target);
+      apply(size.get());
+    }
+    const stop = size.on("change", apply);
+
+    let frame = 0;
+    const follow = () => {
+      if (!desktop.matches) {
+        if (following) {
+          following = false;
+          target = 0;
+          size.jump(0);
+          portrait.style.removeProperty("--portrait-p");
+        }
+      } else if (!following) {
+        following = true;
+        target = readLeave();
+        size.jump(target);
+        apply(size.get());
+      } else {
+        const next = readLeave();
+        if (Math.abs(next - target) > 0.0001) {
+          target = next;
+          size.set(next);
+        }
+      }
+      frame = requestAnimationFrame(follow);
+    };
+    frame = requestAnimationFrame(follow);
+    return () => {
+      cancelAnimationFrame(frame);
+      stop();
+      portrait.style.removeProperty("--portrait-p");
+    };
+  }, [reduced, size]);
 
   useEffect(() => {
     return () => {
@@ -84,6 +202,7 @@ export function BoardPortrait({ src }: { src?: string }) {
 
   return (
     <div
+      ref={portraitRef}
       className="board-portrait"
       data-play={canPlay && phase !== "still" ? phase : undefined}
       onPointerEnter={() => {

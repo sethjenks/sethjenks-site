@@ -87,7 +87,7 @@ function StudyBar({
             ))}
           </span>
         ) : null}
-        <Link className="mosaic-close" href={overlay ? "/" : "/#work"} aria-label="Close">
+        <Link className="mosaic-close" href="/" aria-label="Close">
           <HugeiconsIcon
             icon={Cancel01Icon}
             size={16}

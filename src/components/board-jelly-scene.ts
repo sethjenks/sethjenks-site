@@ -1,3 +1,4 @@
+import type { Collider, RigidBody } from "@dimforge/rapier3d-compat";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
@@ -22,17 +23,14 @@ varying vec3 vWorld;
 void main() {
   vec3 viewDir = normalize(cameraPosition - vWorld);
   vec3 normal = normalize(vNormal);
-  float facing = abs(dot(normal, viewDir));
-  float fresnel = pow(1.0 - facing, 1.85);
   vec3 lightDir = normalize(vec3(0.32, 0.86, 0.48));
   float wrap = dot(normal, lightDir) * 0.5 + 0.5;
   vec3 halfDir = normalize(lightDir + viewDir);
-  float spec = pow(max(dot(normal, halfDir), 0.0), 48.0);
-  float glint = pow(max(dot(normal, halfDir), 0.0), 160.0);
-  vec3 jelly = uColor * (0.72 + wrap * 0.55) + spec * 0.85 + glint;
-  vec3 ink = vec3(0.045, 0.045, 0.05) * (0.62 + wrap * 0.7) + spec * 0.42;
+  float spec = pow(max(dot(normal, halfDir), 0.0), 28.0);
+  vec3 jelly = mix(uColor * (0.9 + wrap * 0.14) + spec * 0.12, uColor, 0.78);
+  vec3 ink = vec3(0.07, 0.075, 0.085) * (0.84 + wrap * 0.2) + spec * 0.08;
   vec3 color = mix(jelly, ink, uSolid);
-  float alpha = mix(mix(0.16, 0.82, fresnel), mix(0.97, 1.0, fresnel), uSolid);
+  float alpha = mix(0.92, 1.0, uSolid);
   gl_FragColor = vec4(color * alpha, alpha);
 }
 `;
@@ -52,12 +50,8 @@ type Body = {
   radius: number;
   x: number;
   y: number;
-  vx: number;
-  vy: number;
-  spin: number;
   squash: number;
   squashV: number;
-  asleep: boolean;
   hops: number;
   morph: number;
   head: THREE.BufferGeometry | null;
@@ -65,18 +59,20 @@ type Body = {
   mesh: THREE.Mesh;
   shadow: THREE.Mesh;
   gel: GelPiece | null;
+  rigid: RigidBody;
+  collider: Collider;
 };
 
 const RECIPES: readonly Recipe[] = [
-  { kind: "cube", color: "#ff159f", radius: 0.34, fx: 0.07, fy: 0.14 },
-  { kind: "ring", color: "#ff8a3d", radius: 0.27, fx: 0.18, fy: 0.4 },
-  { kind: "cube", color: "#ffc638", radius: 0.36, fx: 0.34, fy: 0.12 },
-  { kind: "sphere", color: "#11e4b3", radius: 0.25, fx: 0.46, fy: 0.36 },
-  { kind: "head", color: "#141414", radius: 0.5, fx: 0.24, fy: 0.34 },
-  { kind: "ring", color: "#4d86ff", radius: 0.3, fx: 0.68, fy: 0.42 },
-  { kind: "cube", color: "#b56bff", radius: 0.28, fx: 0.8, fy: 0.15 },
-  { kind: "sphere", color: "#ff5aa5", radius: 0.18, fx: 0.91, fy: 0.32 },
-  { kind: "ring", color: "#7ae0ff", radius: 0.16, fx: 0.96, fy: 0.14 },
+  { kind: "cube", color: "#c3d4e8", radius: 0.34, fx: 0.07, fy: 0.14 },
+  { kind: "ring", color: "#a9c0d8", radius: 0.27, fx: 0.18, fy: 0.4 },
+  { kind: "cube", color: "#d0dce8", radius: 0.36, fx: 0.34, fy: 0.12 },
+  { kind: "sphere", color: "#8eabca", radius: 0.25, fx: 0.46, fy: 0.36 },
+  { kind: "head", color: "#16181c", radius: 0.5, fx: 0.24, fy: 0.34 },
+  { kind: "ring", color: "#b4c8de", radius: 0.3, fx: 0.68, fy: 0.42 },
+  { kind: "cube", color: "#97b0cb", radius: 0.28, fx: 0.8, fy: 0.15 },
+  { kind: "sphere", color: "#c9d6e6", radius: 0.18, fx: 0.91, fy: 0.32 },
+  { kind: "ring", color: "#7d9dbd", radius: 0.16, fx: 0.96, fy: 0.14 },
 ];
 
 function jellyMaterial(color: string, solid: number) {
@@ -145,13 +141,30 @@ function shadowTexture() {
   }
 
   const gradient = context.createRadialGradient(32, 32, 2, 32, 32, 32);
-  gradient.addColorStop(0, "rgba(17, 17, 17, 0.22)");
+  gradient.addColorStop(0, "rgba(17, 17, 17, 0.12)");
   gradient.addColorStop(1, "rgba(17, 17, 17, 0)");
   context.fillStyle = gradient;
   context.fillRect(0, 0, 64, 64);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+function reachOf(body: Body) {
+  switch (body.kind) {
+    case "sphere":
+      return body.radius;
+    case "cube":
+      return body.radius * 1.05;
+    case "ring":
+      return body.radius * 1.15;
+    case "head":
+      return body.radius * 1.2;
+    default: {
+      const unreachable: never = body.kind;
+      return unreachable;
+    }
+  }
 }
 
 function separate(bodies: Body[]) {
@@ -166,7 +179,7 @@ function separate(bodies: Body[]) {
         const dx = b.x - a.x;
         const dy = b.y - a.y;
         const dist = Math.hypot(dx, dy) || 0.0001;
-        const min = (a.radius + b.radius) * 0.96;
+        const min = (reachOf(a) + reachOf(b)) * 0.96;
         if (dist >= min) {
           continue;
         }
@@ -184,14 +197,24 @@ function separate(bodies: Body[]) {
 
 export async function mountBoardJelly(canvas: HTMLCanvasElement) {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let gel: BoardGel | null = null;
-  try {
-    // three/webgpu reads `self` at module scope, so it has to load in the browser.
-    const module = await import("@/components/board-jelly-gel");
-    gel = await module.createBoardGel(canvas);
-  } catch (error) {
-    console.warn("Soft-matter jelly unavailable", error);
-  }
+  const [gel, rapier] = await Promise.all([
+    (async () => {
+      try {
+        // three/webgpu reads `self` at module scope, so it has to load in the browser.
+        const module = await import("@/components/board-jelly-gel");
+        return await module.createBoardGel(canvas);
+      } catch (error) {
+        console.warn("Soft-matter jelly unavailable", error);
+        return null;
+      }
+    })(),
+    (async () => {
+      // Rapier's wasm build initializes in the browser, after the server render.
+      const module = await import("@dimforge/rapier3d-compat");
+      await module.default.init();
+      return module.default;
+    })(),
+  ]);
 
   let renderer: BoardRenderer;
   if (gel) {
@@ -214,6 +237,120 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
+  const world = new rapier.World({ x: 0, y: -13, z: 0 });
+  world.timestep = 1 / 60;
+  world.numSolverIterations = 10;
+  const events = new rapier.EventQueue(true);
+  const colliders = new Map<number, Body>();
+  const REST = { x: 0, y: 0, z: 0, w: 1 };
+  const DEPTH = 0.58;
+
+  const fixedBox = (hx: number, hy: number, hz: number) => {
+    const wall = world.createRigidBody(rapier.RigidBodyDesc.fixed());
+    world.createCollider(
+      rapier.ColliderDesc.cuboid(hx, hy, hz).setFriction(0.9).setRestitution(0.42),
+      wall,
+    );
+    return wall;
+  };
+  const floorBody = fixedBox(30, 0.5, 3);
+  const ceilingBody = fixedBox(30, 0.5, 3);
+  const leftBody = fixedBox(0.5, 30, 3);
+  const rightBody = fixedBox(0.5, 30, 3);
+
+  const dress = (desc: ReturnType<typeof rapier.ColliderDesc.ball>) =>
+    desc
+      .setFriction(0.68)
+      .setRestitution(0.46)
+      .setDensity(1.35)
+      .setActiveEvents(rapier.ActiveEvents.CONTACT_FORCE_EVENTS)
+      .setContactForceEventThreshold(6);
+
+  const hullFrom = (geometry: THREE.BufferGeometry, depth: number) => {
+    const attr = geometry.getAttribute("position");
+    if (!attr || attr.count < 4) {
+      return null;
+    }
+    const stride = Math.max(1, Math.ceil(attr.count / 420));
+    const count = Math.ceil(attr.count / stride);
+    const points = new Float32Array(count * 3);
+    let write = 0;
+    for (let index = 0; index < attr.count; index += stride) {
+      points[write] = attr.getX(index);
+      points[write + 1] = attr.getY(index);
+      points[write + 2] = attr.getZ(index) * depth;
+      write += 3;
+    }
+    return rapier.ColliderDesc.convexHull(points);
+  };
+
+  const descriptor = (kind: JellyKind, radius: number, geometry: THREE.BufferGeometry) => {
+    switch (kind) {
+      case "sphere":
+        return dress(hullFrom(geometry, DEPTH) ?? rapier.ColliderDesc.ball(radius));
+      case "cube": {
+        const half = radius * 0.825;
+        const depth = half * DEPTH;
+        const border = Math.min(radius * 0.16, half * 0.4, depth * 0.4);
+        return dress(
+          rapier.ColliderDesc.roundCuboid(half - border, half - border, Math.max(0.04, depth - border), border),
+        );
+      }
+      case "head": {
+        const hull = hullFrom(geometry, 1);
+        return dress(hull ?? rapier.ColliderDesc.capsule(radius * 0.62, radius * 0.38));
+      }
+      case "ring": {
+        const major = radius * 0.72;
+        const tube = radius * 0.3;
+        const count = 12;
+        const shapes = [];
+        const positions = [];
+        const rotations = [];
+        for (let index = 0; index < count; index += 1) {
+          const angle = (index / count) * Math.PI * 2;
+          shapes.push(new rapier.Ball(tube));
+          positions.push({ x: Math.cos(angle) * major, y: Math.sin(angle) * major, z: 0 });
+          rotations.push(REST);
+        }
+        return dress(rapier.ColliderDesc.compound(shapes, positions, rotations));
+      }
+      default: {
+        const unreachable: never = kind;
+        return unreachable;
+      }
+    }
+  };
+
+  const restRotation = (kind: JellyKind, spin: number) => {
+    let rx = 0;
+    let ry = 0;
+    let rz = spin;
+    switch (kind) {
+      case "cube":
+        rx = 0.42;
+        ry = 0.55;
+        break;
+      case "ring":
+        rx = 0.25;
+        ry = 0.1;
+        break;
+      case "sphere":
+        break;
+      case "head":
+        rx = 0.12;
+        ry = 0.85;
+        rz = spin * 0.15;
+        break;
+      default: {
+        const unreachable: never = kind;
+        return unreachable;
+      }
+    }
+    const turn = new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz));
+    return { x: turn.x, y: turn.y, z: turn.z, w: turn.w };
+  };
+
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 40);
   camera.position.set(0, 0.1, 8.6);
@@ -226,6 +363,16 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     depthWrite: false,
     premultipliedAlpha: true,
   });
+
+  const bind = (rigid: RigidBody, kind: JellyKind, radius: number, geometry: THREE.BufferGeometry, previous?: Collider) => {
+    if (previous) {
+      colliders.delete(previous.handle);
+      world.removeCollider(previous, true);
+    }
+    const collider = world.createCollider(descriptor(kind, radius, geometry), rigid);
+    rigid.recomputeMassPropertiesFromColliders();
+    return collider;
+  };
 
   const head = await headGeometry(0.5);
   const bodies: Body[] = RECIPES.map((recipe) => {
@@ -247,17 +394,25 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     shadow.position.z = -0.35;
     scene.add(shadow);
 
-    return {
+    const spin = recipe.kind === "cube" ? recipe.fx * 4 : 0;
+    const rigid = world.createRigidBody(
+      rapier.RigidBodyDesc.dynamic()
+        .setTranslation(0, 0, 0)
+        .setRotation(restRotation(recipe.kind, spin))
+        .enabledTranslations(true, true, false)
+        .setLinearDamping(0.12)
+        .setAngularDamping(0.28)
+        .setCcdEnabled(true)
+        .setCanSleep(true),
+    );
+    const collider = bind(rigid, recipe.kind, recipe.radius, geometry);
+    const body: Body = {
       kind: recipe.kind,
       radius: recipe.radius,
       x: 0,
       y: 0,
-      vx: 0,
-      vy: 0,
-      spin: recipe.kind === "cube" ? recipe.fx * 4 : 0,
       squash: 0,
       squashV: 0,
-      asleep: false,
       hops: 0,
       morph: 0,
       head: recipe.kind === "head" ? geometry : null,
@@ -265,7 +420,11 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
       mesh,
       shadow,
       gel: gelPiece,
+      rigid,
+      collider,
     };
+    colliders.set(collider.handle, body);
+    return body;
   });
 
   const hit = new THREE.Vector3();
@@ -306,6 +465,14 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     floor = bottom.y;
     ceiling = top.y - 0.18;
     halfW = Math.abs(edge.x) - 0.12;
+    const mid = (floor + ceiling) / 2;
+    floorBody.setTranslation({ x: 0, y: floor - 0.5, z: 0 }, false);
+    ceilingBody.setTranslation({ x: 0, y: ceiling + 0.5, z: 0 }, false);
+    leftBody.setTranslation({ x: -halfW - 0.5, y: mid, z: 0 }, false);
+    rightBody.setTranslation({ x: halfW + 0.5, y: mid, z: 0 }, false);
+    for (const body of bodies) {
+      body.rigid.wakeUp();
+    }
   };
 
   const place = () => {
@@ -317,11 +484,25 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
         continue;
       }
       body.x = -halfW + recipe.fx * halfW * 2;
-      body.y = floor + body.radius + recipe.fy * (ceiling - floor) * 0.62;
-      body.vx = 0;
-      body.vy = 0;
+      body.y = floor + reachOf(body) + recipe.fy * (ceiling - floor) * 0.62;
+      body.squash = 0;
+      body.squashV = 0;
+      body.hops = 0;
+      body.morph = 0;
     }
     separate(bodies);
+    for (let index = 0; index < bodies.length; index += 1) {
+      const body = bodies[index];
+      const recipe = RECIPES[index];
+      if (!body || !recipe) {
+        continue;
+      }
+      const spin = recipe.kind === "cube" ? recipe.fx * 4 : 0;
+      body.rigid.setTranslation({ x: body.x, y: body.y, z: 0 }, true);
+      body.rigid.setRotation(restRotation(recipe.kind, spin), true);
+      body.rigid.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      body.rigid.setAngvel({ x: 0, y: 0, z: 0 }, true);
+    }
     placed = true;
   };
 
@@ -356,7 +537,7 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     let bestDist = Infinity;
     for (const body of bodies) {
       const dist = Math.hypot(body.x - x, body.y - y);
-      if (dist < body.radius * 1.28 && dist < bestDist) {
+      if (dist < reachOf(body) * 1.25 && dist < bestDist) {
         best = body;
         bestDist = dist;
       }
@@ -390,14 +571,16 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     const geometry = kind === "head" ? (body.head ?? shapeGeometry("sphere", body.radius)) : shapeGeometry(kind, body.radius);
     const mesh = new THREE.Mesh(geometry, material);
     mesh.frustumCulled = false;
-    mesh.position.set(body.mesh.position.x, body.mesh.position.y, body.mesh.position.z);
-    mesh.rotation.set(body.mesh.rotation.x, body.mesh.rotation.y, body.mesh.rotation.z);
-    mesh.scale.set(body.mesh.scale.x, body.mesh.scale.y, body.mesh.scale.z);
+    mesh.position.copy(body.mesh.position);
+    mesh.quaternion.copy(body.mesh.quaternion);
+    mesh.scale.copy(body.mesh.scale);
     scene.remove(body.mesh);
     scene.add(mesh);
     body.mesh = mesh;
     body.gel?.retarget(geometry);
     body.kind = kind;
+    body.collider = bind(body.rigid, kind, body.radius, geometry, body.collider);
+    colliders.set(body.collider.handle, body);
     if (previous !== geometry && previous !== body.head) {
       previous.dispose();
     }
@@ -405,12 +588,25 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
 
   const launch = (body: Body) => {
     const direction = Math.random() < 0.5 ? -1 : 1;
-    body.asleep = false;
     body.hops = 1.05;
     body.morph = 0;
-    body.vx = direction * (2.4 + Math.random() * 1.6);
-    body.vy = 4.6 + Math.random() * 1.1;
-    body.spin += direction * (1.4 + Math.random());
+    body.rigid.wakeUp();
+    body.rigid.setLinvel(
+      {
+        x: direction * (3.4 + Math.random() * 1.6),
+        y: 8.2 + Math.random() * 1.2,
+        z: 0,
+      },
+      true,
+    );
+    body.rigid.setAngvel(
+      {
+        x: direction * (1.6 + Math.random()),
+        y: (Math.random() - 0.5) * 1.8,
+        z: direction * (2.4 + Math.random() * 2),
+      },
+      true,
+    );
     body.squashV = -1.1;
   };
 
@@ -424,7 +620,7 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     }
     held = body;
     dragged = false;
-    body.asleep = false;
+    body.rigid.wakeUp();
     pointerX = hit.x;
     pointerY = hit.y;
     pointerAt = performance.now();
@@ -441,6 +637,9 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
       return;
     }
     if (Math.hypot(event.clientX - downClientX, event.clientY - downClientY) > 8) {
+      if (!dragged) {
+        held.rigid.setBodyType(rapier.RigidBodyType.KinematicPositionBased, true);
+      }
       dragged = true;
     }
     const now = performance.now();
@@ -460,10 +659,11 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
       launch(held);
     } else {
       const speed = Math.hypot(pointerVx, pointerVy);
-      const max = 11;
+      const max = 14;
       const scale = speed > max ? max / speed : 1;
-      held.vx = pointerVx * scale;
-      held.vy = pointerVy * scale;
+      held.rigid.setBodyType(rapier.RigidBodyType.Dynamic, true);
+      held.rigid.setLinvel({ x: pointerVx * scale, y: pointerVy * scale, z: 0 }, true);
+      held.rigid.setAngvel({ x: 0, y: 0, z: pointerVx * 0.12 }, true);
       held.hops = 0;
       held.morph = 0;
     }
@@ -471,183 +671,40 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     canvas.style.cursor = "";
   };
 
-  const collide = () => {
-    for (let i = 0; i < bodies.length; i += 1) {
-      const a = bodies[i];
-      if (!a) {
-        continue;
-      }
-      const limit = halfW - a.radius;
-      if (a.x < -limit) {
-        a.x = -limit;
-        if (!a.asleep) {
-          a.vx = Math.abs(a.vx) * 0.62;
-        }
-      } else if (a.x > limit) {
-        a.x = limit;
-        if (!a.asleep) {
-          a.vx = -Math.abs(a.vx) * 0.62;
-        }
-      }
-      const bottom = floor + a.radius;
-      const top = ceiling - a.radius;
-      if (a.asleep) {
-        a.y = Math.max(a.y, bottom);
-      } else if (a.y < bottom) {
-        const impact = Math.max(0, -a.vy);
-        a.y = bottom;
-        if (a.hops > 0 && impact > 0.35) {
-          a.vy = impact * 0.62;
-          a.vx *= 0.96;
-          a.squashV -= impact * 2.2;
-        } else {
-          a.vy = 0;
-          a.vx *= 0.45;
-          if (Math.abs(a.vx) < 0.18) {
-            a.vx = 0;
-          }
-          if (impact > 0.9) {
-            a.squashV -= impact * 1.5;
-          }
-        }
-      } else if (a.y > top) {
-        a.y = top;
-        a.vy = -Math.abs(a.vy) * 0.45;
-      }
-
-      for (let j = i + 1; j < bodies.length; j += 1) {
-        const b = bodies[j];
-        if (!b) {
-          continue;
-        }
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const dist = Math.hypot(dx, dy) || 0.0001;
-        const min = (a.radius + b.radius) * 0.94;
-        if (dist >= min) {
-          continue;
-        }
-        const nx = dx / dist;
-        const ny = dy / dist;
-        const overlap = min - dist;
-        if (a.asleep && b.asleep) {
-          continue;
-        }
-        const shove = (mover: Body, amount: number) => {
-          if (mover === held || mover.asleep) {
-            return;
-          }
-          mover.x += nx * amount;
-          mover.y += ny * amount;
-        };
-        if (a.asleep) {
-          shove(b, overlap);
-          if (b !== held && b.hops === 0 && b.vy * ny < 0) {
-            b.vy = 0;
-            b.vx *= 0.4;
-          }
-        } else if (b.asleep) {
-          shove(a, -overlap);
-          if (a !== held && a.hops === 0 && a.vy * ny > 0) {
-            a.vy = 0;
-            a.vx *= 0.4;
-          }
-        } else {
-          shove(a, -overlap * 0.5);
-          shove(b, overlap * 0.5);
-        }
-        const rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-        if (rel >= 0 || a.hops + b.hops === 0) {
-          continue;
-        }
-        const impulse = -(1.05 * rel) / 2;
-        if (!a.asleep && a !== held) {
-          a.vx -= impulse * nx * (b.asleep ? 2 : 1);
-          a.vy -= impulse * ny * (b.asleep ? 2 : 1);
-          a.spin += impulse * 0.2;
-          a.squash = Math.min(a.squash, -Math.min(0.28, overlap * 1.4));
-        }
-        if (!b.asleep && b !== held) {
-          b.vx += impulse * nx * (a.asleep ? 2 : 1);
-          b.vy += impulse * ny * (a.asleep ? 2 : 1);
-          b.spin -= impulse * 0.2;
-          b.squash = Math.min(b.squash, -Math.min(0.28, overlap * 1.4));
-        }
-      }
-    }
-  };
+  let leftover = 0;
 
   const deform = (body: Body) => {
-    const speed = body.asleep ? 0 : Math.hypot(body.vx, body.vy);
-    const stretch = Math.min(0.48, speed * 0.07);
-    let compress = body.asleep ? 0 : body.squash;
+    const vel = body.rigid.linvel();
+    const speed = Math.hypot(vel.x, vel.y);
+    const stretch = Math.min(0.14, speed * 0.012);
+    let compress = body.squash;
     if (body.morph > 0) {
-      compress -= Math.sin((1 - body.morph / 0.56) * Math.PI) * 0.62;
+      compress -= Math.sin((1 - body.morph / 0.56) * Math.PI) * 0.34;
     }
-    const sy = Math.max(0.28, 1 + compress - stretch * 0.85);
-    const sx = Math.max(0.42, 1 - compress * 0.72 + stretch * 1.15);
-    const sz = Math.max(0.46, 1 - compress * 0.28);
-    const jelly = body.kind === "head" ? 0.6 : 1;
-    return {
-      sx: 1 + (sx - 1) * jelly,
-      sy: 1 + (sy - 1) * jelly,
-      sz: 1 + (sz - 1) * jelly,
-    };
-  };
-
-  const yReach = (rx: number, ry: number, rz: number, hx: number, hy: number, hz: number) => {
-    const a = Math.cos(rx);
-    const b = Math.sin(rx);
-    const c = Math.cos(ry);
-    const d = Math.sin(ry);
-    const e = Math.cos(rz);
-    const f = Math.sin(rz);
-    return hx * Math.abs(a * f + b * d * e) + hy * Math.abs(a * e - b * d * f) + hz * Math.abs(b * c);
-  };
-
-  const footOf = (body: Body) => {
-    const span = body.radius;
-    switch (body.kind) {
-      case "sphere":
-        return span;
-      case "cube": {
-        const half = span * 0.78;
-        return yReach(0.42, 0.55, body.spin, half, half, half);
-      }
-      case "ring": {
-        const outer = span * 0.96;
-        return yReach(0.15, body.spin * 0.25, 0, outer, outer, span * 0.28);
-      }
-      case "head":
-        return yReach(0.12, 0.85, body.spin * 0.15, span * 0.78, span * 1.02, span * 0.78);
-      default: {
-        const unreachable: never = body.kind;
-        return unreachable;
-      }
-    }
+    const sy = Math.max(0.7, 1 + compress * 0.5 - stretch);
+    const sx = Math.max(0.7, 1 - compress * 0.38 + stretch);
+    const depth = body.kind === "head" ? 1 : DEPTH;
+    const sz = depth * Math.max(0.78, 1 - compress * 0.16);
+    return { sx, sy, sz };
   };
 
   const render = () => {
     for (const body of bodies) {
+      const pos = body.rigid.translation();
+      const rot = body.rigid.rotation();
+      body.x = pos.x;
+      body.y = pos.y;
+      body.mesh.position.set(pos.x, pos.y, 0);
+      body.mesh.quaternion.set(rot.x, rot.y, rot.z, rot.w);
       const { sx, sy, sz } = deform(body);
-      const moving = Math.hypot(body.vx, body.vy) > 0.4;
-      const tilt = body.kind === "head" || !moving ? 0 : Math.atan2(body.vy, body.vx);
-      if (body.kind === "head") {
-        body.mesh.rotation.set(0.12, 0.85, body.spin * 0.15);
-      } else if (body.kind === "cube") {
-        body.mesh.rotation.set(0.42, 0.55, body.spin);
-      } else {
-        body.mesh.rotation.set(0.15, body.spin * 0.25, tilt * 0.35);
-      }
       body.mesh.scale.set(sx, sy, sz);
-      body.mesh.position.set(body.x, body.y - body.radius + footOf(body) * sy, 0);
       body.gel?.sync(body.mesh);
-      const lift = (body.y - (floor + body.radius)) / 2.4;
+      const lift = Math.max(0, body.y - floor - reachOf(body)) / 2.2;
       body.shadow.position.set(body.x, floor + 0.02, -0.4);
-      body.shadow.scale.set(body.radius * (1.35 - lift * 0.4), body.radius * 0.42, 1);
+      body.shadow.scale.set(body.radius * (1.35 - Math.min(0.5, lift) * 0.4), body.radius * 0.42, 1);
       const material = body.shadow.material;
       if (material instanceof THREE.MeshBasicMaterial) {
-        material.opacity = Math.max(0.04, 0.9 - lift);
+        material.opacity = Math.max(0.04, 0.85 - lift * 0.35);
       }
     }
     camera.updateMatrixWorld();
@@ -655,111 +712,67 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     renderer.render(scene, camera);
   };
 
-  const settle = (body: Body) => {
-    if (body === held || body.hops > 0 || body.morph > 0) {
-      body.asleep = false;
+  const bump = (handle: number, hit: number) => {
+    const body = colliders.get(handle);
+    if (!body || body === held) {
       return;
     }
-    const speed = Math.hypot(body.vx, body.vy);
-    const grounded = body.y <= floor + body.radius + 0.03;
-    const reach = body.asleep ? 1.25 : 1.06;
-    let supported = grounded;
-    if (!supported) {
-      for (const other of bodies) {
-        if (other === body || other.y > body.y + 0.02) {
-          continue;
-        }
-        const dist = Math.hypot(other.x - body.x, other.y - body.y);
-        if (dist < (body.radius + other.radius) * reach) {
-          supported = true;
-          break;
-        }
-      }
-    }
-    let crowded = false;
-    for (const other of bodies) {
-      if (other === body) {
-        continue;
-      }
-      const dist = Math.hypot(other.x - body.x, other.y - body.y);
-      if (dist < (body.radius + other.radius) * 0.9) {
-        crowded = true;
-        break;
-      }
-    }
-    if (!supported || crowded || speed > 0.16 || Math.abs(body.squash) > 0.02) {
-      body.asleep = false;
-      return;
-    }
-    if (grounded) {
-      body.y = floor + body.radius;
-    }
-    body.vx = 0;
-    body.vy = 0;
-    body.squash = 0;
-    body.squashV = 0;
-    body.asleep = true;
+    body.squashV -= hit * 8;
   };
 
   const step = (dt: number) => {
     for (const body of bodies) {
-      if (body.asleep && body !== held) {
-        continue;
-      }
-      if (body === held && dragged) {
-        const dx = pointerX - body.x;
-        const dy = pointerY - body.y;
-        body.vx += dx * 36 * dt;
-        body.vy += dy * 36 * dt;
-        body.vx *= 0.78;
-        body.vy *= 0.78;
-      } else if (body !== held) {
-        body.vy -= 7.4 * dt;
-        body.vx *= 0.992;
-        body.vy *= 0.992;
-      }
       if (body.hops > 0) {
         body.hops = Math.max(0, body.hops - dt);
         if (body.hops === 0) {
           body.morph = 0.56;
-          body.vy = Math.min(body.vy, 1.4);
+          const vel = body.rigid.linvel();
+          body.rigid.setLinvel({ x: vel.x * 0.85, y: Math.min(vel.y, 1.8), z: 0 }, true);
         }
       }
       if (body.morph > 0) {
         const before = body.morph;
         body.morph = Math.max(0, body.morph - dt);
-        body.vx *= 0.9;
         if (before > 0.28 && body.morph <= 0.28) {
           adopt(body, nextKind(body));
         }
       }
-      body.squashV += (-90 * body.squash - 19 * body.squashV) * dt;
+      body.squashV += (-70 * body.squash - 16 * body.squashV) * dt;
       body.squash += body.squashV * dt;
       if (Math.abs(body.squash) < 0.008 && Math.abs(body.squashV) < 0.05) {
         body.squash = 0;
         body.squashV = 0;
       } else {
-        body.squash = Math.max(-0.48, Math.min(0.22, body.squash));
-      }
-      body.x += body.vx * dt;
-      body.y += body.vy * dt;
-      if (!body.asleep && Math.abs(body.vx) > 0.2) {
-        body.spin += body.vx * dt * 0.18;
+        body.squash = Math.max(-0.42, Math.min(0.18, body.squash));
       }
     }
-    collide();
-    for (const body of bodies) {
-      settle(body);
+    leftover = Math.min(0.1, leftover + dt);
+    let substeps = 0;
+    while (leftover >= world.timestep && substeps < 4) {
+      if (held && dragged) {
+        held.rigid.setNextKinematicTranslation({ x: pointerX, y: pointerY, z: 0 });
+        held.rigid.setNextKinematicRotation(held.rigid.rotation());
+      }
+      world.step(events);
+      events.drainContactForceEvents((event) => {
+        const hit = Math.min(0.4, event.maxForceMagnitude() / 64);
+        bump(event.collider1(), hit);
+        bump(event.collider2(), hit);
+      });
+      leftover -= world.timestep;
+      substeps += 1;
     }
   };
+
 
   const tick = () => {
     frame = window.requestAnimationFrame(tick);
     if (document.hidden) {
+      clock.getDelta();
       return;
     }
     const dt = Math.min(0.033, clock.getDelta());
-    if (!reduce) {
+    if (!reduce && placed) {
       step(dt);
     }
     render();
@@ -802,5 +815,7 @@ export async function mountBoardJelly(canvas: HTMLCanvasElement) {
     } else {
       renderer.dispose();
     }
+    events.free();
+    world.free();
   };
 }

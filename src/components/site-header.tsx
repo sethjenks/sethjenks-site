@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import { SoftMatterMark } from "@/components/soft-matter-mark";
 
 const NAV = [
-  { href: "/#work", label: "Work" },
-  { href: "/#play", label: "Play" },
+  { href: "/", label: "Work" },
   { href: "/journal", label: "Journal" },
 ] as const;
 
@@ -15,8 +14,8 @@ function navCurrent(pathname: string, href: (typeof NAV)[number]["href"]) {
     return pathname === "/journal" || pathname.startsWith("/journal/");
   }
 
-  if (href === "/#work") {
-    return pathname.startsWith("/work");
+  if (href === "/") {
+    return pathname === "/";
   }
 
   return false;

@@ -9,7 +9,7 @@ export default async function Home() {
     <HomeBoard
       board={board}
       name={INTRO.name}
-      headline="Designer who builds."
+      headline="Design leader who builds."
       bio={INTRO.paragraphs[0] ?? ""}
     />
   );

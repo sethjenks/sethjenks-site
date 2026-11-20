@@ -442,7 +442,15 @@ function StageBody({
   switch (opening.kind) {
     case "video":
       return (
-        <video src={opening.src} poster={opening.poster} controls playsInline autoPlay loop />
+        <video
+          src={opening.src}
+          poster={opening.poster}
+          controls
+          playsInline
+          autoPlay={!reduce}
+          loop={!reduce}
+          muted={reduce}
+        />
       );
     case "image":
       return (

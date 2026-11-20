@@ -11,6 +11,7 @@
     "manifests": "node scripts/fetch-nft-manifests.mjs"
   },
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
     "@hugeicons/core-free-icons": "^4.3.5",
     "@hugeicons/react": "^1.1.10",
     "@tldraw/sync": "^5.5.2",
