@@ -45,8 +45,8 @@ export function CardTunePanel({
   const [open, setOpen] = useState(true);
   const [pos, setPos] = useState({ x: 0, y: 72 });
   const posRef = useRef(pos);
-  const panelRef = useRef<HTMLAsideElement>(null);
-  const headRef = useRef<HTMLHeaderElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const headRef = useRef<HTMLElement>(null);
   const placed = useRef(false);
 
   useEffect(() => {
