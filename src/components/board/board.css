@@ -381,3 +381,200 @@ html:has(.board-presentation-loop) {
     scale: 1;
   }
 }
+
+/* Phone screenshot pager. Same field, type, and close control as the open card. */
+.phone-sheet {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  block-size: 100dvh;
+  overflow: clip;
+  background: #ededed;
+  color: #111;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html:has(.phone-sheet) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.phone-sheet-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-block-size: 44px;
+  padding-block: 8px 12px;
+  padding-block-start: calc(env(safe-area-inset-top, 0px) + 10px);
+  padding-inline: max(28px, env(safe-area-inset-left, 0px)) max(28px, env(safe-area-inset-right, 0px));
+  background: #ededed;
+  color: #111;
+}
+
+.phone-sheet-count {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.phone-sheet-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-sheet-dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 999px;
+  background: rgb(17 17 17 / 12%);
+}
+
+.phone-sheet-dot[data-on] {
+  background: #111;
+}
+
+.phone-sheet .card-open-header-collapse {
+  position: relative;
+}
+
+.phone-sheet .card-open-header-collapse::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+}
+
+.phone-sheet-view {
+  flex: 1;
+  min-block-size: 0;
+  container-type: size;
+}
+
+.phone-sheet-track {
+  --sheet-slide: min(84cqi, calc(100cqb * 390 / 852));
+  --sheet-gap: max(12px, calc((100cqi - var(--sheet-slide)) / 2 - 32px));
+  display: flex;
+  align-items: center;
+  gap: var(--sheet-gap);
+  block-size: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+
+.phone-sheet-pad {
+  flex: none;
+  inline-size: max(0px, calc((100cqi - var(--sheet-slide)) / 2 - var(--sheet-gap) / 2));
+  block-size: 1px;
+}
+
+.phone-sheet-track::-webkit-scrollbar {
+  display: none;
+}
+
+.phone-sheet-track:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: -4px;
+}
+
+.phone-sheet-slide {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--sheet-slide);
+  max-block-size: 100%;
+  scroll-snap-align: center;
+}
+
+.phone-sheet-frame {
+  inline-size: 100%;
+  aspect-ratio: 390 / 852;
+  overflow: clip;
+  border-radius: 13% / 6%;
+  background: #ededed;
+  box-shadow: var(--shadow-md);
+}
+
+.phone-sheet-frame img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.phone-sheet-caption {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  inline-size: min(32rem, 100%);
+  margin-inline: auto;
+  padding-inline: max(32px, env(safe-area-inset-left, 0px)) max(28px, env(safe-area-inset-right, 0px));
+  padding-block-end: max(16px, env(safe-area-inset-bottom, 0px));
+  color: #111;
+  text-align: center;
+}
+
+.phone-sheet-label,
+.phone-sheet-description {
+  margin: 0;
+}
+
+.phone-sheet-label {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 20px;
+  text-wrap: balance;
+}
+
+.phone-sheet-description {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 16px;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .phone-sheet {
+    animation: phone-sheet-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .phone-sheet[data-closing] {
+    animation: phone-sheet-out 160ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+}
+
+@keyframes phone-sheet-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes phone-sheet-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
