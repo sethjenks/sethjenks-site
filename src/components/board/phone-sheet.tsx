@@ -1,5 +1,7 @@
 "use client";
 
+import { CollapseIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -102,7 +104,7 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
     const previous = meta?.getAttribute("content");
-    meta?.setAttribute("content", "#141416");
+    meta?.setAttribute("content", "#ededed");
 
     const me = {};
     if (historyOwner === null) {
@@ -217,10 +219,25 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
     >
       <div className="phone-sheet-bar">
         <p className="phone-sheet-count" aria-live="polite" aria-atomic="true">
-          {few ? <SheetDots count={tiles.length} index={index} /> : `${index + 1} / ${tiles.length}`}
+          {few ? (
+            <SheetDots count={tiles.length} index={index} />
+          ) : (
+            <span className="card-open-header-chip">
+              {index + 1} / {tiles.length}
+            </span>
+          )}
         </p>
-        <button ref={doneRef} type="button" className="phone-sheet-done" onClick={requestClose}>
-          Done
+        <button
+          ref={doneRef}
+          type="button"
+          className="card-open-header-collapse"
+          aria-label="Collapse"
+          onClick={(event) => {
+            event.stopPropagation();
+            requestClose();
+          }}
+        >
+          <HugeiconsIcon icon={CollapseIcon} size={24} strokeWidth={2} color="currentColor" />
         </button>
       </div>
       <div className="phone-sheet-view">
