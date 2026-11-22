@@ -190,7 +190,7 @@ export function ShadowLab() {
   const darkRef = useRef<HTMLButtonElement>(null);
   const lightRef = useRef<HTMLButtonElement>(null);
   const colorButtonRef = useRef<HTMLButtonElement>(null);
-  const colorPanelHeadRef = useRef<HTMLHeaderElement>(null);
+  const colorPanelHeadRef = useRef<HTMLElement>(null);
   const panelPosRef = useRef({ x: 24, y: 24 });
   const [light, setLight] = useState<LightState>(INITIAL);
   const [notice, setNotice] = useState<"Apply" | "Copied" | "Saved">("Apply");
