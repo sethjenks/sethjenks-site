@@ -13,6 +13,7 @@ import { INTRO } from "@/lib/intro";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
 import "./home-board.css";
+import "@/components/board/board.css";
 
 // Next.js 16 resolves metadataBase for og:image, not og:video.
 // A relative video path is emitted unchanged, so crawlers need this absolute URL.

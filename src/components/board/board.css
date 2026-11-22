@@ -1,0 +1,383 @@
+.card-shell,
+.card-masonry-tile,
+.board-card[data-presentation] {
+  --object-shadow: var(--shadow-md);
+  --object-shadow-open: var(--shadow-md);
+  --object-shadow-filter: var(--shadow-filter-md);
+  --object-shadow-filter-open: var(--shadow-filter-md);
+}
+
+.card-canvas-loop {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 1621px;
+  height: 949px;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.card-canvas-loop .card-shell {
+  pointer-events: auto;
+}
+
+.card-shell {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+  border: 0;
+  border-radius: 24px;
+  padding: 0;
+  background: #ededed;
+  color: transparent;
+  font: inherit;
+  transition: none;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-shell[aria-expanded="false"] {
+  cursor: zoom-in;
+}
+
+.card-shell[aria-expanded="true"] {
+  cursor: zoom-out;
+}
+
+.card-shell:focus {
+  outline: none;
+}
+
+.card-shell:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 6px;
+}
+
+.card-scroll {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.card-shell[data-scroll] .card-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.28) transparent;
+}
+
+.card-scroll-body {
+  position: relative;
+  width: 100%;
+}
+
+.card-tile {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+  will-change: transform, opacity;
+}
+
+.card-shell .card-tile[data-image],
+.card-shell .card-tile[data-icon],
+.card-masonry-tile .card-tile[data-image],
+.card-masonry-tile .card-tile[data-icon],
+.board-card[data-presentation] .card-tile[data-image] {
+  overflow: visible;
+  background: transparent;
+}
+
+.card-tile img,
+.card-media img,
+.card-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-shell .card-tile[data-image],
+.card-masonry-tile .card-tile[data-image],
+.board-card[data-presentation] .card-tile[data-image] {
+  box-shadow: none;
+  filter: var(--object-shadow-filter);
+}
+
+.card-tile[data-image] .card-media,
+.card-tile[data-image] .card-media-layer,
+.card-tile[data-image] img {
+  border-radius: inherit;
+  box-shadow: none;
+}
+
+.card-shell[aria-expanded="false"] .card-tile:not([data-resting]) {
+  pointer-events: none;
+}
+
+.card-shell[aria-expanded="false"] .card-tile[data-resting] {
+  z-index: 2;
+}
+
+.card-open-header {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--card-open-header, 96px);
+  padding: 0 28px 0 32px;
+  background: #ededed;
+  color: #111;
+  pointer-events: auto;
+}
+
+.card-open-header-lead {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.card-open-header-title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  color: #111;
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 44px;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-open-header-chips {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.card-open-header-chip {
+  padding: 8px 16px;
+  border: 1px solid rgb(17 17 17 / 12%);
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.card-open-header-collapse {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+}
+
+.card-open-header-collapse:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+.card-open-header-collapse:active {
+  scale: 0.96;
+}
+
+.card-image-label {
+  position: absolute;
+  z-index: 2;
+  max-width: calc(100% - 20px);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgb(17 17 17 / 84%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-tile:hover .card-image-label,
+.card-tile[data-described] .card-image-label {
+  opacity: 1;
+}
+
+.card-masonry-loop {
+  position: fixed;
+  z-index: 4;
+  inset: 0;
+  pointer-events: auto;
+}
+
+.card-masonry-loop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ededed;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-masonry-loop[data-open]::before {
+  opacity: 1;
+}
+
+.board-presentation-loop {
+  z-index: 85;
+}
+
+html:has(.board-presentation-loop) {
+  overflow: hidden;
+}
+
+.board-card[data-presentation] {
+  border-radius: 24px;
+  background: #ededed;
+  container-type: inline-size;
+  color: #111;
+}
+
+.card-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+  background: #ededed;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-media-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-media-layer[data-kind="image"] {
+  z-index: 1;
+}
+
+.card-media-layer[data-kind="video"] {
+  z-index: 2;
+}
+
+.card-media-layer[data-kind="texture"] {
+  z-index: 3;
+}
+
+.card-media-layer[data-kind="shader"] {
+  z-index: 4;
+}
+
+.card-media-layer[data-kind="noise"] {
+  z-index: 5;
+}
+
+.card-media-shader,
+.card-media-noise {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-media video[controls] {
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .card-image-label {
+    opacity: 0;
+  }
+
+  .card-tile[data-described] .card-image-label {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card-masonry-loop::before {
+    transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .card-open-header {
+    animation: card-open-header-in 240ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  }
+
+  .card-shell [data-closing] .card-open-header {
+    animation: card-open-header-out 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
+    pointer-events: none;
+  }
+
+  .card-shell[data-leaving="true"] .card-name,
+  .card-shell[data-leaving="true"] .card-expand {
+    opacity: 0;
+    transition: none;
+  }
+}
+
+@keyframes card-open-header-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes card-open-header-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-shell,
+  .card-tile,
+  .card-image-label,
+  .card-masonry-loop::before,
+  .card-open-header {
+    transition: none;
+    animation: none;
+  }
+
+  .card-open-header-collapse:active {
+    scale: 1;
+  }
+}

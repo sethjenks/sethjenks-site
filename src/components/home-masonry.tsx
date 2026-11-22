@@ -1,23 +1,18 @@
 "use client";
 
-import { ArrowExpand01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 
 import { BoardFilterBar, useBoardFilter, type BoardFilter } from "@/components/board-filters";
 import { BoardStage } from "@/components/board-stage";
+import { ExpandLoop } from "@/components/board/expand-loop";
+import { createMasonryFlex } from "@/components/board/masonry-flex";
+import { PresentationResting } from "@/components/board/presentations/resting";
+import { TileChrome } from "@/components/board/tile-chrome";
 import { prefetchCollection } from "@/lib/collections";
 import type { HomeCard, TileBackground, TileForeground, TileHover } from "@/lib/home";
 
 const WIDE_BOARD = "(min-width: 1100px)";
-const HOVER_GROW = 2.8;
-const REST_GROW = 1;
-const HOVER_AMOUNT = 0.5;
-const FLEX_EASE_MS = 400;
-let pendingTile: HTMLElement | null = null;
-let flexGeneration = 0;
-let releaseTimer = 0;
 
 type OpenCard = {
   card: HomeCard;
@@ -29,14 +24,30 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
   const [open, setOpen] = useState<OpenCard | null>(null);
   const [releasing, setReleasing] = useState(false);
   const masonryRef = useRef<HTMLDivElement>(null);
+  const [flex] = useState(() =>
+    createMasonryFlex({
+      tileSelector: ".board-tile",
+      columnSelector: ".board-column",
+      wideQuery: WIDE_BOARD,
+    }),
+  );
+  const filterKey = `${filter}:${revision}`;
+  const [seenFilter, setSeenFilter] = useState(filterKey);
+  if (seenFilter !== filterKey) {
+    setSeenFilter(filterKey);
+    setOpen(null);
+  }
   const visible = columns
     .map((column) => column.filter((tile) => tileVisible(tile, filter)))
     .filter((column) => column.length > 0);
 
   useEffect(() => {
-    setOpen(null);
-    releaseBoard(masonryRef.current, false);
-  }, [filter, revision]);
+    return () => flex.dispose();
+  }, [flex]);
+
+  useEffect(() => {
+    flex.release(masonryRef.current, false);
+  }, [filter, revision, flex]);
 
   useEffect(() => {
     const root = masonryRef.current;
@@ -103,15 +114,15 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
           open?.card.opening.kind === "project" ? (releasing ? "closing" : "") : undefined
         }
         ref={masonryRef}
-        onPointerOver={growTile}
-        onPointerLeave={() => releaseBoard(masonryRef.current, true)}
-        onFocus={growTile}
+        onPointerOver={flex.grow}
+        onPointerLeave={() => flex.release(masonryRef.current, true)}
+        onFocus={flex.grow}
         onBlur={(event) => {
           const next = event.relatedTarget;
           if (next instanceof Node && event.currentTarget.contains(next)) {
             return;
           }
-          releaseBoard(masonryRef.current, true);
+          flex.release(masonryRef.current, true);
         }}
       >
         {visible.map((column, index) => (
@@ -127,7 +138,16 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
           </div>
         ))}
       </div>
-      {open ? (
+      {open?.card.opening.kind === "presentation" ? (
+        <ExpandLoop
+          spec={open.card.opening.spec}
+          origin={boxOf(open.origin)}
+          heldSelector={`[data-portfolio-key="${cssEscape(open.card.key)}"]`}
+          chromeSelector=".home-board-main .board-filters"
+          className="board-presentation-loop"
+          onExited={() => setOpen(null)}
+        />
+      ) : open ? (
         <BoardStage
           card={open.card}
           origin={open.origin}
@@ -142,143 +162,13 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
   );
 }
 
-function growTile(event: SyntheticEvent<HTMLDivElement>) {
-  const masonry = event.currentTarget;
-  if (!(event.target instanceof Element)) {
-    return;
-  }
-
-  const tile = event.target.closest(".board-tile");
-  if (!(tile instanceof HTMLElement) || !masonry.contains(tile)) {
-    return;
-  }
-
-  window.clearTimeout(releaseTimer);
-
-  const column = tile.parentElement;
-  if (!(column instanceof HTMLElement)) {
-    return;
-  }
-
-  if (!window.matchMedia(WIDE_BOARD).matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    return;
-  }
-
-  const columns = [...masonry.querySelectorAll<HTMLElement>(":scope > .board-column")];
-  const columnIndex = columns.indexOf(column);
-  if (columnIndex < 0) {
-    return;
-  }
-
-  if (masonry.dataset.flexing !== "live" && masonry.dataset.flexing !== "lock") {
-    for (const col of columns) {
-      col.style.height = `${col.getBoundingClientRect().height}px`;
-      for (const child of col.querySelectorAll<HTMLElement>(":scope > .board-tile")) {
-        const weight = String(Math.max(child.getBoundingClientRect().height, 1) / 100);
-        child.dataset.restGrow = weight;
-        child.style.flexGrow = weight;
-      }
-    }
-    const generation = ++flexGeneration;
-    masonry.dataset.flexing = "lock";
-    pendingTile = tile;
-    requestAnimationFrame(() => {
-      if (generation !== flexGeneration || masonry.dataset.flexing !== "lock") {
-        return;
-      }
-      masonry.dataset.flexing = "live";
-      requestAnimationFrame(() => {
-        if (generation !== flexGeneration || masonry.dataset.flexing !== "live") {
-          return;
-        }
-        const target = pendingTile ?? tile;
-        pendingTile = null;
-        if (!target.isConnected) {
-          return;
-        }
-        const nextColumn = target.parentElement;
-        const nextIndex =
-          nextColumn instanceof HTMLElement ? columns.indexOf(nextColumn) : columnIndex;
-        applyGrowth(masonry, columns, nextIndex < 0 ? columnIndex : nextIndex, target);
-      });
-    });
-    return;
-  }
-
-  if (masonry.dataset.flexing === "lock") {
-    pendingTile = tile;
-    return;
-  }
-
-  applyGrowth(masonry, columns, columnIndex, tile);
+function boxOf(origin: HTMLElement) {
+  const rect = origin.getBoundingClientRect();
+  return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
 }
 
-function applyGrowth(
-  masonry: HTMLElement,
-  columns: HTMLElement[],
-  columnIndex: number,
-  tile: HTMLElement,
-) {
-  masonry.dataset.grow = String(columnIndex);
-
-    columns.forEach((col, index) => {
-    for (const child of col.querySelectorAll<HTMLElement>(":scope > .board-tile")) {
-      if (index !== columnIndex) {
-        child.style.flexGrow = child.dataset.restGrow ?? String(REST_GROW);
-        continue;
-      }
-      const rest = Number(child.dataset.restGrow ?? REST_GROW);
-      const target = child === tile ? HOVER_GROW : REST_GROW;
-      child.style.flexGrow = String(rest + (target - rest) * HOVER_AMOUNT);
-    }
-  });
-}
-
-function releaseBoard(masonry: HTMLDivElement | null, animate: boolean) {
-  window.clearTimeout(releaseTimer);
-  if (!masonry) {
-    return;
-  }
-
-  flexGeneration += 1;
-  pendingTile = null;
-  delete masonry.dataset.grow;
-
-  const easeBack =
-    animate &&
-    masonry.dataset.flexing === "live" &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (!easeBack) {
-    clearFlexLock(masonry);
-    return;
-  }
-
-  for (const tile of masonry.querySelectorAll<HTMLElement>(".board-tile")) {
-    tile.style.flexGrow = tile.dataset.restGrow ?? String(REST_GROW);
-  }
-
-  const generation = flexGeneration;
-  releaseTimer = window.setTimeout(() => {
-    if (generation !== flexGeneration) {
-      return;
-    }
-    clearFlexLock(masonry);
-  }, FLEX_EASE_MS + 50);
-}
-
-function clearFlexLock(masonry: HTMLElement) {
-  delete masonry.dataset.flexing;
-  delete masonry.dataset.grow;
-
-  for (const col of masonry.querySelectorAll<HTMLElement>(".board-column")) {
-    col.style.height = "";
-  }
-
-  for (const tile of masonry.querySelectorAll<HTMLElement>(".board-tile")) {
-    tile.style.flexGrow = "";
-    delete tile.dataset.restGrow;
-  }
+function cssEscape(value: string) {
+  return typeof CSS !== "undefined" && CSS.escape ? CSS.escape(value) : value.replace(/"/g, '\\"');
 }
 
 function tileVisible(tile: HomeCard, filter: BoardFilter): boolean {
@@ -413,7 +303,10 @@ function WorkCard({
     );
   }
 
-  const media = (
+  const presentation = card.opening.kind === "presentation" ? card.opening.spec : null;
+  const media = presentation ? (
+    <PresentationResting spec={presentation} />
+  ) : (
     <>
       <TileBackground background={card.background} decorative={card.foreground !== undefined} />
       {card.foreground ? <TileForeground foreground={card.foreground} /> : null}
@@ -422,6 +315,7 @@ function WorkCard({
   const tileProps = {
     className: "board-card board-tile",
     "data-frame": card.frame,
+    "data-presentation": presentation ? presentation.id : undefined,
     style: {
       ...hoverStyle(card.hover),
       ...(card.ratio ? { aspectRatio: card.ratio } : {}),
@@ -460,15 +354,11 @@ function WorkCard({
       onClick={openCard}
     >
       {media}
-      <span className="board-tile-title">{card.label}</span>
-      <span className="board-tile-expand" aria-hidden="true">
-        <HugeiconsIcon
-          icon={ArrowExpand01Icon}
-          size={16}
-          strokeWidth={1.75}
-          color="currentColor"
-        />
-      </span>
+      <TileChrome
+        label={presentation ? (presentation.tiles.find((tile) => tile.resting)?.label ?? card.label) : card.label}
+        titleClassName="board-tile-title"
+        expandClassName="board-tile-expand"
+      />
     </button>
   );
 }

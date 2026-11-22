@@ -14,7 +14,7 @@ export function SiteChrome({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const quiet = quietPaths.includes(pathname);
+  const quiet = quietPaths.includes(pathname) || pathname === "/lab/card" || pathname === "/lab/shadows";
   const detail = pathname.startsWith("/work/");
 
   return (

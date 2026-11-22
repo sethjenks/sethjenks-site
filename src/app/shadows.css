@@ -1,0 +1,28 @@
+/* One light, four elevations. Design-system tokens for raised surfaces.
+   --shadow-* is box-shadow (rect / radius hosts).
+   --shadow-filter-* is filter drop-shadow (alpha hosts like squircle PNGs). */
+
+:root {
+  --shadow-sm: 0px 1px 2px oklch(28% 0.009 248.2 / 0.12), 0px 3px 3px oklch(28% 0.009 248.2 / 0.1), 0px 8px 5px oklch(28% 0.009 248.2 / 0.06), 0px 13px 5px oklch(28% 0.009 248.2 / 0.02);
+  --shadow-md: 0px 2px 5px oklch(28% 0.009 248.2 / 0.14), 0px 8px 8px oklch(28% 0.009 248.2 / 0.12), 0px 19px 11px oklch(28% 0.009 248.2 / 0.07), 0px 33px 13px oklch(28% 0.009 248.2 / 0.02);
+  --shadow-lg: 0px 4px 9px oklch(28% 0.009 248.2 / 0.16), 0px 17px 17px oklch(28% 0.009 248.2 / 0.14), 0px 38px 23px oklch(28% 0.009 248.2 / 0.08), 0px 67px 27px oklch(28% 0.009 248.2 / 0.02);
+  --shadow-xl: 0px 7px 15px oklch(28% 0.009 248.2 / 0.18), 0px 28px 28px oklch(28% 0.009 248.2 / 0.15), 0px 63px 38px oklch(28% 0.009 248.2 / 0.09), 0px 111px 44px oklch(28% 0.009 248.2 / 0.03);
+
+  /* Tighter blurs than box-shadow — large kernels read as a square sheet under squircles. */
+  --shadow-filter-sm: drop-shadow(0px 1px 1px oklch(28% 0.009 248.2 / 0.16)) drop-shadow(0px 3px 2px oklch(28% 0.009 248.2 / 0.1));
+  --shadow-filter-md: drop-shadow(0px 2px 2px oklch(28% 0.009 248.2 / 0.18)) drop-shadow(0px 6px 5px oklch(28% 0.009 248.2 / 0.12)) drop-shadow(0px 14px 8px oklch(28% 0.009 248.2 / 0.06));
+  --shadow-filter-lg: drop-shadow(0px 3px 3px oklch(28% 0.009 248.2 / 0.2)) drop-shadow(0px 12px 10px oklch(28% 0.009 248.2 / 0.14)) drop-shadow(0px 28px 16px oklch(28% 0.009 248.2 / 0.07));
+  --shadow-filter-xl: drop-shadow(0px 5px 5px oklch(28% 0.009 248.2 / 0.22)) drop-shadow(0px 20px 14px oklch(28% 0.009 248.2 / 0.15)) drop-shadow(0px 44px 22px oklch(28% 0.009 248.2 / 0.08));
+}
+
+[data-theme="dark"] {
+  --shadow-sm: inset 0px 1px 0px oklch(100% 0 none / 0.06), 0px 1px 2px oklch(28% 0.009 248.2 / 0.29), 0px 3px 3px oklch(28% 0.009 248.2 / 0.26), 0px 8px 5px oklch(28% 0.009 248.2 / 0.15), 0px 13px 5px oklch(28% 0.009 248.2 / 0.04), 0px 21px 6px oklch(28% 0.009 248.2 / 0.01);
+  --shadow-md: inset 0px 1px 0px oklch(100% 0 none / 0.06), 0px 2px 5px oklch(28% 0.009 248.2 / 0.34), 0px 8px 8px oklch(28% 0.009 248.2 / 0.3), 0px 19px 11px oklch(28% 0.009 248.2 / 0.18), 0px 33px 13px oklch(28% 0.009 248.2 / 0.05), 0px 52px 15px oklch(28% 0.009 248.2 / 0.01);
+  --shadow-lg: inset 0px 1px 0px oklch(100% 0 none / 0.06), 0px 4px 9px oklch(28% 0.009 248.2 / 0.39), 0px 17px 17px oklch(28% 0.009 248.2 / 0.34), 0px 38px 23px oklch(28% 0.009 248.2 / 0.2), 0px 67px 27px oklch(28% 0.009 248.2 / 0.06), 0px 104px 29px oklch(28% 0.009 248.2 / 0.01);
+  --shadow-xl: inset 0px 1px 0px oklch(100% 0 none / 0.06), 0px 7px 15px oklch(28% 0.009 248.2 / 0.44), 0px 28px 28px oklch(28% 0.009 248.2 / 0.38), 0px 63px 38px oklch(28% 0.009 248.2 / 0.22), 0px 111px 44px oklch(28% 0.009 248.2 / 0.07), 0px 174px 49px oklch(28% 0.009 248.2 / 0.01);
+
+  --shadow-filter-sm: drop-shadow(0px 1px 1px oklch(28% 0.009 248.2 / 0.34)) drop-shadow(0px 3px 2px oklch(28% 0.009 248.2 / 0.24));
+  --shadow-filter-md: drop-shadow(0px 2px 2px oklch(28% 0.009 248.2 / 0.38)) drop-shadow(0px 6px 5px oklch(28% 0.009 248.2 / 0.28)) drop-shadow(0px 14px 8px oklch(28% 0.009 248.2 / 0.14));
+  --shadow-filter-lg: drop-shadow(0px 3px 3px oklch(28% 0.009 248.2 / 0.42)) drop-shadow(0px 12px 10px oklch(28% 0.009 248.2 / 0.32)) drop-shadow(0px 28px 16px oklch(28% 0.009 248.2 / 0.16));
+  --shadow-filter-xl: drop-shadow(0px 5px 5px oklch(28% 0.009 248.2 / 0.46)) drop-shadow(0px 20px 14px oklch(28% 0.009 248.2 / 0.36)) drop-shadow(0px 44px 22px oklch(28% 0.009 248.2 / 0.18));
+}

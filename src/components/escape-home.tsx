@@ -22,7 +22,7 @@ export function EscapeHome() {
       if (isTypingTarget(event.target)) {
         return;
       }
-      if (document.querySelector("dialog[open]")) {
+      if (document.querySelector("dialog[open], :popover-open, [data-floating-panel]")) {
         return;
       }
       if (pathname === "/") {

@@ -1,0 +1,25 @@
+<svg preserveAspectRatio="xMidYMid meet" overflow="visible" width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="32x32">
+<g id="Union">
+<use xlink:href="#stroke0_1266_122589" fill="url(#paint0_linear_1266_122589)"/>
+<mask id="stroke1_1266_122589" maskUnits="userSpaceOnUse" x="72" y="32" width="496" height="576" fill="black">
+<rect fill="white" x="72" y="32" width="496" height="576"/>
+<use xlink:href="#stroke0_1266_122589"/>
+</mask>
+<path d="M360 520L135.873 327.891C100.41 297.494 80 253.118 80 206.41V200C80 111.634 151.634 40 240 40H280V120M360 520V600H400C488.366 600 560 528.366 560 440V433.59C560 386.882 539.59 342.506 504.127 312.109L280 120M360 520H400C444.183 520 480 484.183 480 440V435.629C480 412.95 470.374 391.337 453.517 376.165L293.241 231.917C284.813 224.332 280 213.525 280 202.185V120M360 520V437.815C360 426.475 355.187 415.668 346.759 408.083L186.483 263.835C169.626 248.663 160 227.05 160 204.371V200C160 155.817 195.817 120 240 120H280" stroke-width="16" stroke="url(#paint1_linear_1266_122589)" style="mix-blend-mode:screen" mask="url(#stroke1_1266_122589)"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_1266_122589" x1="117.443" y1="-12.1032" x2="667.017" y2="625.48" gradientUnits="userSpaceOnUse">
+<stop offset="0.00809239" stop-color="#DCFFBC"/>
+<stop offset="0.237263" stop-color="#5ECE71"/>
+<stop offset="0.947703" stop-color="#1B6A97"/>
+<stop offset="1" stop-color="#0D3349"/>
+</linearGradient>
+<linearGradient id="paint1_linear_1266_122589" x1="349.396" y1="-2.435" x2="451.064" y2="184.813" gradientUnits="userSpaceOnUse">
+<stop stop-color="#E8FBBA"/>
+<stop offset="1" stop-color="#5ECE71" stop-opacity="0.11"/>
+</linearGradient>
+<path id="stroke0_1266_122589" d="M280 40H240C151.634 40 80 111.634 80 200V206.41C80 253.118 100.41 297.494 135.873 327.891L360 520V600H400C488.366 600 560 528.366 560 440V433.59C560 386.882 539.59 342.506 504.127 312.109L280 120V40ZM280 120V202.185C280 213.525 284.813 224.332 293.241 231.917L453.517 376.165C470.374 391.337 480 412.95 480 435.629V440C480 484.183 444.183 520 400 520H360V437.815C360 426.475 355.187 415.668 346.759 408.083L186.483 263.835C169.626 248.663 160 227.05 160 204.371V200C160 155.817 195.817 120 240 120H280Z" fill-rule="evenodd" clip-rule="evenodd"/>
+</defs>
+</svg>

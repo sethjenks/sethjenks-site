@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ArrowExpand01Icon,
+  ExpandIcon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Cancel01Icon,
@@ -255,9 +255,9 @@ function TileLabel({ title }: { title: string }) {
     <>
       <span className="work-masonry-title">{title}</span>
       <HugeiconsIcon
-        icon={ArrowExpand01Icon}
+        icon={ExpandIcon}
         size="1cap"
-        strokeWidth={1.5}
+        strokeWidth={2}
         color="currentColor"
         aria-hidden="true"
       />

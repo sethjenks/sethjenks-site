@@ -23,6 +23,9 @@ export default function LabPage() {
         Objects that might sit inside the home paragraph. The live intro is
         unchanged.
       </p>
+      <p className="lab-links">
+        <a href="/lab/shadows">Shadows</a>
+      </p>
 
       <p className="lab-copy">
         I design software and build it{" "}

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowShrink01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, CollapseIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -339,9 +339,9 @@ export function BoardStage({ card, origin, onClose, onRelease }: BoardStageProps
               onClick={() => closeRef.current()}
             >
               <HugeiconsIcon
-                icon={ArrowShrink01Icon}
+                icon={CollapseIcon}
                 size={24}
-                strokeWidth={1.5}
+                strokeWidth={2}
                 color="currentColor"
                 aria-hidden="true"
               />
@@ -470,6 +470,8 @@ function StageBody({
     case "project":
       return null;
     case "slot":
+      return null;
+    case "presentation":
       return null;
     case "collection":
       return (

@@ -5,6 +5,8 @@ import homeFile from "../../content/home.json";
 import { collectionForGallery, type CollectionId } from "@/lib/collection-ids";
 import { getGalleryItems, type GalleryItem, type GalleryVideo } from "@/lib/gallery";
 import { getProjectItems, type ProjectItem } from "@/lib/projects";
+import { presentationFor } from "@/components/board/presentations/registry";
+import { isPresentationKind, type PresentationSpec } from "@/components/board/presentations/types";
 import { getWorkItems, type WorkItem } from "@/lib/work";
 
 const PORTRAIT_PUBLIC_PATH = "/media/people/seth-jenks.jpg";
@@ -79,6 +81,13 @@ export type CardOpening =
       still: { src: string; alt: string };
       preview: { src: string; alt: string };
       plates: ProjectPlate[];
+    }
+  | {
+      kind: "presentation";
+      presentation: PresentationSpec["id"];
+      href: string;
+      project: PresentationSpec["project"];
+      spec: PresentationSpec;
     };
 
 export type HomeCard = {
@@ -505,6 +514,10 @@ function resolveTile(
   const where = `content/home.json columns[${column}][${index}]`;
   const label = readText(value.label, `${where}.label`);
 
+  if (value.kind !== "work" && value.presentation !== undefined) {
+    throw new Error(`${where} can only set presentation on a work tile.`);
+  }
+
   if (value.kind === "slot") {
     return {
       kind: "card",
@@ -596,6 +609,41 @@ function resolveTile(
       : layers;
   const title = label ?? item.title;
   const heading = item.sections[0]?.heading ?? title;
+
+  if (value.presentation !== undefined) {
+    if (!isPresentationKind(value.presentation)) {
+      throw new Error(`${where} has an unknown presentation.`);
+    }
+
+    const project = {
+      title,
+      chips: [item.year, item.role, ...(item.tags ?? [])],
+      href: `/work/${item.id}`,
+    };
+    const spec = presentationFor(value.presentation, project);
+
+    return {
+      kind: "card",
+      key: `work-${item.id}-presentation-${column}-${index}`,
+      id: item.id,
+      label: title,
+      filter: value.filter,
+      frame: value.frame,
+      ratio: `${spec.closed.width} / ${spec.closed.height}`,
+      href: `/work/${item.id}`,
+      external: false,
+      background: { type: "color" as const, color: "#ededed" },
+      hover: readHover(value.hover, `${where}.hover`),
+      opening: {
+        kind: "presentation" as const,
+        presentation: value.presentation,
+        href: `/work/${item.id}`,
+        project,
+        spec,
+      },
+    };
+  }
+
   return {
     kind: "card",
     key: `work-${item.id}-${plate ?? "hero"}-${column}-${index}`,

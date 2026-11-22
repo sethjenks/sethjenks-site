@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./shadows.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -55,6 +56,10 @@
   --radius-2xl: 0.5rem;
   --radius-3xl: 0.5rem;
   --radius-4xl: 0.5rem;
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
 }
 
 :root {
@@ -3034,6 +3039,13 @@
     font-size: 18px;
     line-height: 1.5;
     color: var(--quiet);
+  }
+
+  .lab-links {
+    display: flex;
+    gap: 1.25rem;
+    margin-block-start: 1.25rem;
+    font-size: 15px;
   }
 
   .lab-page > .lab-copy {

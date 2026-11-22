@@ -245,7 +245,8 @@
         "id": "chia-signer",
         "filter": "product",
         "label": "Transaction Signer",
-        "frame": "tall",
+        "presentation": "phone",
+        "frame": "phone",
         "hover": {
           "background": {
             "to": {
