@@ -1,5 +1,7 @@
 # Chia signer on phones
 
+Preview note: the phone sheet shipped as a sideways pager in both portrait and landscape (App Store screenshot viewer), not a vertical column. Desktop still uses the scaled stage. The query is `(max-width: 719px), (pointer: coarse)`.
+
 Planning note for the homepage phone mosaic. No product code in this change.
 
 The homepage tile labeled Welcome is the Chia Transaction Signer. Tapping it mounts the shared board kit (`ExpandLoop` + `PresentationShell`) that the card lab also uses. On a desktop-width window that kit scales a 1532×862 stage down slightly and the five-column mosaic reads as a gallery. On a phone the same stage is scaled to about a quarter, so the chrome, the captions, and the screens shrink together.

@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
+import { PhoneSheet } from "@/components/board/phone-sheet";
 import { CLOSE_MOVE_DELAY_S, CLOSE_TOTAL_S, OPEN_SHELL_S, moveTransition } from "@/components/board/presentations/motion";
 import { STUDIES } from "@/components/board/presentations/registry";
 import { PresentationShell } from "@/components/board/presentations/shell";
@@ -11,15 +12,9 @@ import { DEFAULT_CARD_TUNE, type CardTune } from "@/components/card-tune-panel";
 
 type Fit = { x: number; y: number; scale: number };
 
-export function ExpandLoop({
-  spec,
-  origin,
-  tune = DEFAULT_CARD_TUNE,
-  heldSelector,
-  chromeSelector = ".card-switch-stack",
-  className,
-  onExited,
-}: {
+const PHONE_PAGER_QUERY = "(max-width: 719px), (pointer: coarse)";
+
+type ExpandLoopProps = {
   spec: PresentationSpec;
   origin: PresentationBox;
   tune?: CardTune;
@@ -27,7 +22,47 @@ export function ExpandLoop({
   chromeSelector?: string;
   className?: string;
   onExited: () => void;
-}) {
+};
+
+export function ExpandLoop(props: ExpandLoopProps) {
+  const mode = usePagerMode(props.spec.id === "phone");
+  if (mode === "sheet") {
+    return (
+      <PhoneSheet
+        spec={props.spec}
+        heldSelector={props.heldSelector}
+        className={props.className}
+        onExited={props.onExited}
+      />
+    );
+  }
+  return <StageLoop {...props} />;
+}
+
+function subscribePager(onChange: () => void) {
+  const media = window.matchMedia(PHONE_PAGER_QUERY);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+function usePagerMode(eligible: boolean) {
+  const matches = useSyncExternalStore(
+    subscribePager,
+    () => window.matchMedia(PHONE_PAGER_QUERY).matches,
+    () => false,
+  );
+  return eligible && matches ? "sheet" : "stage";
+}
+
+function StageLoop({
+  spec,
+  origin,
+  tune = DEFAULT_CARD_TUNE,
+  heldSelector,
+  chromeSelector = ".card-switch-stack",
+  className,
+  onExited,
+}: ExpandLoopProps) {
   const reduced = useReducedMotion() === true;
   const [expanded, setExpanded] = useState(false);
   const [described, setDescribed] = useState<string | null>(null);
