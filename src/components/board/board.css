@@ -455,7 +455,8 @@ html:has(.phone-sheet) {
 }
 
 .phone-sheet-track {
-  --sheet-slide: min(84cqi, calc(100cqb * 390 / 852));
+  --sheet-aspect: 390 / 852;
+  --sheet-slide: min(84cqi, calc(100cqb * var(--sheet-aspect)));
   --sheet-gap: max(12px, calc((100cqi - var(--sheet-slide)) / 2 - 32px));
   display: flex;
   align-items: center;
@@ -486,11 +487,12 @@ html:has(.phone-sheet) {
 }
 
 .phone-sheet-slide {
+  --frame-aspect: var(--sheet-aspect);
   display: flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  inline-size: var(--sheet-slide);
+  inline-size: min(84cqi, calc(100cqb * var(--frame-aspect)));
   max-block-size: 100%;
   scroll-snap-align: center;
 }
@@ -502,6 +504,17 @@ html:has(.phone-sheet) {
   border-radius: 13% / 6%;
   background: #ededed;
   box-shadow: var(--shadow-md);
+}
+
+.phone-sheet-frame[data-icon] {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.phone-sheet-frame .app-icon {
+  inline-size: 100%;
+  block-size: 100%;
 }
 
 .phone-sheet-frame img {

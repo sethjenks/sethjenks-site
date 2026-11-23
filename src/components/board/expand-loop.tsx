@@ -1,18 +1,18 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { PhoneSheet } from "@/components/board/phone-sheet";
+import { mobileExperience, type MobilePattern } from "@/components/board/presentations/mobile";
 import { CLOSE_MOVE_DELAY_S, CLOSE_TOTAL_S, OPEN_SHELL_S, moveTransition } from "@/components/board/presentations/motion";
 import { STUDIES } from "@/components/board/presentations/registry";
 import { PresentationShell } from "@/components/board/presentations/shell";
 import type { PresentationBox, PresentationFrame, PresentationKind, PresentationSpec } from "@/components/board/presentations/types";
+import { useMobileSheet } from "@/components/board/presentations/use-mobile-sheet";
 import { DEFAULT_CARD_TUNE, type CardTune } from "@/components/card-tune-panel";
 
 type Fit = { x: number; y: number; scale: number };
-
-const PHONE_PAGER_QUERY = "(max-width: 719px), (pointer: coarse)";
 
 type ExpandLoopProps = {
   spec: PresentationSpec;
@@ -25,8 +25,8 @@ type ExpandLoopProps = {
 };
 
 export function ExpandLoop(props: ExpandLoopProps) {
-  const mode = usePagerMode(props.spec.id === "phone");
-  if (mode === "sheet") {
+  const pattern = mobileOpen(props.spec.id, useMobileSheet());
+  if (pattern === "pager") {
     return (
       <PhoneSheet
         spec={props.spec}
@@ -39,19 +39,19 @@ export function ExpandLoop(props: ExpandLoopProps) {
   return <StageLoop {...props} />;
 }
 
-function subscribePager(onChange: () => void) {
-  const media = window.matchMedia(PHONE_PAGER_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-}
-
-function usePagerMode(eligible: boolean) {
-  const matches = useSyncExternalStore(
-    subscribePager,
-    () => window.matchMedia(PHONE_PAGER_QUERY).matches,
-    () => false,
-  );
-  return eligible && matches ? "sheet" : "stage";
+function mobileOpen(kind: PresentationSpec["id"], sheet: boolean): MobilePattern | "stage" {
+  if (!sheet) {
+    return "stage";
+  }
+  const pattern = mobileExperience(kind).pattern;
+  switch (pattern) {
+    case "pager":
+      return "pager";
+    default: {
+      const unreachable: never = pattern;
+      return unreachable;
+    }
+  }
 }
 
 function StageLoop({

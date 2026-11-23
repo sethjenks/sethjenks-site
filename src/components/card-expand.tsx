@@ -4,6 +4,9 @@ import { useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 
 import { ExpandLoop } from "@/components/board/expand-loop";
+import { PhoneSheet } from "@/components/board/phone-sheet";
+import { mobileExperience } from "@/components/board/presentations/mobile";
+import { useMobileSheet } from "@/components/board/presentations/use-mobile-sheet";
 import { createMasonryFlex } from "@/components/board/masonry-flex";
 import { PresentationResting } from "@/components/board/presentations/resting";
 import { STUDIES, WIDGET_STUDIES } from "@/components/board/presentations/registry";
@@ -159,6 +162,8 @@ export function CardExpand() {
   const study = variant === "widget" ? WIDGET_STUDIES[orientation] : STUDIES[variant];
   const lensOn = study.id === "icon" && iconLayout === "lens";
   const dockOn = study.id === "icon" && iconLayout === "dock";
+  const mobilePager =
+    useMobileSheet() && mobileExperience(study.id).pattern === "pager" && !lensOn && !dockOn;
   const contentDefault = study.tiles.find((tile) => tile.resting)?.radius ?? 0;
   const studyState =
     layout === "masonry"
@@ -347,6 +352,16 @@ export function CardExpand() {
           />
         </div>
       )}
+      {layout === "single" && mobilePager && expanded ? (
+        <PhoneSheet
+          spec={study}
+          heldSelector=".card-shell"
+          onExited={() => {
+            setDescribed(null);
+            setExpanded(false);
+          }}
+        />
+      ) : null}
       {layout === "masonry" && masonryOpen ? (
         <ExpandLoop
           spec={STUDIES[masonryOpen.id]}

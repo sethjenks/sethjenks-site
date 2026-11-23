@@ -1,6 +1,10 @@
 import type { AppIconMark } from "@/components/app-icon";
 import type { CardMedia } from "@/components/board/card-media";
 
+/**
+ * Card types. A new kind also needs an entry in MOBILE_EXPERIENCES
+ * (`presentations/mobile.ts`) and a branch in ExpandLoop for its pattern.
+ */
 export const PRESENTATION_KINDS = ["phone", "desktop", "widget", "icon"] as const;
 
 export type PresentationKind = (typeof PRESENTATION_KINDS)[number];

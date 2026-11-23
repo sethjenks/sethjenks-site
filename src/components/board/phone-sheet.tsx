@@ -2,9 +2,10 @@
 
 import { CollapseIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
+import { AppIcon } from "@/components/app-icon";
 import { imageLayer } from "@/components/board/card-media";
 import type { PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
 
@@ -198,6 +199,7 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
 
   const few = tiles.length <= 8;
   const active = tiles[index] ?? tiles[start];
+  const resting = tiles[start] ?? tiles[0];
   const sheetClass = className ? `phone-sheet ${className}` : "phone-sheet";
 
   return createPortal(
@@ -244,6 +246,7 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
       <div
         ref={trackRef}
         className="phone-sheet-track"
+        style={{ "--sheet-aspect": frameAspect(resting) } as CSSProperties}
         tabIndex={0}
         aria-roledescription="carousel"
         aria-label={spec.project.title}
@@ -253,6 +256,7 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
           <SheetSlide
             key={tile.id}
             tile={tile}
+            kind={spec.id}
             tileIndex={tileIndex}
             count={tiles.length}
             active={tileIndex === index}
@@ -271,14 +275,20 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
   );
 }
 
+function frameAspect(tile: PresentationTile) {
+  return `${tile.width} / ${tile.height}`;
+}
+
 function SheetSlide({
   tile,
+  kind,
   tileIndex,
   count,
   active,
   distance,
 }: {
   tile: PresentationTile;
+  kind: PresentationSpec["id"];
   tileIndex: number;
   count: number;
   active: boolean;
@@ -292,13 +302,21 @@ function SheetSlide({
     <div
       className="phone-sheet-slide"
       data-slide={tileIndex}
+      style={{ "--frame-aspect": frameAspect(tile) } as CSSProperties}
       role="group"
       aria-roledescription="slide"
       aria-label={`${tileIndex + 1} of ${count}, ${tile.label}`}
       aria-hidden={active ? undefined : true}
     >
-      <div className="phone-sheet-frame">
-        {show && src ? (
+      <div
+        className="phone-sheet-frame"
+        data-icon={tile.icon ? "" : undefined}
+        data-kind={kind}
+        style={tile.icon || kind === "phone" ? undefined : { borderRadius: tile.radius }}
+      >
+        {tile.icon ? (
+          <AppIcon mark={tile.icon.mark} rounded={tile.icon.rounded} />
+        ) : show && src ? (
           // Screenshots are fixed assets. Native img keeps lazy loading on the pager.
           // eslint-disable-next-line @next/next/no-img-element
           <img

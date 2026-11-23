@@ -1,6 +1,8 @@
 # Chia signer on phones
 
-Preview note: the phone sheet shipped as a sideways pager in both portrait and landscape (App Store screenshot viewer), not a vertical column. Desktop still uses the scaled stage. The query is `(max-width: 719px), (pointer: coarse)`.
+Every card type declares a mobile experience in `src/components/board/presentations/mobile.ts`. Phone, desktop, widget, and icon open as the sideways pager on a small screen or a coarse pointer. A fine pointer at 720px or wider keeps that card's desktop stage. Adding a presentation kind without a plan fails the typecheck. Lens and dock stay on the stage.
+
+Preview note: the phone sheet uses the open card's field, chip, type, and collapse control. The query is `(max-width: 719px), (pointer: coarse)`.
 
 Planning note for the homepage phone mosaic. No product code in this change.
 
