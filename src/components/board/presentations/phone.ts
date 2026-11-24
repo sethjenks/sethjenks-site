@@ -1,4 +1,4 @@
-import type { CardMedia } from "@/components/board/card-media";
+import { keyObjectMedia, type KeyObject } from "@/components/board/presentations/key-object";
 import { placed } from "@/components/board/presentations/stage";
 import type { PresentationProject, PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
 
@@ -26,12 +26,6 @@ const PHONE_SCREENS: PhoneScreen[] = [
     src: "/media/card/chia-signer/splash.png",
     label: "Splash",
     description: "The Signer mark, before the first screen.",
-  },
-  {
-    id: "orientation-2",
-    src: "/media/card/chia-signer/orientation-2.png",
-    label: "Secure Enclave",
-    description: "Keys stay in Secure Enclave. There is no seed phrase to steal.",
   },
   {
     id: "orientation-1",
@@ -244,16 +238,34 @@ export const PHONE_PROJECT: PresentationProject = {
   chips: ["2023", "UI/UX", "Chia"],
 };
 
-function phoneMedia(src: string): CardMedia {
+export type PhoneScreenInput = {
+  id: string;
+  label: string;
+  description: string;
+  object: KeyObject;
+};
+
+function toPhoneScreenInput(screen: PhoneScreen | PhoneScreenInput): PhoneScreenInput {
+  if ("object" in screen) {
+    return screen;
+  }
+
   return {
-    layers: [{ kind: "image", src, position: "center top" }],
+    id: screen.id,
+    label: screen.label,
+    description: screen.description,
+    object: { type: "image", src: screen.src },
   };
 }
 
-export function phoneTiles(): PresentationTile[] {
-  const key = PHONE_SCREENS.find((screen) => screen.id === PHONE_KEY_ID) ?? PHONE_SCREENS[0];
-  const rest = PHONE_SCREENS.filter((screen) => screen.id !== key.id);
-  const rows = Math.ceil(PHONE_SCREENS.length / PHONE_COLUMNS);
+export function phoneTiles(
+  screens: readonly (PhoneScreen | PhoneScreenInput)[] = PHONE_SCREENS,
+  keyId = PHONE_KEY_ID,
+): PresentationTile[] {
+  const inputs = screens.map(toPhoneScreenInput);
+  const key = inputs.find((screen) => screen.id === keyId) ?? inputs[0];
+  const rest = inputs.filter((screen) => screen.id !== key?.id);
+  const rows = Math.ceil(inputs.length / PHONE_COLUMNS);
   const tiles: PresentationTile[] = [];
   let restIndex = 0;
 
@@ -282,7 +294,7 @@ export function phoneTiles(): PresentationTile[] {
         ring: Math.max(Math.abs(col - 2), row),
         shiftX: primary ? PHONE_CLOSED_TILE.left - x : 0,
         shiftY: primary ? PHONE_CLOSED_TILE.top - y : 0,
-        media: phoneMedia(screen.src),
+        media: keyObjectMedia(screen.object),
         aspect: PHONE_ASPECT,
         label: screen.label,
         description: screen.description,
@@ -293,7 +305,10 @@ export function phoneTiles(): PresentationTile[] {
   return tiles;
 }
 
-export function phonePresentation(project: PresentationProject = PHONE_PROJECT): PresentationSpec {
+export function phonePresentation(
+  project: PresentationProject = PHONE_PROJECT,
+  screens?: readonly PhoneScreenInput[],
+): PresentationSpec {
   return {
     id: "phone",
     label: "iOS",
@@ -301,6 +316,6 @@ export function phonePresentation(project: PresentationProject = PHONE_PROJECT):
     project,
     closed: placed(PHONE_CLOSED),
     open: placed(PHONE_OPEN),
-    tiles: phoneTiles(),
+    tiles: phoneTiles(screens),
   };
 }

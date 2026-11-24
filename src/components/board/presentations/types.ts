@@ -1,5 +1,6 @@
 import type { AppIconMark } from "@/components/app-icon";
 import type { CardMedia } from "@/components/board/card-media";
+import type { CollectionId } from "@/lib/collection-ids";
 
 export const PRESENTATION_KINDS = ["phone", "desktop", "widget", "icon"] as const;
 
@@ -30,6 +31,11 @@ export type PresentationTile = {
   ring: number;
   shiftX: number;
   shiftY: number;
+  /** Closed-shell placement when the open feed uses a different size. */
+  closedX?: number;
+  closedY?: number;
+  closedWidth?: number;
+  closedHeight?: number;
   image?: string;
   imagePosition?: string;
   aspect?: number;
@@ -48,6 +54,12 @@ export type PresentationProject = {
   href?: string;
 };
 
+export type PresentationCollection = {
+  id: CollectionId;
+  poster: string;
+  title: string;
+};
+
 export type PresentationSpec = {
   id: PresentationKind;
   label: string;
@@ -56,6 +68,9 @@ export type PresentationSpec = {
   closed: PresentationFrame;
   open: PresentationFrame;
   tiles: PresentationTile[];
+  /** Open this icon study as the fisheye lens. */
+  lens?: boolean;
+  collection?: PresentationCollection;
 };
 
 export function isPresentationKind(value: unknown): value is PresentationKind {

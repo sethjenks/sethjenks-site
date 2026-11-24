@@ -18,7 +18,6 @@ import { isMobileScreen } from "@/lib/work-shape";
 const DRAG_THRESHOLD_PX = 8;
 
 const OBJECT_POSITION: Record<string, string> = {
-  "offer-builder": "center center",
   "chia-signer": "center center",
   "chia-friends": "center center",
 };

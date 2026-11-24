@@ -1,11 +1,18 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "good-css": {
       "source": "vojtaholik/good-css",
       "sourceType": "github",
       "skillPath": "skills/good-css/SKILL.md",
-      "computedHash": "64871e84fee8d9f9da1cfc6e8831ad00ef425bccdcc76addcfaa25fbdc131055"
+      "computedHash": "ee1a22bca769d7fce13b7e41207f7982a5e12e5aa785dcb19479b1955911c8ef"
+    },
+    "link-previews": {
+      "source": "joshpuckett/skills",
+      "commit": "d6acb2c7cb3ff876d4107425b1ea3b795c41d02c",
+      "sourceType": "github",
+      "skillPath": "skills/link-previews/SKILL.md",
+      "computedHash": "08e1bf52a72e1cae96eaab08741ba803b6ec2219e4c50044dea78df7a5928064"
     }
   }
 }

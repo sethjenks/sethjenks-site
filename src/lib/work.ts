@@ -56,7 +56,6 @@ export type WorkItem = {
 };
 
 const DISPLAY_ORDER = [
-  "offer-builder",
   "chia-wallet",
   "chia-signer",
   "chia-friends",

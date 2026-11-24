@@ -11,29 +11,45 @@ const CARD_SELECTOR = ".board-tile, .card-shell, .card-masonry-tile";
 export function CardMediaSurface({
   media,
   imagePosition,
+  interactive = false,
 }: {
   media: CardMedia;
   /** Overrides the image layer's object-position for the open frame. */
   imagePosition?: string;
+  /** When true, embed iframes can take focus and pointer input. */
+  interactive?: boolean;
 }) {
   const layers = orderedLayers(media.layers);
 
   return (
     <div className="card-media" aria-hidden="true">
       {layers.map((layer) => (
-        <MediaLayer key={layer.kind} layer={layer} imagePosition={imagePosition} />
+        <MediaLayer
+          key={layer.kind}
+          layer={layer}
+          imagePosition={imagePosition}
+          interactive={interactive}
+        />
       ))}
     </div>
   );
 }
 
-function MediaLayer({ layer, imagePosition }: { layer: CardLayer; imagePosition?: string }) {
+function MediaLayer({
+  layer,
+  imagePosition,
+  interactive,
+}: {
+  layer: CardLayer;
+  imagePosition?: string;
+  interactive: boolean;
+}) {
   const style = { opacity: layer.opacity ?? (layer.kind === "noise" ? 0.16 : 1) } as CSSProperties;
 
   switch (layer.kind) {
     case "image":
       return (
-        <span className="card-media-layer" data-kind="image" style={style}>
+        <span className="card-media-layer" data-kind="image" data-fit={layer.fit} style={style}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={layer.src}
@@ -45,8 +61,19 @@ function MediaLayer({ layer, imagePosition }: { layer: CardLayer; imagePosition?
       );
     case "video":
       return (
-        <span className="card-media-layer" data-kind="video" style={style}>
+        <span className="card-media-layer" data-kind="video" data-fit={layer.fit} style={style}>
           <MediaVideo src={layer.src} poster={layer.poster} playMode={layer.playMode ?? "auto"} />
+        </span>
+      );
+    case "embed":
+      return (
+        <span className="card-media-layer" data-kind="embed" style={style}>
+          <iframe
+            src={layer.src}
+            title={layer.title}
+            tabIndex={interactive ? 0 : -1}
+            sandbox="allow-scripts allow-same-origin"
+          />
         </span>
       );
     case "texture":

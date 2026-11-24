@@ -1,9 +1,11 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "127.0.2.2"],
   async redirects() {
     return [
+      { source: "/work/offer-builder", destination: "/work/chia-wallet", permanent: true },
       { source: "/log", destination: "/journal", permanent: false },
       { source: "/log/:path*", destination: "/journal/:path*", permanent: false },
     ];
@@ -34,4 +36,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default function config(phase: string): NextConfig {
+  return {
+    ...nextConfig,
+    pageExtensions:
+      phase === PHASE_DEVELOPMENT_SERVER
+        ? ["dev.tsx", "dev.ts", "tsx", "ts", "jsx", "js"]
+        : ["tsx", "ts", "jsx", "js"],
+  };
+}

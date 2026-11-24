@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type PointerEvent as ReactPointerEvent, type SetStateAction } from "react";
+import { createPortal } from "react-dom";
 
 import { IconDock, iconDockClosed } from "@/components/icon-dock";
 import { IconLens } from "@/components/icon-lens";
@@ -21,7 +22,8 @@ import {
   tileVariants,
 } from "@/components/board/presentations/motion";
 import { placed } from "@/components/board/presentations/stage";
-import { TileFace, tileHasImage } from "@/components/board/presentations/tile-face";
+import { revealOnScroll } from "@/components/board/reveal";
+import { TileFace, tileHasEmbed, tileHasFace, tileHasImage } from "@/components/board/presentations/tile-face";
 import type { PresentationFrame, PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
 import { tunedContentRadius, type CardTune } from "@/components/card-tune-panel";
 
@@ -86,6 +88,9 @@ export function PresentationShell({
     setAppearOpen(true);
   }
   const scrollable = expanded && !lensOn && !dockOn && armed;
+  const captionRef = useRef<HTMLDivElement>(null);
+  const captionText = useRef("");
+  const fineHover = useFineHover();
   if ((!expanded || lensOn || dockOn) && armed) {
     setArmed(false);
   }
@@ -118,6 +123,15 @@ export function PresentationShell({
       shellRef.current?.focus();
     }
   }, [expanded, openFrame]);
+
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scrollable || !scroller) {
+      return;
+    }
+    const images = [...scroller.querySelectorAll<HTMLElement>(".card-reveal")];
+    return revealOnScroll(images, scroller);
+  }, [scrollable, study]);
 
   return (
     <motion.div
@@ -202,6 +216,8 @@ export function PresentationShell({
           expanded={expanded}
           reduced={reduced}
           blank={masked && !appearOpen}
+          collectionId={study.collection?.id}
+          poster={study.collection?.poster}
           onGesture={() => {
             ignoreClick.current = performance.now();
           }}
@@ -218,6 +234,16 @@ export function PresentationShell({
           className="card-scroll"
           onScroll={() => {
             lastScroll.current = performance.now();
+            hideCaption(captionRef.current, captionText);
+          }}
+          onPointerLeave={() => {
+            hideCaption(captionRef.current, captionText);
+          }}
+          onPointerMove={(event) => {
+            if (!fineHover || event.pointerType !== "mouse") {
+              return;
+            }
+            moveCaption(captionRef.current, captionText, event, study.tiles);
           }}
         >
           <motion.div
@@ -238,6 +264,7 @@ export function PresentationShell({
                 scrollable={scrollable}
                 shift={shift}
                 fades={fades}
+                reduced={reduced}
               />
             ))}
           </motion.div>
@@ -258,8 +285,93 @@ export function PresentationShell({
       ) : (
         <TileChrome label={cardName} titleClassName="card-name" expandClassName="card-expand" />
       )}
+      {fineHover && scrollable
+        ? createPortal(<div ref={captionRef} className="card-cursor-caption" />, document.body)
+        : null}
     </motion.div>
   );
+}
+
+function useFineHover() {
+  const [fine, setFine] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const apply = () => setFine(query.matches);
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, []);
+
+  return fine;
+}
+
+function hideCaption(node: HTMLDivElement | null, current: { current: string }) {
+  current.current = "";
+  node?.removeAttribute("data-show");
+}
+
+function moveCaption(
+  node: HTMLDivElement | null,
+  current: { current: string },
+  event: ReactPointerEvent<HTMLDivElement>,
+  tiles: PresentationTile[],
+) {
+  if (!node) {
+    return;
+  }
+
+  const tileEl = event.target instanceof Element ? event.target.closest(".card-tile[data-image]") : null;
+  const id = tileEl?.getAttribute("data-tile");
+  const text = tiles.find((tile) => tile.id === id)?.description;
+
+  if (!text) {
+    hideCaption(node, current);
+    return;
+  }
+
+  if (current.current !== text) {
+    current.current = text;
+    node.textContent = text;
+  }
+
+  const gap = 16;
+  const margin = 12;
+  const width = node.offsetWidth;
+  const height = node.offsetHeight;
+  let left = event.clientX + gap;
+  let top = event.clientY + gap;
+  if (left + width > window.innerWidth - margin) {
+    left = event.clientX - width - gap;
+  }
+  if (top + height > window.innerHeight - margin) {
+    top = event.clientY - height - gap;
+  }
+  node.style.left = `${Math.max(margin, left)}px`;
+  node.style.top = `${Math.max(margin, top)}px`;
+  node.setAttribute("data-show", "");
+}
+
+function frameVariants(tile: PresentationTile, reduced: boolean) {
+  const travel = moveTransition(reduced, OPEN_SHELL_S);
+  const settle = moveTransition(reduced, OPEN_SHELL_S, CLOSE_MOVE_DELAY_S);
+
+  return {
+    closed: {
+      left: tile.closedX ?? tile.x,
+      top: tile.closedY ?? tile.y,
+      width: tile.closedWidth ?? tile.width,
+      height: tile.closedHeight ?? tile.height,
+      transition: settle,
+    },
+    open: {
+      left: tile.x,
+      top: tile.y,
+      width: tile.width,
+      height: tile.height,
+      transition: travel,
+    },
+  };
 }
 
 function ShellTile({
@@ -271,6 +383,7 @@ function ShellTile({
   scrollable,
   shift,
   fades,
+  reduced,
 }: {
   tile: PresentationTile;
   expanded: boolean;
@@ -280,22 +393,24 @@ function ShellTile({
   scrollable: boolean;
   shift: ReturnType<typeof shiftVariants>;
   fades: Map<number, ReturnType<typeof tileVariants>>;
+  reduced: boolean;
 }) {
   const moving = tile.shiftX !== 0 || tile.shiftY !== 0;
-  const hasFace = tileHasImage(tile) || Boolean(tile.icon);
+  const resized = tile.closedWidth !== undefined;
+  const hasFace = tileHasFace(tile);
   const masked = tune.masked;
   const shaped = !hasFace || masked;
   const style = {
-    left: tile.x,
-    top: tile.y,
-    width: tile.width,
-    height: tile.height,
+    left: resized ? undefined : tile.x,
+    top: resized ? undefined : tile.y,
+    width: resized ? undefined : tile.width,
+    height: resized ? undefined : tile.height,
     borderRadius: tile.icon ? 0 : shaped ? tunedContentRadius(tile.radius, tune) : 0,
     background: hasFace && !shaped ? "transparent" : undefined,
   };
   const face = <TileFace tile={tile} masked={masked} appearOpen={appearOpen} scrollable={scrollable} />;
 
-  if (!moving && tile.resting) {
+  if (!moving && tile.resting && !resized) {
     return (
       <span
         className="card-tile"
@@ -304,10 +419,11 @@ function ShellTile({
         data-tile={tile.id}
         data-image={tileHasImage(tile) ? "" : undefined}
         data-icon={tile.icon ? "" : undefined}
+        data-embed={tileHasEmbed(tile) ? "" : undefined}
         data-described={described === tile.id ? "" : undefined}
         style={style}
       >
-        {face}
+        <span className="card-reveal">{face}</span>
       </span>
     );
   }
@@ -320,13 +436,16 @@ function ShellTile({
       data-tile={tile.id}
       data-image={tileHasImage(tile) ? "" : undefined}
       data-icon={tile.icon ? "" : undefined}
+      data-embed={tileHasEmbed(tile) ? "" : undefined}
       data-described={described === tile.id ? "" : undefined}
       initial="closed"
       animate={expanded ? "open" : "closed"}
-      variants={moving ? shift : fades.get(Math.min(MAX_FADE_RING, Math.max(1, tile.ring)))}
+      variants={
+        resized ? frameVariants(tile, reduced) : moving ? shift : fades.get(Math.min(MAX_FADE_RING, Math.max(1, tile.ring)))
+      }
       style={style}
     >
-      {face}
+      <span className="card-reveal">{face}</span>
     </motion.span>
   );
 }

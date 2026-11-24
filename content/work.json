@@ -1,197 +1,5 @@
 [
   {
-    "id": "offer-builder",
-    "title": "Chia Offer Builder",
-    "year": "2023",
-    "role": "UI/UX",
-    "src": "/media/work/offer-builder-hero.jpg",
-    "width": 2200,
-    "height": 1369,
-    "summary": "How do you create an intuitive interface for a new way of trading digital assets?",
-    "alt": "Offer Builder in the Seedling Wallet, with Offering and Requesting columns for XCH, tokens, NFTs, and fees.",
-    "tags": [
-      "Chia"
-    ],
-    "sections": [
-      {
-        "heading": "Two interfaces, then NFTs",
-        "body": [
-          "In the Chia Wallet, there were two different interfaces for offers — one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work. We needed an interface allowing any combination of assets to be traded for any other combination of assets that was also future-proof and intuitive to use."
-        ]
-      },
-      {
-        "heading": "A proposal, not a payment",
-        "body": [
-          "I took a first principles approach with Offer Builder. Offers are different from transactions in that you are only creating a proposal for a transaction. This needs to be evident in the interface design. The solution we came up with needed to be intuitive, instructive, and durable."
-        ]
-      }
-    ],
-    "blocks": [
-      {
-        "type": "bleed",
-        "frame": {
-          "src": "/media/work/offer-builder-hero.jpg",
-          "width": 2200,
-          "height": 1369,
-          "alt": "Offer Builder in the Seedling Wallet, with Offering and Requesting columns for XCH, tokens, NFTs, and fees."
-        }
-      },
-      {
-        "type": "statement",
-        "label": "The challenge",
-        "text": "We needed an interface allowing any combination of assets to be traded for any other combination of assets that was also future-proof and intuitive to use."
-      },
-      {
-        "type": "essay",
-        "heading": "A proposal, not a payment",
-        "body": [
-          "In the Chia Wallet, there were two different interfaces for offers — one for XCH trades and another for token trading. With NFTs soon to be added to the mix, neither of the existing interfaces would work.",
-          "I took a first principles approach with Offer Builder. Offers are different from transactions in that you are only creating a proposal for a transaction. This needs to be evident in the interface design. The solution we came up with needed to be intuitive, instructive, and durable."
-        ]
-      },
-      {
-        "type": "essay",
-        "heading": "The problem Chia Offers solves",
-        "body": [
-          "Counterparty risk is a common concern in transactions, involving the potential for attackers to take your assets. Traditional finance relies on trusted intermediaries like escrow services, which hold assets until transaction conditions are met. However, on the internet, an attacker may also control the escrow service. This common attack leads to significant asset losses.",
-          "Blockchain, specifically the Chia blockchain, addresses this issue effectively. Using a UTXO-style architecture and aggregatable BLS signatures, Chia enables users to propose transactions (\"Offers\") that others can accept. The blockchain executes these zero-trust transactions, delivering assets to respective wallets. This allows individuals and institutions to conduct counterparty risk-free transactions.",
-          "Creating an offer as quickly as possible was my north star for this feature."
-        ]
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-early.jpg",
-          "width": 2200,
-          "height": 1276,
-          "alt": "Early concept for NFT offers, with a dense token-style trading layout.",
-          "caption": "Early concepts for NFT offers were based on token trading interfaces and seemed overly complex. The established interface pattern broke when trying to trade multiple NFTs or groups of assets for groups of other assets."
-        }
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-columns.jpg",
-          "width": 2200,
-          "height": 1650,
-          "alt": "Two-column offer concept, one side for assets you own and one for assets you want.",
-          "caption": "An offer sets the conditions for both sides of a transaction, so I chose to create two columns. One for items you own and want to trade, and another for items you would like to trade for."
-        }
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-categories.jpg",
-          "width": 2200,
-          "height": 1650,
-          "alt": "Offer builder with XCH, tokens, and NFTs visible at the top level instead of inside a menu.",
-          "caption": "This new paradigm for trading is unfamiliar, so it’s essential we make the user think as little as possible. Hiding asset types under a dropdown menu might be more minimal looking, but it complicates the mental decision-making needed to create a trade. Placing all asset categories at the top level allows users to immediately see their options and construct an offer."
-        }
-      },
-      {
-        "type": "frame",
-        "narrow": true,
-        "frame": {
-          "src": "/media/work/offer-builder-logic.jpg",
-          "width": 2200,
-          "height": 4062,
-          "alt": "Offer Builder with an OR operator between two possible requested assets.",
-          "caption": "The Offer Builder interface allows for multiple assets to be traded and could include logic. In this case an OR operator (in black) could execute the trade if either of the conditions are met."
-        }
-      },
-      {
-        "type": "facts",
-        "items": [
-          {
-            "label": "Year",
-            "lines": [
-              "2023"
-            ]
-          },
-          {
-            "label": "Timeframe",
-            "lines": [
-              "6 weeks"
-            ]
-          },
-          {
-            "label": "Tools",
-            "lines": [
-              "Figma"
-            ]
-          }
-        ]
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-iterations.jpg",
-          "width": 2200,
-          "height": 1324,
-          "alt": "A wall of earlier offer interface iterations.",
-          "caption": "Offers went through dozens and dozens of iterations before we came to the conclusion that the current way of thinking about offers wouldn’t work with NFT or multi-asset offers."
-        }
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-expire.jpg",
-          "width": 2200,
-          "height": 1451,
-          "alt": "Offer Builder with a seven-day expiration on the offer.",
-          "caption": "The most recent offers interface (as of Chia Wallet 2.1.1) allows offers to expire after a period of time."
-        }
-      },
-      {
-        "type": "frame",
-        "frame": {
-          "src": "/media/work/offer-builder-compare.jpg",
-          "width": 2200,
-          "height": 1591,
-          "alt": "The original offers interface beside the updated Offer Builder.",
-          "caption": "The original offers interface and the updated Offer Builder."
-        }
-      }
-    ],
-    "plates": [
-      {
-        "label": "Builder",
-        "src": "/media/work/offer-builder-expire.jpg",
-        "width": 2200,
-        "height": 1451,
-        "alt": "Offer Builder in the Seedling Wallet, with a seven-day expiration and Offering and Requesting columns."
-      },
-      {
-        "label": "Original",
-        "src": "/media/work/offer-builder-compare.jpg",
-        "width": 2200,
-        "height": 1591,
-        "alt": "The original Create an Offer form beside the updated Offer Builder."
-      },
-      {
-        "label": "Assets",
-        "src": "/media/work/offer-builder-categories.jpg",
-        "width": 2200,
-        "height": 1650,
-        "alt": "Offering and Requesting columns with XCH, tokens, and NFTs at the top level."
-      },
-      {
-        "label": "Columns",
-        "src": "/media/work/offer-builder-columns.jpg",
-        "width": 2200,
-        "height": 1650,
-        "alt": "Two-column offer concept, one side for assets you own and one for assets you want."
-      },
-      {
-        "label": "Earlier",
-        "src": "/media/work/offer-builder-early.jpg",
-        "width": 2200,
-        "height": 1276,
-        "alt": "Early NFT offer screens, based on the token trading layout."
-      }
-    ]
-  },
-  {
     "id": "chia-signer",
     "title": "Chia Transaction Signer",
     "year": "2023",
@@ -347,7 +155,7 @@
     "src": "/media/work/chia-wallet-hero.jpg",
     "width": 2200,
     "height": 1433,
-    "summary": "XCH, tokens, and NFTs in one wallet, with every transaction in view.",
+    "summary": "XCH, tokens, NFTs, and offers in one wallet, with every transaction in view.",
     "alt": "The Chia wallet, with the XCH balance, a token list, and a transaction history including a pending clawback.",
     "tags": [
       "Chia"
@@ -374,6 +182,55 @@
         "width": 2200,
         "height": 1369,
         "alt": "The wallet summary with a pending clawback transaction highlighted."
+      },
+      {
+        "label": "Credentials",
+        "src": "/media/work/credentials.jpg",
+        "width": 1024,
+        "height": 661,
+        "alt": "Verifiable Credentials screen with a green government ID card between cards for badging, KYC status, and memberships."
+      },
+      {
+        "label": "Offers",
+        "src": "/media/work/offer-builder-hero.jpg",
+        "width": 2200,
+        "height": 1369,
+        "alt": "Offer Builder in the Seedling Wallet, with Offering and Requesting columns for XCH, tokens, NFTs, and fees."
+      },
+      {
+        "label": "Builder",
+        "src": "/media/work/offer-builder-expire.jpg",
+        "width": 2200,
+        "height": 1451,
+        "alt": "Offer Builder in the Seedling Wallet, with a seven-day expiration and Offering and Requesting columns."
+      },
+      {
+        "label": "Original",
+        "src": "/media/work/offer-builder-compare.jpg",
+        "width": 2200,
+        "height": 1591,
+        "alt": "The original Create an Offer form beside the updated Offer Builder."
+      },
+      {
+        "label": "Assets",
+        "src": "/media/work/offer-builder-categories.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Offering and Requesting columns with XCH, tokens, and NFTs at the top level."
+      },
+      {
+        "label": "Columns",
+        "src": "/media/work/offer-builder-columns.jpg",
+        "width": 2200,
+        "height": 1650,
+        "alt": "Two-column offer concept, one side for assets you own and one for assets you want."
+      },
+      {
+        "label": "Earlier",
+        "src": "/media/work/offer-builder-early.jpg",
+        "width": 2200,
+        "height": 1276,
+        "alt": "Early NFT offer screens, based on the token trading layout."
       }
     ]
   },
@@ -499,7 +356,9 @@
     "height": 2000,
     "summary": "An unofficial field guide to Paper. Every shortcut worth knowing, plus how to put agents to work.",
     "alt": "Paper.tips, with the title and the twelve shortcuts for getting started in Paper.",
-    "tags": ["Paper"],
+    "tags": [
+      "Paper"
+    ],
     "sections": [
       {
         "heading": "Get fast in Paper",
@@ -554,9 +413,11 @@
     "src": "/media/work/philo-hero.jpg",
     "width": 2880,
     "height": 2000,
-    "summary": "Philo helps founders go from \u22121 to 1, from the first spark of an idea to first revenue.",
+    "summary": "Philo helps founders go from −1 to 1, from the first spark of an idea to first revenue.",
     "alt": "Philo homepage, the headline Builders backing builders above an illustration of a workshop and a rocket.",
-    "tags": ["Philo"],
+    "tags": [
+      "Philo"
+    ],
     "sections": [
       {
         "heading": "Builders backing builders",

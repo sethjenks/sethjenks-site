@@ -3,56 +3,6 @@
     [
       {
         "kind": "work",
-        "id": "offer-builder",
-        "filter": "product",
-        "label": "Offer Builder",
-        "frame": "tall",
-        "hover": {
-          "duration": 450,
-          "background": {
-            "to": {
-              "scale": 1.025
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "orientation",
-        "filter": "product",
-        "frame": "phone",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        },
-        "background": {
-          "type": "color",
-          "color": "#eeeeee"
-        },
-        "foreground": {
-          "type": "html",
-          "src": "/media/work/orientation.html",
-          "title": "Orientation"
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "credentials",
-        "filter": "product",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "work",
         "id": "philo",
         "filter": "brand",
         "frame": "poster",
@@ -63,7 +13,8 @@
               "scale": 1.02
             }
           }
-        }
+        },
+        "presentation": "desktop"
       },
       {
         "kind": "gallery",
@@ -150,7 +101,8 @@
               "scale": 1.02
             }
           }
-        }
+        },
+        "presentation": "desktop"
       },
       {
         "kind": "gallery",
@@ -230,13 +182,6 @@
             }
           }
         }
-      },
-      {
-        "kind": "slot",
-        "id": "open-1",
-        "label": "Untitled",
-        "filter": "play",
-        "frame": "tall"
       }
     ],
     [
@@ -244,7 +189,7 @@
         "kind": "work",
         "id": "chia-signer",
         "filter": "product",
-        "label": "Transaction Signer",
+        "label": "Chia Signer",
         "presentation": "phone",
         "frame": "phone",
         "hover": {
@@ -272,6 +217,8 @@
         "kind": "gallery",
         "id": "intermission-iron",
         "filter": "product",
+        "label": "Intermission Health",
+        "presentation": "phone",
         "frame": "phone",
         "hover": {
           "background": {
@@ -462,20 +409,6 @@
             }
           }
         }
-      },
-      {
-        "kind": "slot",
-        "id": "open-2",
-        "label": "Untitled",
-        "filter": "play",
-        "frame": "short"
-      },
-      {
-        "kind": "slot",
-        "id": "open-3",
-        "label": "Untitled",
-        "filter": "play",
-        "frame": "short"
       }
     ],
     [
@@ -484,6 +417,7 @@
         "id": "chia-wallet",
         "filter": "product",
         "label": "Chia Wallet",
+        "presentation": "desktop",
         "frame": "tall",
         "hover": {
           "duration": 500,
@@ -499,6 +433,7 @@
         "kind": "gallery",
         "id": "study-icons",
         "filter": "product",
+        "label": "Realistic Button in Paper",
         "frame": "poster",
         "hover": {
           "background": {
@@ -696,7 +631,8 @@
               "y": -8
             }
           }
-        }
+        },
+        "presentation": "desktop"
       },
       {
         "kind": "gallery",
@@ -723,20 +659,6 @@
             }
           }
         }
-      },
-      {
-        "kind": "slot",
-        "id": "open-4",
-        "label": "Untitled",
-        "filter": "play",
-        "frame": "poster"
-      },
-      {
-        "kind": "slot",
-        "id": "open-5",
-        "label": "Untitled",
-        "filter": "play",
-        "frame": "poster"
       }
     ]
   ],

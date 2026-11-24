@@ -233,7 +233,7 @@ function visibleStill(card: HTMLElement) {
   const background = card.querySelector(".board-tile-bg");
   const foreground = card.querySelector(".board-tile-fg");
   const foregroundOpacity = foreground ? Number(getComputedStyle(foreground).opacity) : 0;
-  const layer = foregroundOpacity > 0.5 && foreground ? foreground : background;
+  const layer = foregroundOpacity > 0.5 && foreground ? foreground : background ?? card.querySelector(".card-tile");
   const image = layer?.querySelector("img");
   const paint = layer ? getComputedStyle(layer).backgroundColor : "#fafafa";
 

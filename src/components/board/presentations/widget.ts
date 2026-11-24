@@ -1,7 +1,17 @@
 import { placed } from "@/components/board/presentations/stage";
-import type { PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+import { faceMedia, fittedTile, type TileFaceMedia } from "@/components/board/presentations/tile-fit";
+import type {
+  PresentationProject,
+  PresentationSpec,
+  PresentationTile,
+} from "@/components/board/presentations/types";
 
 export type WidgetOrientation = "landscape" | "portrait";
+
+export type WidgetInput = {
+  face: TileFaceMedia;
+  frame: { width: number; height: number };
+};
 
 const WIDGET_GAP = 32;
 const WIDGET_RADIUS = 16;
@@ -10,6 +20,10 @@ const WIDGET_PORTRAIT = { width: 252, height: 400 };
 const WIDGET_LANDSCAPE_CLOSED = { width: 520, height: 360 };
 const WIDGET_PORTRAIT_CLOSED = { width: 360, height: 520 };
 const PHONE_OPEN = { width: 1532, height: 862 };
+
+export function widgetOrientationFor(frame: { width: number; height: number }): WidgetOrientation {
+  return frame.width >= frame.height ? "landscape" : "portrait";
+}
 
 export function widgetTiles(orientation: WidgetOrientation): PresentationTile[] {
   const landscape = orientation === "landscape";
@@ -53,16 +67,44 @@ export function widgetTiles(orientation: WidgetOrientation): PresentationTile[] 
   return tiles;
 }
 
-export function widgetPresentation(orientation: WidgetOrientation): PresentationSpec {
-  const closed = orientation === "landscape" ? WIDGET_LANDSCAPE_CLOSED : WIDGET_PORTRAIT_CLOSED;
+export function widgetPresentation(
+  orientation: WidgetOrientation,
+  project: PresentationProject = { title: "Widget", chips: [] },
+  input?: WidgetInput,
+): PresentationSpec {
+  const closedSize = input?.frame
+    ? input.frame
+    : orientation === "landscape"
+      ? WIDGET_LANDSCAPE_CLOSED
+      : WIDGET_PORTRAIT_CLOSED;
+  const tiles = widgetTiles(orientation);
+
+  if (input) {
+    const face = input.face;
+    const aspect = face.width / face.height;
+    const fit = fittedTile(input.frame, aspect, "widget", face.label, face.description);
+    const primary = tiles.find((tile) => tile.resting);
+    if (primary) {
+      primary.label = face.label;
+      primary.description = face.description;
+      primary.media = faceMedia(face);
+      primary.aspect = aspect;
+      primary.closedX = fit.x;
+      primary.closedY = fit.y;
+      primary.closedWidth = fit.width;
+      primary.closedHeight = fit.height;
+      primary.shiftX = 0;
+      primary.shiftY = 0;
+    }
+  }
 
   return {
     id: "widget",
     label: "Widget",
     openLabel: "Expand the widget",
-    project: { title: "Widget", chips: [] },
-    closed: placed(closed),
+    project,
+    closed: placed(closedSize),
     open: placed(PHONE_OPEN),
-    tiles: widgetTiles(orientation),
+    tiles,
   };
 }

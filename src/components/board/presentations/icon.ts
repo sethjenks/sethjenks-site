@@ -1,6 +1,7 @@
 import { APP_ICON_MARKS, type AppIconMark } from "@/components/app-icon";
 import { placed } from "@/components/board/presentations/stage";
-import type { PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+import type { PresentationProject, PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+import type { CollectionId } from "@/lib/collection-ids";
 
 const PHONE_OPEN = { width: 1532, height: 862 };
 const ICON_CLOSED = { width: 400, height: 400 };
@@ -64,12 +65,59 @@ export function iconTiles(): PresentationTile[] {
   return tiles;
 }
 
-export function iconPresentation(): PresentationSpec {
+const ICON_PROJECT: PresentationProject = { title: "Vault", chips: ["Brand"] };
+
+export type IconCollectionInput = {
+  id: CollectionId;
+  poster: string;
+  title: string;
+};
+
+function collectionIconTile(poster: string, title: string): PresentationTile {
+  const x = (ICON_CLOSED.width - ICON_SIZE) / 2;
+  const y = (ICON_CLOSED.height - ICON_SIZE) / 2;
+
+  return {
+    id: "icon",
+    x,
+    y,
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+    radius: ICON_ROUNDED_RADIUS,
+    resting: true,
+    ring: 0,
+    shiftX: 0,
+    shiftY: 0,
+    aspect: 1,
+    media: { layers: [{ kind: "image", src: poster, position: "center", fit: "cover" }] },
+    label: title,
+    description: title,
+  };
+}
+
+export function iconPresentation(
+  project: PresentationProject = ICON_PROJECT,
+  source?: IconCollectionInput,
+): PresentationSpec {
+  if (source) {
+    return {
+      id: "icon",
+      label: "Icon",
+      openLabel: "Expand the icon",
+      project,
+      lens: true,
+      collection: { id: source.id, poster: source.poster, title: source.title },
+      closed: placed(ICON_CLOSED),
+      open: placed(PHONE_OPEN),
+      tiles: [collectionIconTile(source.poster, source.title)],
+    };
+  }
+
   return {
     id: "icon",
     label: "Icon",
     openLabel: "Expand the icon",
-    project: { title: "Vault", chips: ["Brand"] },
+    project,
     closed: placed(ICON_CLOSED),
     open: placed(PHONE_OPEN),
     tiles: iconTiles(),

@@ -10,6 +10,7 @@ import { getQuietPaths } from "@/lib/work";
 import { geistPixelSquare } from "@/lib/pixel-font";
 import { timelessSans } from "@/lib/timeless-sans";
 import { INTRO } from "@/lib/intro";
+import { shareImage, shareVideo } from "@/lib/link-previews/share-image";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
 import "./home-board.css";
@@ -28,34 +29,46 @@ export const viewport: Viewport = {
   themeColor: "oklch(98.5% 0 none)",
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(getSiteUrl()),
-  title: {
-    default: "Seth Jenks",
-    template: "%s · Seth Jenks",
-  },
-  description: INTRO.description,
-  openGraph: {
-    title: "Seth Jenks",
+export async function generateMetadata(): Promise<Metadata> {
+  const image = shareImage("/");
+  const video = shareVideo("/");
+  const shareVideoTags = video
+    ? [{ url: video.url, type: video.type, width: video.width, height: video.height }]
+    : [
+        {
+          url: spacebaseVideoUrl,
+          secureUrl: spacebaseVideoUrl,
+          type: "video/mp4" as const,
+          width: 1024,
+          height: 1024,
+        },
+      ];
+
+  return {
+    metadataBase: new URL(getSiteUrl()),
+    title: {
+      default: "Seth Jenks",
+      template: "%s · Seth Jenks",
+    },
     description: INTRO.description,
-    siteName: "Seth Jenks",
-    type: "website",
-    videos: [
-      {
-        url: spacebaseVideoUrl,
-        secureUrl: spacebaseVideoUrl,
-        type: "video/mp4",
-        width: 1024,
-        height: 1024,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Seth Jenks",
-    description: INTRO.description,
-  },
-};
+    openGraph: {
+      title: "Seth Jenks",
+      description: INTRO.description,
+      siteName: "Seth Jenks",
+      type: "website",
+      ...(image ? { images: [image] } : {}),
+      videos: shareVideoTags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Seth Jenks",
+      description: INTRO.description,
+      ...(image
+        ? { images: [{ url: image.url, alt: image.alt, width: image.width, height: image.height }] }
+        : {}),
+    },
+  };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const quietPaths = await getQuietPaths();

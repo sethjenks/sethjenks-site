@@ -251,12 +251,22 @@ html:has(.card-stage) {
   gap: 16px;
   height: var(--card-open-header, 96px);
   padding: 0 28px 0 32px;
-  background: #ededed;
+  isolation: isolate;
+  background: linear-gradient(
+    to bottom,
+    var(--card-shell-bg, #ededed) 0%,
+    var(--card-shell-bg, #ededed) 34%,
+    color-mix(in srgb, var(--card-shell-bg, #ededed) 88%, transparent) 58%,
+    color-mix(in srgb, var(--card-shell-bg, #ededed) 42%, transparent) 78%,
+    transparent 100%
+  );
   color: #111;
   pointer-events: auto;
 }
 
 .card-open-header-lead {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex: 1;
   align-items: center;
@@ -297,6 +307,8 @@ html:has(.card-stage) {
 }
 
 .card-open-header-collapse {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   flex: none;
   align-items: center;

@@ -12,6 +12,7 @@ import {
   nearestIndex,
   placeItem,
 } from "@/lib/collection-lens-math";
+import { collectionIsPixelated, openCollection, type CollectionId } from "@/lib/collections";
 
 const COLS = 29;
 const ROWS = 21;
@@ -54,11 +55,21 @@ type IconLensProps = {
   expanded: boolean;
   reduced: boolean;
   blank?: boolean;
+  collectionId?: CollectionId;
+  poster?: string;
   onClose: () => void;
   onGesture: () => void;
 };
 
-export function IconLens({ expanded, reduced, blank = false, onClose, onGesture }: IconLensProps) {
+export function IconLens({
+  expanded,
+  reduced,
+  blank = false,
+  collectionId,
+  poster,
+  onClose,
+  onGesture,
+}: IconLensProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const cellsRef = useRef<Array<HTMLSpanElement | null>>([]);
   const expandedRef = useRef(expanded);
@@ -494,8 +505,47 @@ export function IconLens({ expanded, reduced, blank = false, onClose, onGesture 
     kickRef.current();
   }, [expanded, reduced]);
 
+  useLayoutEffect(() => {
+    if (!collectionId) {
+      return;
+    }
+
+    const opened = openCollection(collectionId);
+    let unsubscribe = () => {};
+    let cancelled = false;
+
+    void opened.catalog.then((catalog) => {
+      if (cancelled) {
+        return;
+      }
+      const paint = () => {
+        const count = Math.max(catalog.count, 1);
+        for (let index = 0; index < COUNT; index += 1) {
+          const image = cellsRef.current[index]?.querySelector("img");
+          const piece = catalog.piece(index % count);
+          if (!(image instanceof HTMLImageElement) || !piece || image.getAttribute("src") === piece.src) {
+            continue;
+          }
+          image.src = piece.src;
+        }
+      };
+      paint();
+      unsubscribe = catalog.subscribe(paint);
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      opened.release();
+    };
+  }, [collectionId]);
+
   return (
-    <div ref={rootRef} className="icon-lens">
+    <div
+      ref={rootRef}
+      className="icon-lens"
+      data-pixelated={collectionId && collectionIsPixelated(collectionId) ? "" : undefined}
+    >
       {Array.from({ length: COUNT }, (_, index) => {
         const primary = index === FOCUS_INDEX;
         const mark = primary ? "vault" : APP_ICON_MARKS[index % APP_ICON_MARKS.length];
@@ -510,7 +560,12 @@ export function IconLens({ expanded, reduced, blank = false, onClose, onGesture 
             aria-hidden="true"
             style={{ width: CELL, height: CELL }}
           >
-            <AppIcon mark={mark} rounded blank={blank} />
+            {collectionId ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="icon-lens-piece" src={poster || undefined} alt="" draggable={false} />
+            ) : (
+              <AppIcon mark={mark} rounded blank={blank} />
+            )}
           </span>
         );
       })}

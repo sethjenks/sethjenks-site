@@ -1,12 +1,20 @@
 "use client";
 
 import { AppIcon } from "@/components/app-icon";
-import { imageLayer } from "@/components/board/card-media";
+import { embedLayer, imageLayer } from "@/components/board/card-media";
 import { CardMediaSurface } from "@/components/board/card-media-surface";
 import type { PresentationTile } from "@/components/board/presentations/types";
 
 export function tileHasImage(tile: PresentationTile): boolean {
   return Boolean(tile.image || imageLayer(tile.media));
+}
+
+export function tileHasEmbed(tile: PresentationTile): boolean {
+  return Boolean(embedLayer(tile.media));
+}
+
+export function tileHasFace(tile: PresentationTile): boolean {
+  return tileHasImage(tile) || tileHasEmbed(tile) || Boolean(tile.icon) || Boolean(tile.media);
 }
 
 export function imageBox(width: number, height: number, aspect: number) {
@@ -30,15 +38,20 @@ export function TileFace({
   appearOpen: boolean;
   scrollable: boolean;
 }) {
-  const openImage = appearOpen && tileHasImage(tile);
+  const openImage = appearOpen && tileHasImage(tile) && !tileHasEmbed(tile);
   const box = openImage && tile.aspect ? imageBox(tile.width, tile.height, tile.aspect) : null;
+  const embed = embedLayer(tile.media);
 
   return (
     <>
       {tile.icon ? (
         <AppIcon mark={tile.icon.mark} rounded={tile.icon.rounded} blank={masked && !appearOpen} />
       ) : tile.media ? (
-        <CardMediaSurface media={tile.media} imagePosition={openImage ? "center" : undefined} />
+        <CardMediaSurface
+          media={tile.media}
+          imagePosition={openImage ? "center" : undefined}
+          interactive={appearOpen && tileHasEmbed(tile)}
+        />
       ) : tile.image ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -48,7 +61,7 @@ export function TileFace({
           style={{ objectPosition: openImage ? "center" : (tile.imagePosition ?? "center top") }}
         />
       ) : null}
-      {scrollable && tileHasImage(tile) ? (
+      {scrollable && tileHasImage(tile) && !embed ? (
         <span
           className="card-image-label"
           style={

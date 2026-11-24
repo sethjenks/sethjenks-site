@@ -1,0 +1,157 @@
+{
+  "system": {
+    "template": "plate",
+    "color": "#000000",
+    "domain": "sethjenks.com",
+    "font": {
+      "family": "Timeless Sans",
+      "titleWeight": 500,
+      "labelWeight": 420
+    },
+    "colors": {
+      "light": {
+        "background": "#fafafa",
+        "ink": "#111111",
+        "label": "#6b6b6b"
+      },
+      "dark": {
+        "background": "#0a0a0a",
+        "ink": "#fafafa",
+        "label": "#8a8a8a"
+      },
+      "panel": "#ffffff"
+    },
+    "margin": 56,
+    "textBottom": 80,
+    "panelGap": 48,
+    "panelWidth": 540,
+    "labelSize": 24,
+    "labelLineHeight": 1.3,
+    "labelGap": 48,
+    "lineHeight": 0.9,
+    "titleSize": {
+      "min": 40,
+      "max": 150
+    },
+    "maxLines": 4
+  },
+  "entries": [
+    {
+      "id": "home",
+      "path": "/",
+      "title": "Seth Jenks",
+      "group": "Pages",
+      "theme": "dark",
+      "layout": "type-and-image",
+      "image": {
+        "sheet": [
+          "og/sources/work-offer-builder-hero.jpg",
+          "og/sources/work-chia-wallet-hero.jpg",
+          "og/sources/work-chia-signer-hero.jpg",
+          "og/sources/work-chia-friends-hero.jpg",
+          "og/sources/work-paper-tips-hero.jpg",
+          "og/sources/work-philo-hero.jpg"
+        ],
+        "columns": 2
+      },
+      "version": "2f645a12bb7a",
+      "savedHash": "1d83fe06"
+    },
+    {
+      "id": "journal",
+      "path": "/journal",
+      "title": "Journal",
+      "group": "Pages",
+      "theme": "light",
+      "layout": "type-only",
+      "image": null,
+      "version": "2fa77333edaf",
+      "savedHash": "296c43e5"
+    },
+    {
+      "id": "work-chia-wallet",
+      "path": "/work/chia-wallet",
+      "title": "Chia Wallet",
+      "group": "Work",
+      "theme": "light",
+      "layout": "type-and-image",
+      "image": {
+        "src": "og/sources/work-chia-wallet-hero.jpg",
+        "focus": {
+          "x": 0.5,
+          "y": 0.45
+        }
+      },
+      "version": "ee31454beed5",
+      "savedHash": "ef28dca2"
+    },
+    {
+      "id": "work-chia-signer",
+      "path": "/work/chia-signer",
+      "title": "Chia Transaction Signer",
+      "group": "Work",
+      "theme": "light",
+      "layout": "type-and-image",
+      "image": {
+        "src": "og/sources/work-chia-signer-hero.jpg",
+        "focus": {
+          "x": 0.5,
+          "y": 0.4
+        }
+      },
+      "version": "8818c128df4a",
+      "savedHash": "d140a22b"
+    },
+    {
+      "id": "work-chia-friends",
+      "path": "/work/chia-friends",
+      "title": "Chia Friends",
+      "group": "Work",
+      "theme": "light",
+      "layout": "type-and-image",
+      "image": {
+        "src": "og/sources/work-chia-friends-hero.jpg",
+        "focus": {
+          "x": 0.5,
+          "y": 0.45
+        }
+      },
+      "version": "6bbce6b15738",
+      "savedHash": "85dafa38"
+    },
+    {
+      "id": "work-paper-tips",
+      "path": "/work/paper-tips",
+      "title": "Paper.tips",
+      "group": "Work",
+      "theme": "light",
+      "layout": "type-and-image",
+      "image": {
+        "src": "og/sources/work-paper-tips-hero.jpg",
+        "focus": {
+          "x": 0.5,
+          "y": 0.45
+        }
+      },
+      "version": "e8f90221a5b9",
+      "savedHash": "a924d7c8"
+    },
+    {
+      "id": "work-philo",
+      "path": "/work/philo",
+      "title": "Philo",
+      "group": "Work",
+      "theme": "light",
+      "layout": "type-and-image",
+      "image": {
+        "src": "og/sources/work-philo-hero.jpg",
+        "focus": {
+          "x": 0.5,
+          "y": 0.4
+        }
+      },
+      "version": "ca2cbf66a804",
+      "savedHash": "b87c4e64"
+    }
+  ]
+}

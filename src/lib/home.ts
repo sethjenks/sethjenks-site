@@ -2,11 +2,16 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 
 import homeFile from "../../content/home.json";
-import { collectionForGallery, type CollectionId } from "@/lib/collection-ids";
+import { collectionForGallery } from "@/lib/collection-ids";
 import { getGalleryItems, type GalleryItem, type GalleryVideo } from "@/lib/gallery";
 import { getProjectItems, type ProjectItem } from "@/lib/projects";
-import { presentationFor } from "@/components/board/presentations/registry";
-import { isPresentationKind, type PresentationSpec } from "@/components/board/presentations/types";
+import { presentationFor, type PresentationMedia } from "@/components/board/presentations/registry";
+import {
+  isPresentationKind,
+  type PresentationKind,
+  type PresentationProject,
+  type PresentationSpec,
+} from "@/components/board/presentations/types";
 import { getWorkItems, type WorkItem } from "@/lib/work";
 
 const PORTRAIT_PUBLIC_PATH = "/media/people/seth-jenks.jpg";
@@ -55,40 +60,13 @@ export type TileForeground =
   | { type: "video"; src: string; poster?: string; alt: string; fit: HomeFit; play: "hover" | "always" }
   | { type: "html"; src: string; title: string };
 
-export type ProjectPlate = {
-  label: string;
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
+export type CardOpening = {
+  kind: "presentation";
+  presentation: PresentationSpec["id"];
+  href: string;
+  project: PresentationSpec["project"];
+  spec: PresentationSpec;
 };
-
-export type CardOpening =
-  | { kind: "slot" }
-  | { kind: "video"; src: string; poster?: string; width: number; height: number }
-  | { kind: "image"; src: string; alt: string; width: number; height: number }
-  | { kind: "frame"; src: string; title: string; width: number; height: number }
-  | { kind: "collection"; id: CollectionId; poster: string; title: string }
-  | {
-      kind: "project";
-      href: string;
-      title: string;
-      summary: string;
-      year: string;
-      role: string;
-      tags: string[];
-      statement: string;
-      still: { src: string; alt: string };
-      preview: { src: string; alt: string };
-      plates: ProjectPlate[];
-    }
-  | {
-      kind: "presentation";
-      presentation: PresentationSpec["id"];
-      href: string;
-      project: PresentationSpec["project"];
-      spec: PresentationSpec;
-    };
 
 export type HomeCard = {
   kind: "card";
@@ -377,38 +355,87 @@ function galleryStill(item: GalleryItem): HomeStill {
   }
 }
 
-function galleryOpening(item: GalleryItem, foreground: TileForeground | undefined): CardOpening {
+function frameBox(frame: HomeFrame) {
+  switch (frame) {
+    case "tall":
+      return { width: 383, height: 440 };
+    case "poster":
+      return { width: 383, height: 280 };
+    case "short":
+      return { width: 383, height: 248 };
+    case "mark":
+      return { width: 383, height: 210 };
+    case "phone":
+      return { width: 390, height: 852 };
+    default: {
+      const unreachable: never = frame;
+      return unreachable;
+    }
+  }
+}
+
+function readPresentation(value: unknown, where: string): PresentationKind | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!isPresentationKind(value)) {
+    throw new Error(`${where} has an unknown presentation.`);
+  }
+  return value;
+}
+
+function withPresentation(
+  card: Omit<HomeCard, "opening" | "ratio">,
+  kind: PresentationKind,
+  project: PresentationProject,
+  media: PresentationMedia | undefined,
+  href: string,
+): HomeCard {
+  const spec = presentationFor(kind, project, media);
+  return {
+    ...card,
+    ratio: `${spec.closed.width} / ${spec.closed.height}`,
+    ...(href ? { href } : {}),
+    opening: { kind: "presentation", presentation: kind, href, project, spec },
+  };
+}
+
+function galleryPoster(item: GalleryItem, foreground: TileForeground | undefined) {
+  if (item.media === "video" || item.media === "site") {
+    return item.poster;
+  }
+  if (item.media === "image") {
+    return item.src;
+  }
+  if (foreground?.type === "image" || foreground?.type === "vector") {
+    return foreground.src;
+  }
+  return "";
+}
+
+function galleryPresentation(
+  item: GalleryItem,
+  frame: HomeFrame,
+  foreground: TileForeground | undefined,
+  fit: HomeFit,
+  explicit: PresentationKind | undefined,
+): { kind: PresentationKind; project: PresentationProject; media?: PresentationMedia } {
+  const project = { title: item.title, chips: [] as string[] };
+  const box = frameBox(frame);
   const collection = collectionForGallery(item.id);
+  let kind: PresentationKind = "widget";
+  let media: PresentationMedia | undefined;
+
   if (collection) {
-    const poster =
-      item.media === "video" || item.media === "site"
-        ? item.poster
-        : item.media === "image"
-          ? item.src
-          : foreground?.type === "image" || foreground?.type === "vector"
-            ? foreground.src
-            : "";
-    return { kind: "collection", id: collection, poster, title: item.title };
-  }
-
-  if (foreground?.type === "video" || item.media === "video") {
-    const src = foreground?.type === "video" ? foreground.src : item.media === "video" ? item.src : "";
-    const poster =
-      foreground?.type === "video"
-        ? foreground.poster
-        : item.media === "video"
-          ? item.poster
-          : undefined;
-    return {
-      kind: "video",
-      src,
-      width: item.width,
-      height: item.height,
-      ...(poster ? { poster } : {}),
+    kind = "icon";
+    media = {
+      icon: {
+        id: collection,
+        poster: galleryPoster(item, foreground),
+        title: item.title,
+      },
     };
-  }
-
-  if (foreground?.type === "html" || item.media === "frame" || item.media === "site") {
+  } else if (foreground?.type === "html" || item.media === "frame" || item.media === "site") {
     const src =
       foreground?.type === "html"
         ? foreground.src
@@ -418,21 +445,199 @@ function galleryOpening(item: GalleryItem, foreground: TileForeground | undefine
             ? item.src
             : "";
     const title = foreground?.type === "html" ? foreground.title : item.title;
-    return { kind: "frame", src, title, width: item.width, height: item.height };
+    const portrait = item.height / item.width > 1.15;
+    kind = portrait ? "phone" : "desktop";
+    media = portrait
+      ? {
+          screens: [
+            {
+              id: item.id,
+              label: title,
+              description: item.alt,
+              object: { type: "embed", src, title },
+            },
+          ],
+        }
+      : {
+          frames: [
+            {
+              label: title,
+              description: item.alt,
+              aspect: item.width / item.height,
+              object: { type: "embed", src, title },
+            },
+          ],
+        };
+  } else {
+    const still = galleryStill(item);
+    const video =
+      foreground?.type === "video"
+        ? {
+            src: foreground.src,
+            poster: foreground.poster ?? still.src,
+            play: foreground.play === "always" ? ("auto" as const) : ("hover" as const),
+          }
+        : item.media === "video"
+          ? { src: item.src, poster: item.poster, play: "auto" as const }
+          : undefined;
+    const contain =
+      fit === "contain" ||
+      foreground?.type === "vector" ||
+      (foreground?.type === "video" && foreground.fit === "contain") ||
+      (foreground?.type === "image" && foreground.fit === "contain");
+    const src = foreground?.type === "image" || foreground?.type === "vector" ? foreground.src : still.src;
+    media = {
+      widget: {
+        frame: box,
+        face: {
+          src,
+          width: still.width,
+          height: still.height,
+          label: item.title,
+          description: item.alt,
+          contain,
+          ...(video ? { video } : {}),
+        },
+      },
+    };
   }
 
-  const pictured =
-    foreground?.type === "image" || foreground?.type === "vector"
-      ? { src: foreground.src, alt: foreground.alt }
-      : { src: item.media === "image" ? item.src : "", alt: item.media === "image" ? item.alt : "" };
+  const resolved = explicit ?? kind;
+  if (resolved === "phone" && media?.widget && !media.widget.face.video) {
+    const face = media.widget.face;
+    return {
+      kind: "phone",
+      project,
+      media: {
+        screens: [
+          {
+            id: item.id,
+            label: face.label,
+            description: face.description,
+            object: { type: "image", src: face.src },
+          },
+        ],
+      },
+    };
+  }
 
-  return {
-    kind: "image",
-    src: pictured.src,
-    alt: pictured.alt,
-    width: item.width,
-    height: item.height,
+  if (resolved === "phone" && media?.frames?.[0]?.object.type === "embed") {
+    const frame = media.frames[0];
+    return {
+      kind: "phone",
+      project,
+      media: {
+        screens: [
+          {
+            id: item.id,
+            label: frame.label,
+            description: frame.description,
+            object: frame.object,
+          },
+        ],
+      },
+    };
+  }
+
+  if (resolved === "desktop" && media?.screens?.[0]?.object.type === "embed") {
+    const screen = media.screens[0];
+    return {
+      kind: "desktop",
+      project,
+      media: {
+        frames: [
+          {
+            label: screen.label,
+            description: screen.description,
+            aspect: item.width / item.height,
+            object: screen.object,
+          },
+        ],
+      },
+    };
+  }
+
+  return { kind: resolved, project, media: explicit === undefined || explicit === kind ? media : undefined };
+}
+
+function friendFrames(item: WorkItem, title: string) {
+  const frames = [];
+
+  for (const block of item.blocks ?? []) {
+    switch (block.type) {
+      case "bleed":
+      case "frame":
+        frames.push({
+          aspect: block.frame.width / block.frame.height,
+          label: title,
+          description: block.frame.caption ?? block.frame.alt,
+          object: { type: "image" as const, src: block.frame.src, position: "center center" },
+        });
+        break;
+      case "statement":
+      case "essay":
+      case "facts":
+        break;
+      default: {
+        const unknown: never = block;
+        return unknown;
+      }
+    }
+  }
+
+  if (frames.length > 0) {
+    return frames;
+  }
+
+  return [
+    {
+      aspect: item.width / item.height,
+      label: title,
+      description: item.summary,
+      object: { type: "image" as const, src: item.src, position: "center center" },
+    },
+  ];
+}
+
+function workPresentation(
+  item: WorkItem,
+  _frame: HomeFrame,
+  title: string,
+  explicit: PresentationKind | undefined,
+): { kind: PresentationKind; project: PresentationProject; media?: PresentationMedia } {
+  const project = {
+    title,
+    chips: [item.year, item.role, ...(item.tags ?? [])],
+    href: `/work/${item.id}`,
   };
+  let kind: PresentationKind = "desktop";
+  let media: PresentationMedia | undefined;
+
+  if (item.id === "chia-signer") {
+    kind = "phone";
+  } else if (item.id === "chia-friends") {
+    kind = "desktop";
+    media = { frames: friendFrames(item, title) };
+  } else {
+    media = {
+      frames: [
+        {
+          aspect: item.width / item.height,
+          label: title,
+          description: item.summary,
+          object: { type: "image" as const, src: item.src, position: "center top" },
+        },
+        ...(item.plates ?? []).map((plate) => ({
+          aspect: plate.width / plate.height,
+          label: plate.label,
+          description: plate.alt,
+          object: { type: "image" as const, src: plate.src, position: "center top" },
+        })),
+      ],
+    };
+  }
+
+  return { kind: explicit ?? kind, project, media: explicit === undefined || explicit === kind ? media : undefined };
 }
 
 function galleryHref(
@@ -490,7 +695,7 @@ function resolveTile(
     throw new Error(`content/home.json columns[${column}][${index}] must be an object.`);
   }
 
-  if (value.kind !== "gallery" && value.kind !== "work" && value.kind !== "slot") {
+  if (value.kind !== "gallery" && value.kind !== "work") {
     throw new Error(`content/home.json columns[${column}][${index}] has an unknown kind.`);
   }
 
@@ -514,24 +719,7 @@ function resolveTile(
   const where = `content/home.json columns[${column}][${index}]`;
   const label = readText(value.label, `${where}.label`);
 
-  if (value.kind !== "work" && value.presentation !== undefined) {
-    throw new Error(`${where} can only set presentation on a work tile.`);
-  }
-
-  if (value.kind === "slot") {
-    return {
-      kind: "card",
-      key: `slot-${value.id}-${column}-${index}`,
-      id: value.id,
-      label: label ?? "Untitled",
-      filter: value.filter,
-      frame: value.frame,
-      external: false,
-      background: { type: "color", color: "#eeeeee" },
-      hover: readHover(undefined, `${where}.hover`),
-      opening: { kind: "slot" },
-    };
-  }
+  const explicit = readPresentation(value.presentation, `${where}.presentation`);
 
   if (value.kind === "gallery") {
     const item = gallery.find((entry) => entry.id === value.id);
@@ -563,17 +751,23 @@ function resolveTile(
         throw new Error(`${where} needs a foreground.`);
       }
 
-      return {
-        ...card,
-        background: readBackground(
-          value.background,
-          { type: "color", color: "#eeeeee" },
-          `${where}.background`,
-        ),
-        foreground,
-        hover: readHover(value.hover, `${where}.hover`),
-        opening: galleryOpening(item, foreground),
-      };
+      const presented = galleryPresentation(item, value.frame, foreground, fit, explicit);
+      return withPresentation(
+        {
+          ...card,
+          background: readBackground(
+            value.background,
+            { type: "color", color: "#eeeeee" },
+            `${where}.background`,
+          ),
+          foreground,
+          hover: readHover(value.hover, `${where}.hover`),
+        },
+        presented.kind,
+        { ...presented.project, title: card.label },
+        presented.media,
+        href.href ?? "",
+      );
     }
 
     const still = galleryStill(item);
@@ -581,11 +775,14 @@ function resolveTile(
       item.media === "video"
         ? playingVideo(readTileLayers(value, still, fit, where), item, fit, value.foreground)
         : readTileLayers(value, still, fit, where);
-    return {
-      ...card,
-      ...layers,
-      opening: galleryOpening(item, layers.foreground),
-    };
+    const presented = galleryPresentation(item, value.frame, layers.foreground, fit, explicit);
+    return withPresentation(
+      { ...card, ...layers },
+      presented.kind,
+      { ...presented.project, title: card.label },
+      presented.media,
+      href.href ?? "",
+    );
   }
 
   const item = work.find((entry) => entry.id === value.id);
@@ -608,73 +805,26 @@ function resolveTile(
       ? playingVideo(layers, video, fit, value.foreground)
       : layers;
   const title = label ?? item.title;
-  const heading = item.sections[0]?.heading ?? title;
+  const presented = workPresentation(item, value.frame, title, explicit);
 
-  if (value.presentation !== undefined) {
-    if (!isPresentationKind(value.presentation)) {
-      throw new Error(`${where} has an unknown presentation.`);
-    }
-
-    const project = {
-      title,
-      chips: [item.year, item.role, ...(item.tags ?? [])],
-      href: `/work/${item.id}`,
-    };
-    const spec = presentationFor(value.presentation, project);
-
-    return {
+  return withPresentation(
+    {
       kind: "card",
       key: `work-${item.id}-presentation-${column}-${index}`,
       id: item.id,
       label: title,
       filter: value.filter,
       frame: value.frame,
-      ratio: `${spec.closed.width} / ${spec.closed.height}`,
-      href: `/work/${item.id}`,
       external: false,
-      background: { type: "color" as const, color: "#ededed" },
-      hover: readHover(value.hover, `${where}.hover`),
-      opening: {
-        kind: "presentation" as const,
-        presentation: value.presentation,
-        href: `/work/${item.id}`,
-        project,
-        spec,
-      },
-    };
-  }
-
-  return {
-    kind: "card",
-    key: `work-${item.id}-${plate ?? "hero"}-${column}-${index}`,
-    id: item.id,
-    label: title,
-    filter: value.filter,
-    frame: value.frame,
-    ...(value.frame === "phone" ? { ratio: `${still.width} / ${still.height}` } : {}),
-    href: `/work/${item.id}`,
-    external: false,
-    opening: {
-      kind: "project",
-      href: `/work/${item.id}`,
-      title,
-      summary: item.summary,
-      year: item.year,
-      role: item.role,
-      tags: item.tags ?? [],
-      statement: /[.!?]$/.test(heading) ? heading : `${heading}.`,
-      still: { src: item.src, alt: item.alt ?? item.summary },
-      preview: { src: still.src, alt: still.alt },
-      plates: (item.plates ?? []).map((entry) => ({
-        label: entry.label,
-        src: entry.src,
-        alt: entry.alt,
-        width: entry.width,
-        height: entry.height,
-      })),
+      background: shown.background,
+      hover: shown.hover,
+      ...(shown.foreground ? { foreground: shown.foreground } : {}),
     },
-    ...shown,
-  };
+    presented.kind,
+    presented.project,
+    presented.media,
+    `/work/${item.id}`,
+  );
 }
 
 function playingVideo(

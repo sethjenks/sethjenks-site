@@ -1,8 +1,9 @@
 export type VideoPlayMode = "auto" | "hover";
 
 export type CardLayer =
-  | { kind: "image"; src: string; position?: string; opacity?: number }
-  | { kind: "video"; src: string; poster?: string; playMode?: VideoPlayMode; opacity?: number }
+  | { kind: "image"; src: string; position?: string; opacity?: number; fit?: "cover" | "contain" }
+  | { kind: "video"; src: string; poster?: string; playMode?: VideoPlayMode; opacity?: number; fit?: "cover" | "contain" }
+  | { kind: "embed"; src: string; title: string; opacity?: number }
   | { kind: "texture"; gradient: string; opacity?: number }
   | { kind: "shader"; preset: "soft"; opacity?: number }
   | { kind: "noise"; opacity?: number };
@@ -12,7 +13,12 @@ export type CardMedia = {
   layers: CardLayer[];
 };
 
-const LAYER_ORDER = ["image", "video", "texture", "shader", "noise"] as const;
+const LAYER_ORDER = ["image", "video", "embed", "texture", "shader", "noise"] as const;
+
+export function embedLayer(media: CardMedia | undefined): Extract<CardLayer, { kind: "embed" }> | undefined {
+  const layer = media?.layers.find((item) => item.kind === "embed");
+  return layer?.kind === "embed" ? layer : undefined;
+}
 
 export function orderedLayers(layers: readonly CardLayer[]): CardLayer[] {
   const first = new Map<CardLayer["kind"], CardLayer>();

@@ -170,7 +170,7 @@ function StageLoop({
           reduced={reduced}
           described={described}
           setDescribed={setDescribed}
-          lensOn={false}
+          lensOn={spec.lens === true}
           dockOn={false}
           tune={tune}
           onToggle={() => {

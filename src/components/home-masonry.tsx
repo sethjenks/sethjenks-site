@@ -1,16 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 
 import { BoardFilterBar, useBoardFilter, type BoardFilter } from "@/components/board-filters";
-import { BoardStage } from "@/components/board-stage";
 import { ExpandLoop } from "@/components/board/expand-loop";
 import { createMasonryFlex } from "@/components/board/masonry-flex";
+import { revealOnScroll } from "@/components/board/reveal";
 import { PresentationResting } from "@/components/board/presentations/resting";
 import { TileChrome } from "@/components/board/tile-chrome";
 import { prefetchCollection } from "@/lib/collections";
-import type { HomeCard, TileBackground, TileForeground, TileHover } from "@/lib/home";
+import type { HomeCard, TileHover } from "@/lib/home";
 
 const WIDE_BOARD = "(min-width: 1100px)";
 
@@ -22,7 +21,6 @@ type OpenCard = {
 export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
   const { filter, revision } = useBoardFilter();
   const [open, setOpen] = useState<OpenCard | null>(null);
-  const [releasing, setReleasing] = useState(false);
   const masonryRef = useRef<HTMLDivElement>(null);
   const [flex] = useState(() =>
     createMasonryFlex({
@@ -48,6 +46,15 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
   useEffect(() => {
     flex.release(masonryRef.current, false);
   }, [filter, revision, flex]);
+
+  useEffect(() => {
+    const root = masonryRef.current;
+    if (!root) {
+      return;
+    }
+    const tiles = [...root.querySelectorAll<HTMLElement>(".board-tile")];
+    return revealOnScroll(tiles, null);
+  }, [filter, revision]);
 
   useEffect(() => {
     const root = masonryRef.current;
@@ -110,9 +117,6 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
       <div
         className="board-masonry"
         data-cols={visible.length}
-        data-expanding={
-          open?.card.opening.kind === "project" ? (releasing ? "closing" : "") : undefined
-        }
         ref={masonryRef}
         onPointerOver={flex.grow}
         onPointerLeave={() => flex.release(masonryRef.current, true)}
@@ -138,7 +142,7 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
           </div>
         ))}
       </div>
-      {open?.card.opening.kind === "presentation" ? (
+      {open ? (
         <ExpandLoop
           spec={open.card.opening.spec}
           origin={boxOf(open.origin)}
@@ -146,16 +150,6 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
           chromeSelector=".home-board-main .board-filters"
           className="board-presentation-loop"
           onExited={() => setOpen(null)}
-        />
-      ) : open ? (
-        <BoardStage
-          card={open.card}
-          origin={open.origin}
-          onRelease={() => setReleasing(true)}
-          onClose={() => {
-            setReleasing(false);
-            setOpen(null);
-          }}
         />
       ) : null}
     </>
@@ -178,8 +172,6 @@ function tileVisible(tile: HomeCard, filter: BoardFilter): boolean {
 function tileKey(tile: HomeCard): string {
   return tile.key;
 }
-
-const TILE_IMAGE_SIZES = "(max-width: 719px) 100vw, (max-width: 1099px) 50vw, 380px";
 
 function hoverStyle(hover: TileHover): CSSProperties {
   return {
@@ -225,69 +217,6 @@ function pauseTileMedia(event: SyntheticEvent<HTMLElement>) {
   setHoverMedia(event.currentTarget, false);
 }
 
-function TileBackground({ background, decorative }: { background: TileBackground; decorative: boolean }) {
-  switch (background.type) {
-    case "color":
-      return <span className="board-tile-layer board-tile-bg" style={{ background: background.color }} />;
-    case "gradient":
-      return <span className="board-tile-layer board-tile-bg" style={{ background: background.gradient }} />;
-    case "image":
-      return (
-        <span className="board-tile-layer board-tile-bg" data-fit={background.fit}>
-          <Image src={background.src} alt={decorative ? "" : background.alt} fill sizes={TILE_IMAGE_SIZES} />
-        </span>
-      );
-    default: {
-      const unreachable: never = background;
-      return unreachable;
-    }
-  }
-}
-
-function TileForeground({ foreground }: { foreground: TileForeground }) {
-  switch (foreground.type) {
-    case "image":
-      return (
-        <span className="board-tile-layer board-tile-fg" data-fit={foreground.fit}>
-          <Image src={foreground.src} alt={foreground.alt} fill sizes={TILE_IMAGE_SIZES} />
-        </span>
-      );
-    case "vector":
-      return (
-        <span className="board-tile-layer board-tile-fg" data-fit={foreground.fit}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={foreground.src} alt={foreground.alt} />
-        </span>
-      );
-    case "video":
-      return (
-        <span className="board-tile-layer board-tile-fg" data-fit={foreground.fit}>
-          <video
-            poster={foreground.poster}
-            muted
-            loop
-            playsInline
-            preload="none"
-            data-play={foreground.play}
-            data-src={foreground.play === "always" ? foreground.src : undefined}
-            src={foreground.play === "hover" ? foreground.src : undefined}
-            aria-label={foreground.alt}
-          />
-        </span>
-      );
-    case "html":
-      return (
-        <span className="board-tile-layer board-tile-fg">
-          <iframe src={foreground.src} title={foreground.title} tabIndex={-1} sandbox="allow-scripts allow-same-origin" />
-        </span>
-      );
-    default: {
-      const unreachable: never = foreground;
-      return unreachable;
-    }
-  }
-}
-
 function WorkCard({
   card,
   held,
@@ -297,65 +226,52 @@ function WorkCard({
   held: boolean;
   onOpen: (next: OpenCard) => void;
 }) {
-  if (card.opening.kind === "slot") {
-    return (
-      <article className="board-card board-tile board-slot" data-frame={card.frame} aria-hidden="true" />
-    );
-  }
-
-  const presentation = card.opening.kind === "presentation" ? card.opening.spec : null;
-  const media = presentation ? (
-    <PresentationResting spec={presentation} />
-  ) : (
-    <>
-      <TileBackground background={card.background} decorative={card.foreground !== undefined} />
-      {card.foreground ? <TileForeground foreground={card.foreground} /> : null}
-    </>
-  );
-  const tileProps = {
-    className: "board-card board-tile",
-    "data-frame": card.frame,
-    "data-presentation": presentation ? presentation.id : undefined,
-    style: {
-      ...hoverStyle(card.hover),
-      ...(card.ratio ? { aspectRatio: card.ratio } : {}),
-    },
-    onPointerEnter: (event: SyntheticEvent<HTMLElement>) => {
-      playTileMedia(event);
-      if (card.opening.kind === "collection") {
-        prefetchCollection(card.opening.id);
-      }
-    },
-    onPointerLeave: pauseTileMedia,
-    onFocus: playTileMedia,
-    onBlur: pauseTileMedia,
-  };
-
-  const openCard = (event: SyntheticEvent<HTMLButtonElement>) => {
-    if (card.opening.kind === "collection") {
-      prefetchCollection(card.opening.id);
-    }
-    for (const node of event.currentTarget.querySelectorAll("video")) {
-      if (node instanceof HTMLVideoElement) {
-        node.pause();
-      }
-    }
-    onOpen({ card, origin: event.currentTarget });
-  };
+  const spec = card.opening.spec;
+  const collectionId = spec.collection?.id;
 
   return (
     <button
-      {...tileProps}
       type="button"
-      aria-haspopup="dialog"
-      aria-label={`Open ${card.label}`}
+      className="board-card board-tile"
+      data-frame={card.frame}
+      data-presentation={spec.id}
       data-portfolio-key={card.key}
       data-held={held ? "" : undefined}
-      onClick={openCard}
+      aria-haspopup="dialog"
+      aria-label={`Open ${card.label}`}
+      style={{
+        ...hoverStyle(card.hover),
+        ...(card.ratio ? { aspectRatio: card.ratio } : {}),
+      }}
+      onPointerEnter={(event) => {
+        playTileMedia(event);
+        if (collectionId) {
+          prefetchCollection(collectionId);
+        }
+      }}
+      onPointerLeave={pauseTileMedia}
+      onFocus={(event) => {
+        playTileMedia(event);
+        if (collectionId) {
+          prefetchCollection(collectionId);
+        }
+      }}
+      onBlur={pauseTileMedia}
+      onClick={(event) => {
+        if (collectionId) {
+          prefetchCollection(collectionId);
+        }
+        for (const node of event.currentTarget.querySelectorAll("video")) {
+          if (node instanceof HTMLVideoElement) {
+            node.pause();
+          }
+        }
+        onOpen({ card, origin: event.currentTarget });
+      }}
     >
-      {media}
+      <PresentationResting spec={spec} />
       <TileChrome
-        label={presentation ? (presentation.tiles.find((tile) => tile.resting)?.label ?? card.label) : card.label}
+        label={card.label}
         titleClassName="board-tile-title"
         expandClassName="board-tile-expand"
       />

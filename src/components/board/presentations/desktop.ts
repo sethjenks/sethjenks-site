@@ -1,11 +1,29 @@
+import { keyObjectMedia, type KeyObject } from "@/components/board/presentations/key-object";
 import { placed } from "@/components/board/presentations/stage";
-import type { PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+import type { PresentationProject, PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+
+export type DesktopFrameInput = {
+  label: string;
+  description: string;
+  aspect: number;
+  object: KeyObject;
+};
+
+type DesktopFrameCatalog = {
+  src: string;
+  position: string;
+  aspect: number;
+  label: string;
+  description: string;
+};
+
+const DESKTOP_PROJECT: PresentationProject = { title: "Citrus Pear", chips: ["Brand"] };
 
 const DESKTOP_CLOSED = { width: 532, height: 475 };
 const DESKTOP_OPEN = { width: 1532, height: 862 };
 const DESKTOP_GAP = 20;
 const DESKTOP_PRIMARY = { x: 69, y: 85, width: 700, height: 520, radius: 36 };
-const DESKTOP_FRAMES = [
+const DESKTOP_FRAMES: DesktopFrameCatalog[] = [
   {
     src: "/media/card/desk-impeccable.png",
     position: "left top",
@@ -57,94 +75,69 @@ const DESKTOP_FRAMES = [
   },
 ];
 
-export function desktopTiles(): PresentationTile[] {
-  const gap = DESKTOP_GAP;
-  const pad = 28;
-  const heroFrame = DESKTOP_FRAMES[0];
-  const hero = {
-    x: DESKTOP_PRIMARY.x,
-    y: DESKTOP_PRIMARY.y,
-    width: DESKTOP_PRIMARY.width,
-    height: DESKTOP_PRIMARY.height,
-  };
-  const rightX = hero.x + hero.width + gap;
-  const innerRight = DESKTOP_OPEN.width - pad;
-  const sideWidth = Math.floor((innerRight - rightX - gap) / 2);
-  const columns = [
-    { x: hero.x, width: hero.width, y: hero.y + hero.height + gap },
-    { x: rightX, width: sideWidth, y: hero.y },
-    { x: rightX + sideWidth + gap, width: sideWidth, y: hero.y },
-  ];
-  const cursor = columns.map((column) => column.y);
-  const tiles: PresentationTile[] = [];
-
-  if (heroFrame) {
-    tiles.push({
-      id: "d-hero",
-      x: hero.x,
-      y: hero.y,
-      width: hero.width,
-      height: hero.height,
-      radius: DESKTOP_PRIMARY.radius,
-      resting: true,
-      ring: 0,
-      shiftX: 0,
-      shiftY: 0,
-      image: heroFrame.src,
-      imagePosition: heroFrame.position,
-      aspect: heroFrame.aspect,
-      label: heroFrame.label,
-      description: heroFrame.description,
-    });
+function toDesktopFrameInput(frame: DesktopFrameCatalog | DesktopFrameInput): DesktopFrameInput {
+  if ("object" in frame) {
+    return frame;
   }
 
-  DESKTOP_FRAMES.slice(1).forEach((frame, index) => {
-    let columnIndex = 0;
-    for (let i = 1; i < cursor.length; i += 1) {
-      const top = cursor[i];
-      if (top !== undefined && (cursor[columnIndex] === undefined || top < cursor[columnIndex])) {
-        columnIndex = i;
-      }
-    }
+  return {
+    label: frame.label,
+    description: frame.description,
+    aspect: frame.aspect,
+    object: { type: "image", src: frame.src, position: frame.position },
+  };
+}
 
-    const column = columns[columnIndex];
-    const y = cursor[columnIndex];
-    if (!column || y === undefined) {
-      return;
-    }
+export function desktopTiles(
+  frames: readonly (DesktopFrameCatalog | DesktopFrameInput)[] = DESKTOP_FRAMES,
+): PresentationTile[] {
+  const width = DESKTOP_OPEN.width;
+  let y = 0;
 
-    const height = Math.round(column.width / frame.aspect);
-    tiles.push({
-      id: `d-${columnIndex}-${index}`,
-      x: column.x,
+  return frames.map((entry, index) => {
+    const frame = toDesktopFrameInput(entry);
+    const height = Math.max(1, Math.round(width / frame.aspect));
+    const primary = index === 0;
+    const tile: PresentationTile = {
+      id: primary ? "d-hero" : `d-${index}`,
+      x: 0,
       y,
-      width: column.width,
+      width,
       height,
-      radius: 0,
-      resting: false,
-      ring: Math.min(4, columnIndex + 1),
+      radius: primary ? DESKTOP_PRIMARY.radius : 0,
+      resting: primary,
+      ring: Math.min(4, index),
       shiftX: 0,
       shiftY: 0,
-      image: frame.src,
-      imagePosition: frame.position,
+      media: keyObjectMedia(frame.object),
       aspect: frame.aspect,
       label: frame.label,
       description: frame.description,
-    });
-    cursor[columnIndex] = y + height + gap;
-  });
+    };
 
-  return tiles;
+    if (primary) {
+      tile.closedX = DESKTOP_PRIMARY.x;
+      tile.closedY = DESKTOP_PRIMARY.y;
+      tile.closedWidth = DESKTOP_PRIMARY.width;
+      tile.closedHeight = DESKTOP_PRIMARY.height;
+    }
+
+    y += height + DESKTOP_GAP;
+    return tile;
+  });
 }
 
-export function desktopPresentation(): PresentationSpec {
+export function desktopPresentation(
+  project: PresentationProject = DESKTOP_PROJECT,
+  frames?: readonly DesktopFrameInput[],
+): PresentationSpec {
   return {
     id: "desktop",
     label: "Desktop",
     openLabel: "Expand the desktop view",
-    project: { title: "Citrus Pear", chips: ["Brand"] },
+    project,
     closed: placed(DESKTOP_CLOSED),
     open: placed(DESKTOP_OPEN),
-    tiles: desktopTiles(),
+    tiles: desktopTiles(frames),
   };
 }

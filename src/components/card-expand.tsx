@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { ExpandLoop } from "@/components/board/expand-loop";
 import { createMasonryFlex } from "@/components/board/masonry-flex";
 import { PresentationResting } from "@/components/board/presentations/resting";
+import { iconPresentation } from "@/components/board/presentations/icon";
 import { STUDIES, WIDGET_STUDIES } from "@/components/board/presentations/registry";
 import { PresentationShell } from "@/components/board/presentations/shell";
 import { STAGE_H, STAGE_W } from "@/components/board/presentations/stage";
@@ -20,6 +21,16 @@ const MASONRY_COLUMNS: PresentationKind[][] = [
   ["phone", "widget"],
   ["desktop", "icon"],
 ];
+
+/** Icon → Lens: fisheye over a real collection (replaces the old Collection type). */
+const ICON_LENS_STUDY = iconPresentation(
+  { title: "Trashformers", chips: ["Collection"] },
+  {
+    id: "trashformers",
+    poster: "/media/work/trashformers-poster.jpg",
+    title: "Trashformers",
+  },
+);
 
 function useStageScale() {
   const [scale, setScale] = useState<number | null>(null);
@@ -156,7 +167,12 @@ export function CardExpand() {
   const [orientation, setOrientation] = useState<WidgetOrientation>("landscape");
   const [tune, setTune] = useState<CardTune>(DEFAULT_CARD_TUNE);
   const [masonryOpen, setMasonryOpen] = useState<{ id: PresentationKind; origin: PresentationBox } | null>(null);
-  const study = variant === "widget" ? WIDGET_STUDIES[orientation] : STUDIES[variant];
+  const study =
+    variant === "widget"
+      ? WIDGET_STUDIES[orientation]
+      : variant === "icon" && iconLayout === "lens"
+        ? ICON_LENS_STUDY
+        : STUDIES[variant];
   const lensOn = study.id === "icon" && iconLayout === "lens";
   const dockOn = study.id === "icon" && iconLayout === "dock";
   const contentDefault = study.tiles.find((tile) => tile.resting)?.radius ?? 0;

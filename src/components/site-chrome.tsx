@@ -14,7 +14,12 @@ export function SiteChrome({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const quiet = quietPaths.includes(pathname) || pathname === "/lab/card" || pathname === "/lab/shadows";
+  const linkPreviews = pathname === "/link-previews" || pathname.startsWith("/link-previews/");
+  const quiet =
+    quietPaths.includes(pathname) ||
+    pathname === "/lab/card" ||
+    pathname === "/lab/shadows" ||
+    linkPreviews;
   const detail = pathname.startsWith("/work/");
 
   return (
