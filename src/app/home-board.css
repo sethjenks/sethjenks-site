@@ -104,11 +104,18 @@
   width: var(--rail-width, var(--board-side));
   max-height: calc(100svh - 56px);
   overflow: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(0 0 0 / 20%) transparent;
 }
 
 .board-sidebar::-webkit-scrollbar {
-  display: none;
+  width: 8px;
+  height: 8px;
+}
+
+.board-sidebar::-webkit-scrollbar-thumb {
+  background: rgb(0 0 0 / 20%);
+  border-radius: 4px;
 }
 
 .board-name {
@@ -253,8 +260,10 @@
   inset: -7px 0;
 }
 
-.board-filter:hover {
-  background-color: color-mix(in oklch, var(--board-ink) 12%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .board-filter:hover {
+    background-color: color-mix(in oklch, var(--board-ink) 12%, transparent);
+  }
 }
 
 .board-filter[aria-pressed="true"] {
@@ -268,8 +277,10 @@
     0 8px 18px -9px var(--glass-shade);
 }
 
-.board-filter[aria-pressed="true"]:hover {
-  background-color: color-mix(in oklch, var(--board-ink) 78%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .board-filter[aria-pressed="true"]:hover {
+    background-color: color-mix(in oklch, var(--board-ink) 78%, transparent);
+  }
 }
 
 .board-filter:active {
@@ -297,13 +308,18 @@
     background-color: var(--board-paper);
   }
 
-  .board-filter:hover {
-    background-color: color-mix(in oklch, var(--board-ink) 8%, var(--board-paper));
+  .board-filter[aria-pressed="true"] {
+    background-color: var(--board-ink);
   }
 
-  .board-filter[aria-pressed="true"],
-  .board-filter[aria-pressed="true"]:hover {
-    background-color: var(--board-ink);
+  @media (hover: hover) and (pointer: fine) {
+    .board-filter:hover {
+      background-color: color-mix(in oklch, var(--board-ink) 8%, var(--board-paper));
+    }
+
+    .board-filter[aria-pressed="true"]:hover {
+      background-color: var(--board-ink);
+    }
   }
 }
 
@@ -468,7 +484,7 @@ button.board-card[data-held] {
 }
 
 button.board-card:active .board-tile-expand {
-  scale: 0.96;
+  scale: 1;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -741,6 +757,7 @@ button.board-card:active .board-tile-expand {
 }
 
 .board-project-contract {
+  position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -752,6 +769,12 @@ button.board-card:active .board-tile-expand {
   background: transparent;
   color: var(--board-ink, #111111);
   cursor: pointer;
+}
+
+.board-project-contract::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
 }
 
 .board-project-contract:focus-visible {
@@ -1063,7 +1086,7 @@ html:has(dialog.board-stage:modal) {
   align-items: center;
   gap: 12px;
   min-width: 0;
-  min-height: 36px;
+  min-height: 44px;
   color: inherit;
   text-decoration: none;
 }
@@ -1126,7 +1149,7 @@ span.board-project-icon {
 .mosaic-chip,
 .study-bar {
   position: sticky;
-  top: 16px;
+  top: max(16px, env(safe-area-inset-top, 0px));
   z-index: 4;
   display: flex;
   justify-content: center;
@@ -1139,7 +1162,7 @@ span.board-project-icon {
 
 .study-bar {
   top: 0;
-  padding: 16px 16px 12px;
+  padding: max(16px, env(safe-area-inset-top, 0px)) 16px 12px;
   background: linear-gradient(
     to bottom,
     var(--background) 0%,

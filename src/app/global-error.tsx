@@ -15,6 +15,9 @@ export default function GlobalError({
 
   return (
     <html lang="en">
+      <head>
+        <title>This page didn’t load</title>
+      </head>
       <body
         style={{
           margin: 0,

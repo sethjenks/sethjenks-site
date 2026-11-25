@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { Feed } from "@/components/feed";
+import { shareImage } from "@/lib/link-previews/share-image";
 import {
   filterDayGroupsByTag,
   getEntryDayGroups,
@@ -21,14 +22,31 @@ export async function generateMetadata({
   const { tag } = await params;
   const filter = normalizeTag(safeTag(tag));
 
+  const title = filter || "Journal";
+  const description = filter
+    ? `Notes tagged ${filter}.`
+    : "Notes from the work, dated in America/Denver.";
+  const image = shareImage("/journal");
+
   return {
-    title: filter || "Journal",
-    description: filter
-      ? `Notes tagged ${filter}.`
-      : "Notes from the work, dated in America/Denver.",
+    title,
+    description,
     robots: {
       index: false,
       follow: true,
+    },
+    openGraph: {
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(image
+        ? { images: [{ url: image.url, alt: image.alt, width: image.width, height: image.height }] }
+        : {}),
     },
   };
 }
@@ -54,6 +72,7 @@ export default async function JournalTagPage({
 
   return (
     <main id="journal" className="log-main">
+      <h1 className="sr-only">{filter}</h1>
       <Feed
         groups={groups}
         empty={{

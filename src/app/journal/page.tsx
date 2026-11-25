@@ -36,6 +36,7 @@ export default async function JournalPage() {
 
   return (
     <main id="journal" className="log-main">
+      <h1 className="sr-only">Journal</h1>
       <Feed groups={groups} />
     </main>
   );

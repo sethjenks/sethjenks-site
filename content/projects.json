@@ -7,6 +7,20 @@
     "icon": "/media/projects/arcana.png"
   },
   {
+    "id": "fiiinds",
+    "title": "Fiiinds",
+    "line": "A visual link library of tools, sites, and references.",
+    "href": "https://fiiinds.com",
+    "icon": "/media/projects/fiiinds.png"
+  },
+  {
+    "id": "xymo",
+    "title": "Xymo",
+    "line": "Operations bot fleets for the work still done by hand.",
+    "href": "https://xymo.io",
+    "icon": "/media/projects/xymo.png"
+  },
+  {
     "id": "offramp",
     "title": "Offramp",
     "line": "An eight-question diagnostic for owners preparing to sell.",

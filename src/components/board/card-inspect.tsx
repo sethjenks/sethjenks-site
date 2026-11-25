@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "motion/react";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
@@ -48,6 +49,7 @@ export function CardInspect({
 }) {
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
+  const reduced = useReducedMotion() === true;
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -81,7 +83,8 @@ export function CardInspect({
             src={source.src}
             poster={source.poster}
             controls
-            autoPlay
+            autoPlay={!reduced}
+            muted
             playsInline
             loop
           />

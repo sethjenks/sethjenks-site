@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Nothing here",
+  description: "That page is not on this site.",
 };
 
 export default function NotFound() {

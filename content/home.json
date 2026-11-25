@@ -234,7 +234,7 @@
         "kind": "gallery",
         "id": "work-your-ass-off",
         "filter": "brand",
-        "label": "Arnold's Pump Club",
+        "label": "Arnold’s Pump Club",
         "presentation": "desktop",
         "fill": true,
         "frame": "tall",
@@ -530,6 +530,8 @@
   ],
   "projects": [
     "arcana",
+    "fiiinds",
+    "xymo",
     "offramp",
     "paper-tips",
     "trashformers",

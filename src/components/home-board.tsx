@@ -19,6 +19,9 @@ type HomeBoardProps = {
 // Parked. Set this to render the footer shapes again.
 const SHOW_BOARD_JELLY = false;
 
+// Parked. Set this to show the Projects list in the left rail again.
+const SHOW_BOARD_PROJECTS = false;
+
 export function HomeBoard({ board, name, headline, bio }: HomeBoardProps) {
   return (
     <main className="home-board">
@@ -44,7 +47,7 @@ export function HomeBoard({ board, name, headline, bio }: HomeBoardProps) {
             <p className="board-headline">{headline}</p>
             {bio ? <p className="board-bio">{bio}</p> : null}
           </div>
-          <BoardProjects projects={board.projects} />
+          {SHOW_BOARD_PROJECTS ? <BoardProjects projects={board.projects} /> : null}
         </aside>
         <div className="home-board-main">
           <BoardMasonry columns={board.columns} />

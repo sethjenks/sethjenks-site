@@ -234,7 +234,7 @@
   }
 
   button:active {
-    transform: scale(0.97);
+    scale: 0.96;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -567,6 +567,10 @@
     }
   }
 
+  .key-button:active {
+    scale: 1;
+  }
+
   .key-button:active .key-button-face {
     transform: scale(0.96);
     box-shadow:
@@ -786,6 +790,7 @@
   .work-masonry-card:active,
   button.work-masonry-verb:active {
     transform: none;
+    scale: 1;
   }
 
   .work-masonry-shell {
@@ -1348,6 +1353,7 @@
     color: var(--ink);
     font-family: var(--font-mono);
     font-size: 12px;
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0.08em;
     line-height: 1.4;
     white-space: nowrap;
@@ -1790,6 +1796,11 @@
     width: min(960px, calc(100% - 48px));
     margin-inline: auto;
     margin-block-start: 20px;
+  }
+
+  .study-title,
+  .study h2 {
+    scroll-margin-top: calc(78px + env(safe-area-inset-top, 0px));
   }
 
   .study-title {

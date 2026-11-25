@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Feed } from "@/components/feed";
 import { formatDayHeading, getEntryDayGroups } from "@/lib/entries";
+import { shareImage } from "@/lib/link-previews/share-image";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -21,9 +22,26 @@ export async function generateMetadata({
     return { title: "Journal" };
   }
 
+  const title = formatDayHeading(date);
+  const description = `Notes from ${title}.`;
+  const image = shareImage("/journal");
+
   return {
-    title: formatDayHeading(date),
-    description: `Notes from ${formatDayHeading(date)}.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(image
+        ? { images: [{ url: image.url, alt: image.alt, width: image.width, height: image.height }] }
+        : {}),
+    },
   };
 }
 
@@ -47,7 +65,7 @@ export default async function JournalDayPage({
 
   return (
     <main id="journal" className="log-main">
-      <Feed groups={[group]} />
+      <Feed groups={[group]} stamp="h1" />
     </main>
   );
 }

@@ -14,9 +14,11 @@ function dayOfMonth(date: string): string {
 function EntryArticle({
   entry,
   priorityMedia,
+  titleTag: Title,
 }: {
   entry: Entry;
   priorityMedia: boolean;
+  titleTag: "h2" | "h3";
 }) {
   return (
     <article id={entry.id} className="log-entry">
@@ -24,9 +26,9 @@ function EntryArticle({
         {entry.media ? (
           <EntryMediaFigure media={entry.media} priority={priorityMedia} />
         ) : null}
-        <h3 className="log-title">
+        <Title className="log-title">
           <Link href={`/journal/${entry.date}#${entry.id}`}>{entry.title}</Link>
-        </h3>
+        </Title>
         <p className="log-summary">{entry.summary}</p>
         {entry.tags && entry.tags.length > 0 ? (
           <ul className="log-tags">
@@ -53,6 +55,7 @@ const DEFAULT_EMPTY = {
 export function Feed({
   groups,
   empty = DEFAULT_EMPTY,
+  stamp = "h2",
 }: {
   groups: DayGroup[];
   empty?: {
@@ -60,6 +63,8 @@ export function Feed({
     body: string;
     action?: { href: string; label: string };
   };
+  /** Day pages use h1 for the date so the outline does not start at h2. */
+  stamp?: "h1" | "h2";
 }) {
   if (groups.length === 0) {
     return (
@@ -75,6 +80,8 @@ export function Feed({
     );
   }
 
+  const Stamp = stamp === "h1" ? "h1" : "h2";
+
   return (
     <div className="log-days">
       {groups.map((group, groupIndex) => (
@@ -88,7 +95,7 @@ export function Feed({
             <p className="day-numeral" aria-hidden="true">
               {dayOfMonth(group.date)}
             </p>
-            <h2 id={`day-${group.date}`} className="day-stamp">
+            <Stamp id={`day-${group.date}`} className="day-stamp">
               <Link href={`/journal/${group.date}`} className="day-link">
                 <time
                   dateTime={group.date}
@@ -97,13 +104,14 @@ export function Feed({
                   {formatDayHeading(group.date)}
                 </time>
               </Link>
-            </h2>
+            </Stamp>
           </div>
           <div className="day-entries">
             {group.entries.map((entry, entryIndex) => (
               <EntryArticle
                 key={entry.id}
                 entry={entry}
+                titleTag={stamp === "h1" ? "h2" : "h3"}
                 priorityMedia={
                   groupIndex === 0 &&
                   entryIndex === group.entries.findIndex((item) => item.media)

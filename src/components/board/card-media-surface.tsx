@@ -20,9 +20,13 @@ export function CardMediaSurface({
   interactive?: boolean;
 }) {
   const layers = orderedLayers(media.layers);
+  const reduced = useReducedMotion() === true;
+  const exposed =
+    interactive &&
+    layers.some((layer) => layer.kind === "embed" || (layer.kind === "video" && reduced));
 
   return (
-    <div className="card-media" aria-hidden="true">
+    <div className="card-media" aria-hidden={exposed ? undefined : true}>
       {layers.map((layer) => (
         <MediaLayer
           key={layer.kind}

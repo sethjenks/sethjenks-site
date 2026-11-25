@@ -1213,6 +1213,7 @@ function CollectionLightbox({
         initial={{ opacity: 0 }}
         animate={{ opacity: chromeOn ? 1 : 0 }}
         transition={chromeTransition}
+        inert={chromeOn ? undefined : true}
         style={{ pointerEvents: chromeOn ? "auto" : "none" }}
         onClick={onClose}
       >
@@ -1242,6 +1243,7 @@ function CollectionLightbox({
         initial={{ opacity: 0 }}
         animate={{ opacity: chromeOn ? 1 : 0 }}
         transition={chromeTransition}
+        inert={chromeOn ? undefined : true}
         style={{ pointerEvents: chromeOn ? "auto" : "none" }}
       >
         <div className="work-lightbox-bar">
@@ -1351,6 +1353,7 @@ function LightboxView({
         initial={{ opacity: 0 }}
         animate={{ opacity: chromeOn ? 1 : 0 }}
         transition={chromeTransition}
+        inert={chromeOn ? undefined : true}
         style={{ pointerEvents: chromeOn ? "auto" : "none" }}
         onClick={onClose}
       >
@@ -1386,6 +1389,7 @@ function LightboxView({
         initial={{ opacity: 0 }}
         animate={{ opacity: chromeOn ? 1 : 0 }}
         transition={chromeTransition}
+        inert={chromeOn ? undefined : true}
         style={{ pointerEvents: chromeOn ? "auto" : "none" }}
       >
         <LightboxTitle
