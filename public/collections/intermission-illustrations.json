@@ -1,0 +1,88 @@
+{
+  "id": "intermission-illustrations",
+  "title": "Intermission Illustrations",
+  "galleryId": "intermission-illustrations",
+  "source": "Intermission BG-removed crayon illustrations",
+  "items": [
+    {
+      "name": "Vial",
+      "src": "/media/collections/intermission-illustrations/01-vial.webp"
+    },
+    {
+      "name": "Beaker",
+      "src": "/media/collections/intermission-illustrations/02-beaker.webp"
+    },
+    {
+      "name": "DNA",
+      "src": "/media/collections/intermission-illustrations/03-dna.webp"
+    },
+    {
+      "name": "Lab table",
+      "src": "/media/collections/intermission-illustrations/04-lab-table.webp"
+    },
+    {
+      "name": "Blood tubes",
+      "src": "/media/collections/intermission-illustrations/05-blood-tubes.webp"
+    },
+    {
+      "name": "Package",
+      "src": "/media/collections/intermission-illustrations/06-package.webp"
+    },
+    {
+      "name": "Checklist",
+      "src": "/media/collections/intermission-illustrations/07-checklist.webp"
+    },
+    {
+      "name": "Clipboard",
+      "src": "/media/collections/intermission-illustrations/08-clipboard.webp"
+    },
+    {
+      "name": "Bar chart",
+      "src": "/media/collections/intermission-illustrations/09-bar-chart.webp"
+    },
+    {
+      "name": "Line chart",
+      "src": "/media/collections/intermission-illustrations/10-line-chart.webp"
+    },
+    {
+      "name": "Laptop",
+      "src": "/media/collections/intermission-illustrations/11-laptop.webp"
+    },
+    {
+      "name": "Doctor",
+      "src": "/media/collections/intermission-illustrations/12-doctor.webp"
+    },
+    {
+      "name": "Talking",
+      "src": "/media/collections/intermission-illustrations/13-talking.webp"
+    },
+    {
+      "name": "Video chat",
+      "src": "/media/collections/intermission-illustrations/14-video-chat.webp"
+    },
+    {
+      "name": "Looking up",
+      "src": "/media/collections/intermission-illustrations/15-sky.webp"
+    },
+    {
+      "name": "Bike",
+      "src": "/media/collections/intermission-illustrations/16-bike.webp"
+    },
+    {
+      "name": "Dog walk",
+      "src": "/media/collections/intermission-illustrations/17-dog-walk.webp"
+    },
+    {
+      "name": "Popcorn",
+      "src": "/media/collections/intermission-illustrations/18-popcorn.webp"
+    },
+    {
+      "name": "Weights",
+      "src": "/media/collections/intermission-illustrations/19-weights.webp"
+    },
+    {
+      "name": "Walk with weights",
+      "src": "/media/collections/intermission-illustrations/20-walk-weights.webp"
+    }
+  ]
+}

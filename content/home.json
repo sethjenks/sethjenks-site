@@ -3,46 +3,27 @@
     [
       {
         "kind": "work",
-        "id": "philo",
-        "filter": "brand",
-        "frame": "poster",
+        "id": "chia-signer",
+        "filter": "product",
+        "label": "Chia Signer",
+        "presentation": "phone",
+        "frame": "phone",
         "hover": {
-          "duration": 500,
           "background": {
             "to": {
-              "scale": 1.02
-            }
-          }
-        },
-        "presentation": "desktop"
-      },
-      {
-        "kind": "gallery",
-        "id": "embarc",
-        "filter": "brand",
-        "frame": "mark",
-        "fit": "contain",
-        "foreground": {
-          "type": "video",
-          "src": "/media/work/embarc.mp4",
-          "poster": "/media/work/embarc-poster.jpg",
-          "fit": "contain",
-          "play": "always"
-        },
-        "hover": {
-          "duration": 600,
-          "background": {
-            "to": {
-              "opacity": 0
+              "scale": 1.025
             }
           }
         }
       },
       {
         "kind": "gallery",
-        "id": "faultline-hoodie",
-        "filter": "brand",
-        "frame": "tall",
+        "id": "study-icons",
+        "filter": "product",
+        "label": "Realistic Button in Paper",
+        "presentation": "desktop",
+        "frame": "poster",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -56,6 +37,7 @@
         "id": "sunset",
         "filter": "brand",
         "frame": "poster",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -65,29 +47,45 @@
         }
       },
       {
-        "kind": "gallery",
-        "id": "work-your-ass-off",
+        "kind": "work",
+        "id": "philo",
         "filter": "brand",
-        "frame": "tall",
+        "label": "Philo.vc website",
+        "frame": "poster",
         "hover": {
+          "duration": 500,
           "background": {
             "to": {
               "scale": 1.02
             }
           }
-        }
+        },
+        "presentation": "desktop",
+        "stack": [
+          "philo-headshots"
+        ]
       },
       {
         "kind": "gallery",
-        "id": "philo-sticker-set",
+        "id": "xymo",
         "filter": "brand",
-        "frame": "tall",
+        "frame": "mark",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
               "scale": 1.02
             }
           }
+        },
+        "background": {
+          "type": "color",
+          "color": "#eeeeee"
+        },
+        "foreground": {
+          "type": "html",
+          "src": "/media/work/xymo.html",
+          "title": "Xymo"
         }
       },
       {
@@ -106,48 +104,10 @@
       },
       {
         "kind": "gallery",
-        "id": "xf",
-        "filter": "play",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "faultline-rebuild",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "merch-makers",
-        "filter": "play",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
         "id": "skillhack",
         "filter": "play",
         "frame": "poster",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -161,6 +121,7 @@
         "id": "trashformers",
         "filter": "play",
         "frame": "short",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -172,197 +133,10 @@
       },
       {
         "kind": "gallery",
-        "id": "jacket",
-        "filter": "play",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      }
-    ],
-    [
-      {
-        "kind": "work",
-        "id": "chia-signer",
-        "filter": "product",
-        "label": "Chia Signer",
-        "presentation": "phone",
-        "frame": "phone",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.025
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "farming",
-        "filter": "brand",
-        "frame": "short",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "intermission-iron",
-        "filter": "product",
-        "label": "Intermission Health",
-        "presentation": "phone",
-        "frame": "phone",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "sage",
-        "filter": "brand",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "final-card",
-        "filter": "brand",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "fatherhood",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "faultline-do-it-afraid",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "lift-the-world",
-        "filter": "brand",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "philo-headshots",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
         "id": "timelord",
         "filter": "play",
         "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "icons",
-        "filter": "play",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "what-a-life",
-        "filter": "play",
-        "frame": "short",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "security-scorecard",
-        "filter": "play",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "sweatshirt",
-        "filter": "play",
-        "frame": "tall",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -374,38 +148,15 @@
       {
         "kind": "gallery",
         "id": "vision",
-        "filter": "play",
-        "frame": "tall",
+        "filter": "brand",
+        "label": "Chia Enterprise Apps",
+        "presentation": "icon",
+        "frame": "mark",
         "hover": {
+          "duration": 450,
           "background": {
             "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "batgan",
-        "filter": "play",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "crayon-illustrations",
-        "filter": "play",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
+              "scale": 1.08
             }
           }
         }
@@ -431,10 +182,154 @@
       },
       {
         "kind": "gallery",
-        "id": "study-icons",
+        "id": "embarc",
+        "filter": "brand",
+        "label": "Embarc Chicago rebrand",
+        "frame": "mark",
+        "fill": true,
+        "fit": "cover",
+        "foreground": {
+          "type": "video",
+          "src": "/media/work/embarc.mp4",
+          "poster": "/media/work/embarc-poster.jpg",
+          "fit": "cover",
+          "play": "hover"
+        },
+        "hover": {
+          "duration": 600,
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "faultline-rebuild",
+        "filter": "brand",
+        "label": "Faultline",
+        "presentation": "desktop",
+        "fill": true,
+        "frame": "tall",
+        "stack": [
+          "faultline-afraid-tee",
+          "faultline-do-it-afraid",
+          "faultline-gloves",
+          "faultline-hoodie",
+          "keep-fighting-tee",
+          "faultline-anomaly",
+          "keep-fighting",
+          "faultline-demons-tee"
+        ],
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "work-your-ass-off",
+        "filter": "brand",
+        "label": "Arnold's Pump Club",
+        "presentation": "desktop",
+        "fill": true,
+        "frame": "tall",
+        "stack": [
+          "lift-the-world",
+          "la-strong"
+        ],
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "xf",
+        "filter": "brand",
+        "label": "XCH Brand",
+        "frame": "tall",
+        "fill": true,
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "security-scorecard",
+        "filter": "play",
+        "frame": "poster",
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "batgan",
+        "filter": "play",
+        "frame": "tall",
+        "fill": true,
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "icons",
+        "filter": "play",
+        "frame": "poster",
+        "fill": true,
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "chia-friends",
+        "filter": "play",
+        "frame": "tall",
+        "fill": true,
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.015,
+              "y": -8
+            }
+          }
+        }
+      }
+    ],
+    [
+      {
+        "kind": "gallery",
+        "id": "intermission-iron",
         "filter": "product",
-        "label": "Realistic Button in Paper",
-        "frame": "poster",
+        "label": "Intermission Health",
+        "presentation": "phone",
+        "frame": "phone",
         "hover": {
           "background": {
             "to": {
@@ -445,94 +340,16 @@
       },
       {
         "kind": "gallery",
-        "id": "xymo",
+        "id": "fatherhood",
         "filter": "brand",
+        "label": "Fatherhood Movement",
+        "presentation": "desktop",
         "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        },
-        "background": {
-          "type": "color",
-          "color": "#eeeeee"
-        },
-        "foreground": {
-          "type": "html",
-          "src": "/media/work/xymo.html",
-          "title": "Xymo"
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "sulek",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        },
-        "background": {
-          "type": "color",
-          "color": "#eeeeee"
-        },
-        "foreground": {
-          "type": "vector",
-          "src": "/media/work/sulek.svg",
-          "alt": "Orange Sulek mark with a stepped tower, scattered stars, and a geometric wordmark.",
-          "fit": "contain"
-        },
-        "fit": "contain"
-      },
-      {
-        "kind": "gallery",
-        "id": "faultline-gloves",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "philo-stickers",
-        "filter": "brand",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "la-strong",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "faultline-afraid-tee",
-        "filter": "brand",
-        "frame": "tall",
+        "fill": true,
+        "stack": [
+          "jacket",
+          "sweatshirt"
+        ],
         "hover": {
           "background": {
             "to": {
@@ -545,7 +362,13 @@
         "kind": "gallery",
         "id": "zip-hoodie",
         "filter": "brand",
-        "frame": "short",
+        "label": "Sam Sulek",
+        "presentation": "desktop",
+        "fill": true,
+        "frame": "tall",
+        "stack": [
+          "sulek"
+        ],
         "hover": {
           "background": {
             "to": {
@@ -556,9 +379,31 @@
       },
       {
         "kind": "gallery",
-        "id": "philo-vision",
+        "id": "philo-sticker-set",
         "filter": "brand",
-        "frame": "short",
+        "label": "Vision to Venture",
+        "presentation": "desktop",
+        "fill": true,
+        "frame": "tall",
+        "stack": [
+          "philo-stickers",
+          "philo-vision"
+        ],
+        "hover": {
+          "background": {
+            "to": {
+              "scale": 1.02
+            }
+          }
+        }
+      },
+      {
+        "kind": "gallery",
+        "id": "intermission-illustrations",
+        "filter": "play",
+        "label": "Intermission Illustrations",
+        "frame": "tall",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -572,45 +417,7 @@
         "id": "spacebase",
         "filter": "play",
         "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "sage-advice",
-        "filter": "play",
-        "frame": "poster",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "keep-fighting-tee",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "faultline-anomaly",
-        "filter": "brand",
-        "frame": "tall",
+        "fill": true,
         "hover": {
           "background": {
             "to": {
@@ -623,36 +430,11 @@
         "kind": "work",
         "id": "chia-friends",
         "filter": "play",
+        "label": "Chia Friends",
+        "presentation": "desktop",
         "frame": "poster",
         "hover": {
-          "background": {
-            "to": {
-              "scale": 1.015,
-              "y": -8
-            }
-          }
-        },
-        "presentation": "desktop"
-      },
-      {
-        "kind": "gallery",
-        "id": "keep-fighting",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
-          "background": {
-            "to": {
-              "scale": 1.02
-            }
-          }
-        }
-      },
-      {
-        "kind": "gallery",
-        "id": "faultline-demons-tee",
-        "filter": "brand",
-        "frame": "tall",
-        "hover": {
+          "duration": 450,
           "background": {
             "to": {
               "scale": 1.02
@@ -661,6 +443,90 @@
         }
       }
     ]
+  ],
+  "shelved": [
+    {
+      "kind": "gallery",
+      "id": "what-a-life",
+      "filter": "brand",
+      "frame": "short",
+      "fill": true,
+      "hover": {
+        "background": {
+          "to": {
+            "scale": 1.02
+          }
+        }
+      }
+    },
+    {
+      "kind": "gallery",
+      "id": "merch-makers",
+      "filter": "play",
+      "frame": "tall",
+      "hover": {
+        "background": {
+          "to": {
+            "scale": 1.02
+          }
+        }
+      }
+    },
+    {
+      "kind": "gallery",
+      "id": "sage-advice",
+      "filter": "play",
+      "frame": "poster",
+      "hover": {
+        "background": {
+          "to": {
+            "scale": 1.02
+          }
+        }
+      }
+    },
+    {
+      "kind": "gallery",
+      "id": "final-card",
+      "filter": "brand",
+      "frame": "poster",
+      "fill": true,
+      "hover": {
+        "background": {
+          "to": {
+            "scale": 1.02
+          }
+        }
+      }
+    },
+    {
+      "kind": "gallery",
+      "id": "sage",
+      "filter": "brand",
+      "frame": "poster",
+      "fill": true,
+      "hover": {
+        "background": {
+          "to": {
+            "scale": 1.02
+          }
+        }
+      }
+    },
+    {
+      "kind": "gallery",
+      "id": "farming",
+      "filter": "brand",
+      "frame": "short",
+      "fill": true,
+      "hover": {
+        "background": {
+          "to": {
+            "scale": 1.02
+          }
+        }
+      }
+    }
   ],
   "projects": [
     "arcana",

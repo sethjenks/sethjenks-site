@@ -43,7 +43,12 @@ html:has(.card-stage) {
 }
 
 .card-shell[aria-expanded="true"] {
-  cursor: zoom-out;
+  cursor: default;
+}
+
+.card-shell[aria-expanded="true"] .card-tile[data-image],
+.card-shell[aria-expanded="true"] .card-tile[data-embed] {
+  cursor: zoom-in;
 }
 
 .card-shell:focus {
@@ -240,30 +245,6 @@ html:has(.card-stage) {
   border-radius: 999px;
 }
 
-.card-open-header {
-  position: absolute;
-  z-index: 5;
-  top: 0;
-  right: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  height: var(--card-open-header, 96px);
-  padding: 0 28px 0 32px;
-  isolation: isolate;
-  background: linear-gradient(
-    to bottom,
-    var(--card-shell-bg, #ededed) 0%,
-    var(--card-shell-bg, #ededed) 34%,
-    color-mix(in srgb, var(--card-shell-bg, #ededed) 88%, transparent) 58%,
-    color-mix(in srgb, var(--card-shell-bg, #ededed) 42%, transparent) 78%,
-    transparent 100%
-  );
-  color: #111;
-  pointer-events: auto;
-}
-
 .card-open-header-lead {
   position: relative;
   z-index: 1;
@@ -428,6 +409,9 @@ html:has(.card-stage) {
 
 .icon-lens {
   position: absolute;
+  /* Keep the fisheye under the open header — cells assign high z-index for
+     depth, and without a local stacking context they paint over the controls. */
+  z-index: 1;
   inset: 0;
   overflow: hidden;
   border-radius: inherit;

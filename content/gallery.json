@@ -1,7 +1,7 @@
 [
   {
     "id": "philo",
-    "title": "Philo",
+    "title": "Philo.vc website",
     "media": "site",
     "src": "/media/work/philo.mp4",
     "poster": "/media/work/philo-poster.jpg",
@@ -12,23 +12,23 @@
   },
   {
     "id": "embarc",
-    "title": "Embarc",
+    "title": "Embarc Chicago rebrand",
     "media": "video",
     "src": "/media/work/embarc.mp4",
     "poster": "/media/work/embarc-poster.jpg",
     "width": 1024,
     "height": 536,
-    "alt": "A montage of Embarc, from the wordmark to school lockups, a sidewalk sign, app icons, the website, a billboard, the learning hub, and a street banner."
+    "alt": "A montage of the Embarc Chicago rebrand, from the wordmark to school lockups, a sidewalk sign, app icons, the website, a billboard, the learning hub, and a street banner."
   },
   {
     "id": "xf",
-    "title": "XF",
+    "title": "XCH Brand",
     "media": "video",
     "src": "/media/work/xf.mp4",
     "poster": "/media/work/xf-poster.jpg",
     "width": 1024,
     "height": 1024,
-    "alt": "A loop of the XF collection: a hemp hoodie, a green hoodie back print, a green tee, a cap, an outdoor hemp hoodie, and a green bottle, each with the XF mark."
+    "alt": "A loop of the XCH Brand collection: a hemp hoodie, a green hoodie back print, a green tee, a cap, an outdoor hemp hoodie, and a green bottle, each with the mark."
   },
   {
     "id": "sage",
@@ -114,14 +114,12 @@
     "alt": "A fast jump cut through thirty-six black-and-white Philo portraits."
   },
   {
-    "id": "crayon-illustrations",
-    "title": "Illustrations",
-    "media": "video",
-    "src": "/media/work/crayon-illustrations.mp4",
-    "poster": "/media/work/crayon-illustrations-poster.jpg",
+    "id": "intermission-illustrations",
+    "title": "Intermission Illustrations",
+    "src": "/media/work/intermission-illustrations-poster.webp",
     "width": 1024,
     "height": 1024,
-    "alt": "A jump cut through fifteen blue-and-yellow crayon illustrations on warm cream: a vial, a woman talking, blood tubes, a laptop, a chart, a package, a doctor, a bike, and a beaker."
+    "alt": "A blue-and-yellow crayon illustration of a woman talking, from the Intermission Health set."
   },
   {
     "id": "orientation",
@@ -184,7 +182,7 @@
     "src": "/media/work/icons.mp4",
     "poster": "/media/work/icons-poster.jpg",
     "width": 800,
-    "height": 600,
+    "height": 800,
     "alt": "A montage of four icons: a red play button, a speedometer near 85 mph, a green radar, and a black On Air sign."
   },
   {
@@ -272,13 +270,13 @@
   },
   {
     "id": "sulek",
-    "title": "Sulek",
+    "title": "Sam Sulek",
     "mark": true,
     "pad": 16,
     "src": "/media/work/sulek.svg",
     "width": 959.361,
     "height": 1036.5,
-    "alt": "Orange Sulek mark with a stepped tower, scattered stars, and a geometric wordmark."
+    "alt": "Orange Sam Sulek mark with a stepped tower, scattered stars, and a geometric wordmark."
   },
   {
     "id": "credentials",
@@ -336,7 +334,7 @@
   },
   {
     "id": "vision",
-    "title": "Vision",
+    "title": "Chia Enterprise Apps",
     "mark": true,
     "src": "/media/work/vision-icon.png",
     "width": 1062,
@@ -425,10 +423,10 @@
   },
   {
     "id": "study-icons",
-    "title": "Study",
-    "src": "/media/work/study-pair.jpg",
-    "width": 1024,
-    "height": 768,
-    "alt": "Two Study app icons on a dark surface, one unlit and one lit with a blue glow."
+    "title": "Realistic Button in Paper",
+    "src": "/media/work/paper-button/key-first-try.webp",
+    "width": 1600,
+    "height": 1200,
+    "alt": "First Paper pass at a Bluetooth key and a Command key, with a blue lamp under the left cap."
   }
 ]

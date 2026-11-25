@@ -62,7 +62,7 @@ function MediaLayer({
     case "video":
       return (
         <span className="card-media-layer" data-kind="video" data-fit={layer.fit} style={style}>
-          <MediaVideo src={layer.src} poster={layer.poster} playMode={layer.playMode ?? "auto"} />
+          <MediaVideo src={layer.src} poster={layer.poster} playMode={layer.playMode ?? "hover"} />
         </span>
       );
     case "embed":

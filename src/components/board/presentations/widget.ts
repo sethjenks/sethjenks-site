@@ -14,7 +14,7 @@ export type WidgetInput = {
 };
 
 const WIDGET_GAP = 32;
-const WIDGET_RADIUS = 16;
+const WIDGET_RADIUS = 32;
 const WIDGET_LANDSCAPE = { width: 400, height: 252 };
 const WIDGET_PORTRAIT = { width: 252, height: 400 };
 const WIDGET_LANDSCAPE_CLOSED = { width: 520, height: 360 };
@@ -77,26 +77,24 @@ export function widgetPresentation(
     : orientation === "landscape"
       ? WIDGET_LANDSCAPE_CLOSED
       : WIDGET_PORTRAIT_CLOSED;
-  const tiles = widgetTiles(orientation);
 
-  if (input) {
-    const face = input.face;
-    const aspect = face.width / face.height;
-    const fit = fittedTile(input.frame, aspect, "widget", face.label, face.description);
-    const primary = tiles.find((tile) => tile.resting);
-    if (primary) {
-      primary.label = face.label;
-      primary.description = face.description;
-      primary.media = faceMedia(face);
-      primary.aspect = aspect;
-      primary.closedX = fit.x;
-      primary.closedY = fit.y;
-      primary.closedWidth = fit.width;
-      primary.closedHeight = fit.height;
-      primary.shiftX = 0;
-      primary.shiftY = 0;
-    }
+  // Lab study: silhouette grid. Project cards: only real faces — no empty black tiles.
+  if (!input) {
+    return {
+      id: "widget",
+      label: "Widget",
+      openLabel: "Expand the widget",
+      project,
+      closed: placed(closedSize),
+      open: placed(PHONE_OPEN),
+      tiles: widgetTiles(orientation),
+    };
   }
+
+  const face = input.face;
+  const aspect = face.width / face.height;
+  const fit = fittedTile(input.frame, aspect, "widget", face.label, face.description);
+  const size = orientation === "landscape" ? WIDGET_LANDSCAPE : WIDGET_PORTRAIT;
 
   return {
     id: "widget",
@@ -105,6 +103,27 @@ export function widgetPresentation(
     project,
     closed: placed(closedSize),
     open: placed(PHONE_OPEN),
-    tiles,
+    tiles: [
+      {
+        id: "widget",
+        x: (PHONE_OPEN.width - size.width) / 2,
+        y: (PHONE_OPEN.height - size.height) / 2,
+        width: size.width,
+        height: size.height,
+        radius: fit.radius,
+        resting: true,
+        ring: 0,
+        shiftX: 0,
+        shiftY: 0,
+        closedX: fit.x,
+        closedY: fit.y,
+        closedWidth: fit.width,
+        closedHeight: fit.height,
+        media: faceMedia(face),
+        aspect,
+        label: face.label,
+        description: face.description,
+      },
+    ],
   };
 }

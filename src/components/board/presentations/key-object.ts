@@ -12,6 +12,9 @@ export type KeyObject =
     }
   | { type: "embed"; src: string; title: string };
 
+/** In-card rebuild of the Paper.tips Command key. Not a URL. */
+export const COMMAND_KEY_SRC = "embed:command-key";
+
 export function keyObjectMedia(object: KeyObject): CardMedia {
   switch (object.type) {
     case "image":
@@ -35,7 +38,7 @@ export function keyObjectMedia(object: KeyObject): CardMedia {
             kind: "video",
             src: object.src,
             poster: object.poster,
-            playMode: object.play ?? "auto",
+            playMode: object.play ?? "hover",
             fit: object.fit,
           },
         ],

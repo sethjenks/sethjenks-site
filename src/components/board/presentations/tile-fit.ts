@@ -13,6 +13,11 @@ export type TileFaceMedia = {
     poster?: string;
     play: "auto" | "hover";
   };
+  /** App-icon / HTML mark — takes over the face instead of image/video. */
+  embed?: {
+    src: string;
+    title: string;
+  };
 };
 
 export function fittedTile(
@@ -52,7 +57,7 @@ export function fittedTile(
     y: (frame.height - height) / 2,
     width,
     height,
-    radius: 16,
+    radius: 32,
     resting: true,
     ring: 0,
     shiftX: 0,
@@ -64,6 +69,10 @@ export function fittedTile(
 }
 
 export function faceMedia(face: TileFaceMedia): CardMedia {
+  if (face.embed) {
+    return { layers: [{ kind: "embed", src: face.embed.src, title: face.embed.title }] };
+  }
+
   const fit = face.contain ? "contain" : "cover";
   if (!face.video) {
     return { layers: [{ kind: "image", src: face.src, position: "center", fit }] };

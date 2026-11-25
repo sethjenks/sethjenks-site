@@ -42,6 +42,7 @@ export function collectionIsPixelated(id: CollectionId): boolean {
       return true;
     case "trashformers":
     case "batgan":
+    case "intermission-illustrations":
       return false;
     default: {
       const unknown: never = id;
@@ -124,6 +125,8 @@ async function loadCatalog(
       return loadSingle("/collections/trashformers.json", signal);
     case "batgan":
       return loadSingle("/collections/batgan.json", signal);
+    case "intermission-illustrations":
+      return loadSingle("/collections/intermission-illustrations.json", signal);
     default: {
       const unknown: never = id;
       return unknown;
@@ -297,7 +300,10 @@ function parsePieces(value: unknown): CollectionPiece[] {
       return [];
     }
     const piece = item as { name?: unknown; src?: unknown };
-    if (typeof piece.src !== "string" || !piece.src.startsWith("https://")) {
+    if (
+      typeof piece.src !== "string" ||
+      !(piece.src.startsWith("https://") || piece.src.startsWith("/media/") || piece.src.startsWith("/collections/"))
+    ) {
       return [];
     }
     const name = typeof piece.name === "string" && piece.name.trim() ? piece.name.trim() : "Untitled";

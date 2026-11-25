@@ -1352,72 +1352,6 @@ span.board-project-icon {
     transition: flex-grow 400ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  @supports (animation-timeline: view()) and (animation-duration: auto) {
-    @media (prefers-reduced-motion: no-preference) {
-      .board-masonry[data-cols="2"],
-      .board-masonry[data-cols="3"] {
-        view-timeline-name: --board-scroll;
-        view-timeline-axis: block;
-      }
-
-      .board-masonry[data-cols="2"] > .board-column,
-      .board-masonry[data-cols="3"] > .board-column {
-        animation-duration: auto;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: --board-scroll;
-        animation-range: contain 0% contain 100%;
-      }
-
-      .board-masonry[data-cols="2"] > .board-column:nth-child(1) {
-        animation-name: board-drift-slow;
-      }
-
-      .board-masonry[data-cols="2"] > .board-column:nth-child(2) {
-        animation-name: board-drift-fast;
-      }
-
-      .board-masonry[data-cols="3"] > .board-column:nth-child(1) {
-        animation-name: board-drift-slow;
-      }
-
-      .board-masonry[data-cols="3"] > .board-column:nth-child(2) {
-        animation-name: board-drift-mid;
-      }
-
-      .board-masonry[data-cols="3"] > .board-column:nth-child(3) {
-        animation-name: board-drift-fast;
-      }
-    }
-  }
-}
-
-@keyframes board-drift-slow {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-
-  40% {
-    transform: translate3d(0, -90px, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes board-drift-mid {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-
-  40% {
-    transform: translate3d(0, -180px, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
-  }
 }
 
 @supports (animation-timeline: view()) and (animation-duration: auto) {
@@ -1533,20 +1467,6 @@ span.board-project-icon {
       filter: blur(calc(var(--leave) * 8px));
       translate: calc(var(--leave) * (100% + var(--board-inset) + 16px) * -1) 0;
     }
-  }
-}
-
-@keyframes board-drift-fast {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-
-  40% {
-    transform: translate3d(0, -280px, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
   }
 }
 

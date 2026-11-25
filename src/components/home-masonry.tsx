@@ -8,10 +8,15 @@ import { createMasonryFlex } from "@/components/board/masonry-flex";
 import { revealOnScroll } from "@/components/board/reveal";
 import { PresentationResting } from "@/components/board/presentations/resting";
 import { TileChrome } from "@/components/board/tile-chrome";
+import { DEFAULT_CARD_TUNE } from "@/components/card-tune-panel";
 import { prefetchCollection } from "@/lib/collections";
 import type { HomeCard, TileHover } from "@/lib/home";
 
 const WIDE_BOARD = "(min-width: 1100px)";
+/** Three columns need two full rows. Fewer cards pack into two so a column is not left empty. */
+const THREE_COLUMN_MIN = 6;
+/** Lab defaults to masked silhouettes; the live board shows real marks and art. */
+const BOARD_CARD_TUNE = { ...DEFAULT_CARD_TUNE, masked: false };
 
 type OpenCard = {
   card: HomeCard;
@@ -35,9 +40,11 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
     setSeenFilter(filterKey);
     setOpen(null);
   }
-  const visible = columns
-    .map((column) => column.filter((tile) => tileVisible(tile, filter)))
-    .filter((column) => column.length > 0);
+  const visible = layoutColumns(
+    columns
+      .map((column) => column.filter((tile) => tileVisible(tile, filter)))
+      .filter((column) => column.length > 0),
+  );
 
   useEffect(() => {
     return () => flex.dispose();
@@ -146,6 +153,7 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
         <ExpandLoop
           spec={open.card.opening.spec}
           origin={boxOf(open.origin)}
+          tune={BOARD_CARD_TUNE}
           heldSelector={`[data-portfolio-key="${cssEscape(open.card.key)}"]`}
           chromeSelector=".home-board-main .board-filters"
           className="board-presentation-loop"
@@ -167,6 +175,33 @@ function cssEscape(value: string) {
 
 function tileVisible(tile: HomeCard, filter: BoardFilter): boolean {
   return filter === "all" || tile.filter === filter;
+}
+
+function layoutColumns(columns: HomeCard[][]): HomeCard[][] {
+  const count = columns.reduce((sum, column) => sum + column.length, 0);
+  if (count === 0 || count >= THREE_COLUMN_MIN || columns.length <= 2) {
+    return columns;
+  }
+
+  const packed: HomeCard[][] = [[], []];
+  for (const [index, card] of readingOrder(columns).entries()) {
+    packed[index % packed.length]!.push(card);
+  }
+  return packed.filter((column) => column.length > 0);
+}
+
+function readingOrder(columns: HomeCard[][]): HomeCard[] {
+  const depth = Math.max(...columns.map((column) => column.length));
+  const order: HomeCard[] = [];
+  for (let row = 0; row < depth; row += 1) {
+    for (const column of columns) {
+      const card = column[row];
+      if (card) {
+        order.push(card);
+      }
+    }
+  }
+  return order;
 }
 
 function tileKey(tile: HomeCard): string {
@@ -204,8 +239,8 @@ function setHoverMedia(tile: HTMLElement, playing: boolean) {
       void node.play();
       continue;
     }
+    // Pause in place — resume from the same frame on the next hover.
     node.pause();
-    node.currentTime = 0;
   }
 }
 
@@ -235,6 +270,7 @@ function WorkCard({
       className="board-card board-tile"
       data-frame={card.frame}
       data-presentation={spec.id}
+      data-fill={spec.fill ? "" : undefined}
       data-portfolio-key={card.key}
       data-held={held ? "" : undefined}
       aria-haspopup="dialog"
@@ -269,7 +305,7 @@ function WorkCard({
         onOpen({ card, origin: event.currentTarget });
       }}
     >
-      <PresentationResting spec={spec} />
+      <PresentationResting spec={spec} tune={BOARD_CARD_TUNE} />
       <TileChrome
         label={card.label}
         titleClassName="board-tile-title"

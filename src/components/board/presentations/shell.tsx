@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type PointerEvent as ReactPointerEvent, type SetStateAction } from "react";
 import { createPortal } from "react-dom";
 
+import { CardInspect, tileInspectSource } from "@/components/board/card-inspect";
 import { IconDock, iconDockClosed } from "@/components/icon-dock";
 import { IconLens } from "@/components/icon-lens";
 import { CardOpenHeader, CARD_OPEN_HEADER } from "@/components/card-open-header";
@@ -23,7 +24,15 @@ import {
 } from "@/components/board/presentations/motion";
 import { placed } from "@/components/board/presentations/stage";
 import { revealOnScroll } from "@/components/board/reveal";
-import { TileFace, tileHasEmbed, tileHasFace, tileHasImage } from "@/components/board/presentations/tile-face";
+import {
+  TileFace,
+  tileContentRadius,
+  tileHasCopy,
+  tileHasEmbed,
+  tileHasFace,
+  tileHasImage,
+  tileOpenRadius,
+} from "@/components/board/presentations/tile-face";
 import type { PresentationFrame, PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
 import { tunedContentRadius, type CardTune } from "@/components/card-tune-panel";
 
@@ -61,12 +70,15 @@ export function PresentationShell({
   openFrame?: PresentationFrame;
 }) {
   const [armed, setArmed] = useState(false);
+  const [inspectedId, setInspectedId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const lastScroll = useRef(0);
   const ignoreClick = useRef(0);
   const masked = tune.masked;
   const cardName = study.tiles.find((tile) => tile.resting)?.label ?? study.label;
+  const inspectedTile = inspectedId ? study.tiles.find((tile) => tile.id === inspectedId) : null;
+  const inspected = inspectedTile ? tileInspectSource(inspectedTile) : null;
   const shellStyle = { "--card-open-header": `${CARD_OPEN_HEADER}px` } as CSSProperties;
   const shell = useMemo(
     () => shellVariants(dockOn ? ICON_DOCK_FRAME : study.closed, openFrame ?? study.open, reduced),
@@ -93,6 +105,9 @@ export function PresentationShell({
   const fineHover = useFineHover();
   if ((!expanded || lensOn || dockOn) && armed) {
     setArmed(false);
+  }
+  if (!expanded && inspectedId) {
+    setInspectedId(null);
   }
 
   useEffect(() => {
@@ -198,9 +213,19 @@ export function PresentationShell({
 
         if (expanded && tile) {
           const id = tile.getAttribute("data-tile");
+          const match = id ? study.tiles.find((item) => item.id === id) : null;
+          if (match && tileInspectSource(match)) {
+            setInspectedId(match.id);
+            return;
+          }
           if (id) {
             setDescribed((current) => (current === id ? null : id));
           }
+          return;
+        }
+
+        // Open only from the closed shell. Collapse via header, Escape, or scrim.
+        if (expanded) {
           return;
         }
 
@@ -227,7 +252,14 @@ export function PresentationShell({
           }}
         />
       ) : null}
-      {dockOn ? <IconDock expanded={expanded} reduced={reduced} blank={masked && !appearOpen} /> : null}
+      {dockOn ? (
+        <IconDock
+          expanded={expanded}
+          reduced={reduced}
+          blank={masked && !appearOpen}
+          marks={[...new Set(study.tiles.flatMap((tile) => (tile.icon ? [tile.icon.mark] : [])))]}
+        />
+      ) : null}
       {lensOn || dockOn ? null : (
         <div
           ref={scrollRef}
@@ -288,6 +320,7 @@ export function PresentationShell({
       {fineHover && scrollable
         ? createPortal(<div ref={captionRef} className="card-cursor-caption" />, document.body)
         : null}
+      {inspected ? <CardInspect source={inspected} onClose={() => setInspectedId(null)} /> : null}
     </motion.div>
   );
 }
@@ -352,7 +385,7 @@ function moveCaption(
   node.setAttribute("data-show", "");
 }
 
-function frameVariants(tile: PresentationTile, reduced: boolean) {
+function frameVariants(tile: PresentationTile, reduced: boolean, closedRadius: number, openRadius: number) {
   const travel = moveTransition(reduced, OPEN_SHELL_S);
   const settle = moveTransition(reduced, OPEN_SHELL_S, CLOSE_MOVE_DELAY_S);
 
@@ -362,6 +395,7 @@ function frameVariants(tile: PresentationTile, reduced: boolean) {
       top: tile.closedY ?? tile.y,
       width: tile.closedWidth ?? tile.width,
       height: tile.closedHeight ?? tile.height,
+      borderRadius: closedRadius,
       transition: settle,
     },
     open: {
@@ -369,6 +403,7 @@ function frameVariants(tile: PresentationTile, reduced: boolean) {
       top: tile.y,
       width: tile.width,
       height: tile.height,
+      borderRadius: openRadius,
       transition: travel,
     },
   };
@@ -399,25 +434,44 @@ function ShellTile({
   const resized = tile.closedWidth !== undefined;
   const hasFace = tileHasFace(tile);
   const masked = tune.masked;
+  // Live board (unmasked): never paint empty black placeholders. Lab masked
+  // studies keep silhouette tiles on purpose.
+  if (!hasFace && !masked) {
+    return null;
+  }
+  const copy = tileHasCopy(tile);
   const shaped = !hasFace || masked;
+  const tuned = tunedContentRadius(tile.radius, tune);
+  const closedRadius = tileContentRadius(tile, tuned, masked);
+  const openTuned =
+    tile.openRadius !== undefined ? tunedContentRadius(tile.openRadius, tune) : tuned;
+  const openRadius =
+    tile.openRadius !== undefined
+      ? tileContentRadius(tile, openTuned, masked)
+      : tileOpenRadius(tile, tuned, masked);
   const style = {
     left: resized ? undefined : tile.x,
     top: resized ? undefined : tile.y,
     width: resized ? undefined : tile.width,
     height: resized ? undefined : tile.height,
-    borderRadius: tile.icon ? 0 : shaped ? tunedContentRadius(tile.radius, tune) : 0,
-    background: hasFace && !shaped ? "transparent" : undefined,
+    // Resized tiles animate radius via variants; others keep the resting value.
+    borderRadius: resized ? undefined : closedRadius,
+    background: copy || (hasFace && !shaped) ? "transparent" : undefined,
   };
   const face = <TileFace tile={tile} masked={masked} appearOpen={appearOpen} scrollable={scrollable} />;
+  // Media stays decorative. Copy and the live embed are readable once the card is open.
+  const exposed = (copy || tileHasEmbed(tile)) && (expanded || appearOpen);
+  const hidden = exposed ? undefined : true;
 
   if (!moving && tile.resting && !resized) {
     return (
       <span
         className="card-tile"
-        aria-hidden="true"
+        aria-hidden={hidden}
         data-resting=""
         data-tile={tile.id}
         data-image={tileHasImage(tile) ? "" : undefined}
+        data-copy={copy ? "" : undefined}
         data-icon={tile.icon ? "" : undefined}
         data-embed={tileHasEmbed(tile) ? "" : undefined}
         data-described={described === tile.id ? "" : undefined}
@@ -431,17 +485,22 @@ function ShellTile({
   return (
     <motion.span
       className="card-tile"
-      aria-hidden="true"
+      aria-hidden={hidden}
       data-resting={tile.resting ? "" : undefined}
       data-tile={tile.id}
       data-image={tileHasImage(tile) ? "" : undefined}
+      data-copy={copy ? "" : undefined}
       data-icon={tile.icon ? "" : undefined}
       data-embed={tileHasEmbed(tile) ? "" : undefined}
       data-described={described === tile.id ? "" : undefined}
       initial="closed"
       animate={expanded ? "open" : "closed"}
       variants={
-        resized ? frameVariants(tile, reduced) : moving ? shift : fades.get(Math.min(MAX_FADE_RING, Math.max(1, tile.ring)))
+        resized
+          ? frameVariants(tile, reduced, closedRadius, openRadius)
+          : moving
+            ? shift
+            : fades.get(Math.min(MAX_FADE_RING, Math.max(1, tile.ring)))
       }
       style={style}
     >

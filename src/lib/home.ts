@@ -5,9 +5,13 @@ import homeFile from "../../content/home.json";
 import { collectionForGallery } from "@/lib/collection-ids";
 import { getGalleryItems, type GalleryItem, type GalleryVideo } from "@/lib/gallery";
 import { getProjectItems, type ProjectItem } from "@/lib/projects";
+import { CHIA_ICON_MARKS } from "@/components/board/presentations/icon";
+import { copyFrame, embedFrame, imageFrame, type DesktopFrameInput } from "@/components/board/presentations/desktop";
+import { COMMAND_KEY_SRC } from "@/components/board/presentations/key-object";
 import { presentationFor, type PresentationMedia } from "@/components/board/presentations/registry";
 import {
   isPresentationKind,
+  withFill,
   type PresentationKind,
   type PresentationProject,
   type PresentationSpec,
@@ -384,14 +388,25 @@ function readPresentation(value: unknown, where: string): PresentationKind | und
   return value;
 }
 
+function readFill(value: unknown, where: string): boolean {
+  if (value === undefined) {
+    return false;
+  }
+  if (typeof value !== "boolean") {
+    throw new Error(`${where} must be a boolean.`);
+  }
+  return value;
+}
+
 function withPresentation(
   card: Omit<HomeCard, "opening" | "ratio">,
   kind: PresentationKind,
   project: PresentationProject,
   media: PresentationMedia | undefined,
   href: string,
+  fill = false,
 ): HomeCard {
-  const spec = presentationFor(kind, project, media);
+  const spec = withFill(presentationFor(kind, project, media), fill);
   return {
     ...card,
     ratio: `${spec.closed.width} / ${spec.closed.height}`,
@@ -413,18 +428,221 @@ function galleryPoster(item: GalleryItem, foreground: TileForeground | undefined
   return "";
 }
 
+function galleryDesktopFrame(item: GalleryItem, fit: "cover" | "contain" = "contain"): DesktopFrameInput {
+  if (item.media === "video") {
+    return {
+      label: item.title,
+      description: item.alt,
+      aspect: item.width / item.height,
+      object: {
+        type: "video",
+        src: item.src,
+        poster: item.poster,
+        play: "hover",
+        fit,
+      },
+    };
+  }
+
+  if (item.media === "image") {
+    return {
+      label: item.title,
+      description: item.alt,
+      aspect: item.width / item.height,
+      object: { type: "image", src: item.src, position: "center center", fit },
+    };
+  }
+
+  throw new Error(`Gallery item "${item.id}" cannot join a desktop stack.`);
+}
+
+function readGalleryStack(
+  value: unknown,
+  gallery: readonly GalleryItem[],
+  heroId: string,
+  where: string,
+): GalleryItem[] {
+  if (value === undefined) {
+    return [];
+  }
+
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`${where} must be a non-empty array of gallery ids.`);
+  }
+
+  const seen = new Set<string>([heroId]);
+  const stack: GalleryItem[] = [];
+
+  for (const [index, entry] of value.entries()) {
+    if (typeof entry !== "string" || entry.trim().length === 0) {
+      throw new Error(`${where}[${index}] must be a gallery id.`);
+    }
+
+    const id = entry.trim();
+    if (seen.has(id)) {
+      throw new Error(`${where}[${index}] repeats "${id}".`);
+    }
+
+    const item = gallery.find((candidate) => candidate.id === id);
+    if (!item) {
+      throw new Error(`Unknown gallery id "${id}" in ${where}[${index}].`);
+    }
+
+    if (item.media !== "image" && item.media !== "video") {
+      throw new Error(`${where}[${index}] ("${id}") must be an image or video.`);
+    }
+
+    seen.add(id);
+    stack.push(item);
+  }
+
+  return stack;
+}
+
+function heroClosedBox(item: { width: number; height: number }) {
+  return { width: item.width, height: item.height };
+}
+
+const PAPER_BUTTON = "/media/work/paper-button";
+const PAPER_BUTTON_ARTICLE = "https://paper.tips/notes/you-can-rebuild-a-button-from-a-photo";
+
+function studyIconsFrames(): DesktopFrameInput[] {
+  const shot = (file: string, label: string, description: string): DesktopFrameInput =>
+    imageFrame({
+      src: `${PAPER_BUTTON}/${file}`,
+      label,
+      description,
+      width: 1600,
+      height: 1200,
+      fit: "cover",
+    });
+
+  return [
+    embedFrame({
+      src: COMMAND_KEY_SRC,
+      title: "Command key",
+      label: "The button",
+      description: "The HTML and CSS rebuild. Click the key to turn the lamp on.",
+      width: 1080,
+      height: 540,
+    }),
+    shot(
+      "key-reference.webp",
+      "The reference",
+      "The source photo: a Bluetooth key and a Command key in a recessed well, by Beyza İlhan.",
+    ),
+    copyFrame({
+      title: "The reference",
+      label: "The reference",
+      body: "This is the photo I was working against, by Beyza İlhan. Everything after this is me trying to rebuild it.",
+    }),
+    shot(
+      "key-first-try.webp",
+      "First pass",
+      "First Paper pass at the Bluetooth and Command key pair, with a blue lamp under the left cap.",
+    ),
+    copyFrame({
+      title: "First pass",
+      label: "First pass",
+      body: "Closer than I expected, and still not the photo. The glyphs came out as vectors, the corners went soft, and the lamp missed the well.",
+    }),
+    shot(
+      "key-second-try.webp",
+      "Second pass",
+      "Second Paper pass after a written critique of the first attempt.",
+    ),
+    copyFrame({
+      title: "Critique, then again",
+      label: "Second pass",
+      body: "I wrote what was off against the source and sent it back. The second pass started to hold the proportions.",
+    }),
+    shot(
+      "key-third-try.webp",
+      "Third pass",
+      "Third Paper pass with the recessed tray restored around the key pair.",
+    ),
+    copyFrame({
+      title: "The tray comes back",
+      label: "Third pass",
+      body: "I missed the recessed tray from the first try, so I asked for it. The third pass set the keys down in a well again.",
+    }),
+    shot(
+      "key-fourth-try.webp",
+      "Fourth pass",
+      "Fourth Paper pass after matching tiled grain from a screenshot of the source.",
+    ),
+    copyFrame({
+      title: "Grain, not banding",
+      label: "Fourth pass",
+      body: "Gradients band. I showed it a crop of the noise, and the fourth pass tiled that grain into the shapes.",
+    }),
+    shot(
+      "key-unlit-lit.webp",
+      "Lamp off, lamp on",
+      "Two Command keys on the same dark ground: lamp off on the left, blue underglow on the right.",
+    ),
+    copyFrame({
+      title: "Lamp off, lamp on",
+      label: "Finish",
+      body: "I dropped the tray and kept a single Command key. One state shows the socket. The other turns the blue light on.",
+    }),
+  ];
+}
+
 function galleryPresentation(
   item: GalleryItem,
   frame: HomeFrame,
   foreground: TileForeground | undefined,
   fit: HomeFit,
   explicit: PresentationKind | undefined,
+  stack: readonly GalleryItem[] = [],
+  fill = false,
 ): { kind: PresentationKind; project: PresentationProject; media?: PresentationMedia } {
   const project = { title: item.title, chips: [] as string[] };
   const box = frameBox(frame);
   const collection = collectionForGallery(item.id);
   let kind: PresentationKind = "widget";
   let media: PresentationMedia | undefined;
+
+  if (item.id === "study-icons") {
+    if (item.media !== "image") {
+      throw new Error(`Gallery item "${item.id}" must be an image.`);
+    }
+
+    return {
+      kind: "desktop",
+      project: { ...project, href: PAPER_BUTTON_ARTICLE },
+      media: {
+        frames: studyIconsFrames(),
+        layout: "split",
+        /* A little taller than the still, so the cap sits just below the top edge. */
+        closed: fill ? { width: item.width, height: Math.round(item.height * 1.12) } : box,
+      },
+    };
+  }
+
+  if (stack.length > 0 || explicit === "desktop") {
+    if (item.media !== "image" && item.media !== "video") {
+      throw new Error(`Gallery item "${item.id}" cannot open as a desktop stack.`);
+    }
+
+    const visionBanner = item.id === "philo-sticker-set" && stack.length > 0;
+
+    return {
+      kind: "desktop",
+      project,
+      media: {
+        // Cover on the hero so fill cards bleed edge-to-edge; contain keeps later pieces whole.
+        frames: [galleryDesktopFrame(item, "cover"), ...stack.map((entry) => galleryDesktopFrame(entry))],
+        // Stacks open as a 3-column masonry (same column count as widget landscape).
+        // Vision to Venture puts the film across the top and the two graphics under it.
+        columns: visionBanner ? undefined : stack.length > 0 ? 3 : undefined,
+        layout: visionBanner ? "banner" : undefined,
+        // Fill cards size the closed shell to the hero so cover does not crop.
+        closed: fill ? heroClosedBox(item) : frameBox(frame),
+      },
+    };
+  }
 
   if (collection) {
     kind = "icon";
@@ -445,29 +663,47 @@ function galleryPresentation(
             ? item.src
             : "";
     const title = foreground?.type === "html" ? foreground.title : item.title;
-    const portrait = item.height / item.width > 1.15;
-    kind = portrait ? "phone" : "desktop";
-    media = portrait
-      ? {
-          screens: [
-            {
-              id: item.id,
-              label: title,
-              description: item.alt,
-              object: { type: "embed", src, title },
-            },
-          ],
-        }
-      : {
-          frames: [
-            {
-              label: title,
-              description: item.alt,
-              aspect: item.width / item.height,
-              object: { type: "embed", src, title },
-            },
-          ],
-        };
+    // App marks / filled icons stay on the widget (icon-like) shell — not a desktop page.
+    if (("mark" in item && item.mark) || fill || explicit === "widget" || explicit === "icon") {
+      kind = "widget";
+      media = {
+        widget: {
+          frame: fill ? heroClosedBox(item) : box,
+          face: {
+            src,
+            width: item.width,
+            height: item.height,
+            label: title,
+            description: item.alt,
+            embed: { src, title },
+          },
+        },
+      };
+    } else {
+      const portrait = item.height / item.width > 1.15;
+      kind = portrait ? "phone" : "desktop";
+      media = portrait
+        ? {
+            screens: [
+              {
+                id: item.id,
+                label: title,
+                description: item.alt,
+                object: { type: "embed", src, title },
+              },
+            ],
+          }
+        : {
+            frames: [
+              {
+                label: title,
+                description: item.alt,
+                aspect: item.width / item.height,
+                object: { type: "embed", src, title },
+              },
+            ],
+          };
+    }
   } else {
     const still = galleryStill(item);
     const video =
@@ -478,7 +714,7 @@ function galleryPresentation(
             play: foreground.play === "always" ? ("auto" as const) : ("hover" as const),
           }
         : item.media === "video"
-          ? { src: item.src, poster: item.poster, play: "auto" as const }
+          ? { src: item.src, poster: item.poster, play: "hover" as const }
           : undefined;
     const contain =
       fit === "contain" ||
@@ -488,7 +724,7 @@ function galleryPresentation(
     const src = foreground?.type === "image" || foreground?.type === "vector" ? foreground.src : still.src;
     media = {
       widget: {
-        frame: box,
+        frame: fill ? heroClosedBox(still) : box,
         face: {
           src,
           width: still.width,
@@ -521,22 +757,25 @@ function galleryPresentation(
     };
   }
 
-  if (resolved === "phone" && media?.frames?.[0]?.object.type === "embed") {
+  if (resolved === "phone" && media?.frames?.[0]) {
     const frame = media.frames[0];
-    return {
-      kind: "phone",
-      project,
-      media: {
-        screens: [
-          {
-            id: item.id,
-            label: frame.label,
-            description: frame.description,
-            object: frame.object,
-          },
-        ],
-      },
-    };
+    const object = frame.object;
+    if (object.type === "embed") {
+      return {
+        kind: "phone",
+        project,
+        media: {
+          screens: [
+            {
+              id: item.id,
+              label: frame.label,
+              description: frame.description,
+              object,
+            },
+          ],
+        },
+      };
+    }
   }
 
   if (resolved === "desktop" && media?.screens?.[0]?.object.type === "embed") {
@@ -553,6 +792,20 @@ function galleryPresentation(
             object: screen.object,
           },
         ],
+      },
+    };
+  }
+
+  // Icon set (e.g. Vision → Vault / Signer / Wallet), not a collection lens.
+  if (resolved === "icon" && !media?.icon) {
+    return {
+      kind: "icon",
+      project,
+      media: {
+        iconSet: {
+          marks: CHIA_ICON_MARKS,
+          poster: galleryPoster(item, foreground),
+        },
       },
     };
   }
@@ -604,6 +857,7 @@ function workPresentation(
   _frame: HomeFrame,
   title: string,
   explicit: PresentationKind | undefined,
+  stack: readonly GalleryItem[] = [],
 ): { kind: PresentationKind; project: PresentationProject; media?: PresentationMedia } {
   const project = {
     title,
@@ -612,12 +866,49 @@ function workPresentation(
   };
   let kind: PresentationKind = "desktop";
   let media: PresentationMedia | undefined;
+  const extras = stack.map((entry) => galleryDesktopFrame(entry));
 
   if (item.id === "chia-signer") {
     kind = "phone";
   } else if (item.id === "chia-friends") {
     kind = "desktop";
-    media = { frames: friendFrames(item, title) };
+    media = {
+      frames: [...friendFrames(item, title), ...extras],
+      columns: extras.length > 0 ? 3 : undefined,
+    };
+  } else if (item.id === "philo") {
+    // Hero, then site video (lands in the middle column), then plates + stack.
+    media = {
+      frames: [
+        {
+          aspect: item.width / item.height,
+          label: title,
+          description: item.summary,
+          object: { type: "image" as const, src: item.src, position: "center top" },
+        },
+        {
+          aspect: 1440 / 900,
+          label: "Site",
+          description:
+            "A jump cut through the Philo Ventures site, from the homepage through Explore, Build, Companies, and Team.",
+          object: {
+            type: "video" as const,
+            src: "/media/work/philo.mp4",
+            poster: "/media/work/philo-poster.jpg",
+            play: "hover" as const,
+            fit: "cover" as const,
+          },
+        },
+        ...(item.plates ?? []).map((plate) => ({
+          aspect: plate.width / plate.height,
+          label: plate.label,
+          description: plate.alt,
+          object: { type: "image" as const, src: plate.src, position: "center top" },
+        })),
+        ...extras,
+      ],
+      columns: 3,
+    };
   } else {
     media = {
       frames: [
@@ -633,7 +924,9 @@ function workPresentation(
           description: plate.alt,
           object: { type: "image" as const, src: plate.src, position: "center top" },
         })),
+        ...extras,
       ],
+      columns: extras.length > 0 ? 3 : undefined,
     };
   }
 
@@ -720,6 +1013,7 @@ function resolveTile(
   const label = readText(value.label, `${where}.label`);
 
   const explicit = readPresentation(value.presentation, `${where}.presentation`);
+  const fill = readFill(value.fill, `${where}.fill`);
 
   if (value.kind === "gallery") {
     const item = gallery.find((entry) => entry.id === value.id);
@@ -740,6 +1034,8 @@ function resolveTile(
       ...(href.href ? { href: href.href } : {}),
     };
 
+    const stack = readGalleryStack(value.stack, gallery, item.id, `${where}.stack`);
+
     if (item.media === "frame") {
       const foreground = readForeground(
         value.foreground ?? { type: "html", src: item.src, title: item.title },
@@ -751,7 +1047,7 @@ function resolveTile(
         throw new Error(`${where} needs a foreground.`);
       }
 
-      const presented = galleryPresentation(item, value.frame, foreground, fit, explicit);
+      const presented = galleryPresentation(item, value.frame, foreground, fit, explicit, stack, fill);
       return withPresentation(
         {
           ...card,
@@ -767,6 +1063,7 @@ function resolveTile(
         { ...presented.project, title: card.label },
         presented.media,
         href.href ?? "",
+        fill,
       );
     }
 
@@ -775,13 +1072,14 @@ function resolveTile(
       item.media === "video"
         ? playingVideo(readTileLayers(value, still, fit, where), item, fit, value.foreground)
         : readTileLayers(value, still, fit, where);
-    const presented = galleryPresentation(item, value.frame, layers.foreground, fit, explicit);
+    const presented = galleryPresentation(item, value.frame, layers.foreground, fit, explicit, stack, fill);
     return withPresentation(
       { ...card, ...layers },
       presented.kind,
       { ...presented.project, title: card.label },
       presented.media,
       href.href ?? "",
+      fill,
     );
   }
 
@@ -805,7 +1103,8 @@ function resolveTile(
       ? playingVideo(layers, video, fit, value.foreground)
       : layers;
   const title = label ?? item.title;
-  const presented = workPresentation(item, value.frame, title, explicit);
+  const stack = readGalleryStack(value.stack, gallery, item.id, `${where}.stack`);
+  const presented = workPresentation(item, value.frame, title, explicit, stack);
 
   return withPresentation(
     {
@@ -824,6 +1123,7 @@ function resolveTile(
     presented.project,
     presented.media,
     `/work/${item.id}`,
+    fill,
   );
 }
 
@@ -845,7 +1145,7 @@ function playingVideo(
       poster: clip.poster,
       alt: clip.alt,
       fit: layers.foreground?.type === "video" ? layers.foreground.fit : fit,
-      play: "always",
+      play: "hover",
     },
     hover: {
       ...layers.hover,

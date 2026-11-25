@@ -521,8 +521,11 @@ export function IconLens({
       const paint = () => {
         const count = Math.max(catalog.count, 1);
         for (let index = 0; index < COUNT; index += 1) {
+          const itemIndex = index % count;
+          // Chunked catalogs (Chia Friends) only load the hero chunk until asked.
+          catalog.ensure(itemIndex);
           const image = cellsRef.current[index]?.querySelector("img");
-          const piece = catalog.piece(index % count);
+          const piece = catalog.piece(itemIndex);
           if (!(image instanceof HTMLImageElement) || !piece || image.getAttribute("src") === piece.src) {
             continue;
           }

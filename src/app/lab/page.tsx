@@ -25,6 +25,7 @@ export default function LabPage() {
       </p>
       <p className="lab-links">
         <a href="/lab/shadows">Shadows</a>
+        <a href="/lab/torph">Torph</a>
       </p>
 
       <p className="lab-copy">

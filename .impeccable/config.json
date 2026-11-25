@@ -12,6 +12,15 @@
         "value": "timeless sans",
         "createdAt": "2026-11-24T01:17:59.468Z",
         "reason": "User specified Timeless Sans as the share-image display font, loaded from src/fonts/TimelessSansVF.woff2."
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/components/board/board.css"
+        ],
+        "createdAt": "2026-11-24T23:49:44.308Z",
+        "reason": "The command glyph's metal fill is the rebuilt Paper.tips key, not heading decoration."
       }
     ]
   }

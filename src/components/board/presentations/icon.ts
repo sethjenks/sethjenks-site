@@ -5,6 +5,8 @@ import type { CollectionId } from "@/lib/collection-ids";
 
 const PHONE_OPEN = { width: 1532, height: 862 };
 const ICON_CLOSED = { width: 400, height: 400 };
+/** Match `iconDockClosed` in icon-dock.tsx — kept here so this module stays server-safe. */
+const ICON_DOCK_CLOSED = { width: 700, height: 480 };
 const ICON_SIZE = 256;
 const ICON_GAP = 32;
 const ICON_ROUNDED_RADIUS = Math.round((ICON_SIZE * 280) / 1024);
@@ -22,6 +24,9 @@ const ICON_META: Record<AppIconMark, { label: string; description: string }> = {
     description: "Three segments meeting in a triangular gap.",
   },
 };
+
+/** The three Chia product icons — Vault, Signer, Wallet. */
+export const CHIA_ICON_MARKS = APP_ICON_MARKS;
 
 export function iconTiles(): PresentationTile[] {
   const tiles: PresentationTile[] = [];
@@ -73,6 +78,18 @@ export type IconCollectionInput = {
   title: string;
 };
 
+/** A short set of App Icons (e.g. the three Chia marks). Optional poster is the closed face. */
+export type IconSetInput = {
+  marks: readonly AppIconMark[];
+  poster?: string;
+};
+
+export type IconSource = IconCollectionInput | IconSetInput;
+
+function isIconSet(source: IconSource): source is IconSetInput {
+  return "marks" in source;
+}
+
 function collectionIconTile(poster: string, title: string): PresentationTile {
   const x = (ICON_CLOSED.width - ICON_SIZE) / 2;
   const y = (ICON_CLOSED.height - ICON_SIZE) / 2;
@@ -95,10 +112,63 @@ function collectionIconTile(poster: string, title: string): PresentationTile {
   };
 }
 
+/** Centered row of marks. Poster (if any) paints the resting face while closed. */
+export function iconSetTiles(
+  marks: readonly AppIconMark[] = CHIA_ICON_MARKS,
+  poster?: string,
+): PresentationTile[] {
+  const count = Math.max(1, marks.length);
+  const totalW = count * ICON_SIZE + (count - 1) * ICON_GAP;
+  const originX = (PHONE_OPEN.width - totalW) / 2;
+  const originY = (PHONE_OPEN.height - ICON_SIZE) / 2;
+  const primaryIndex = Math.floor((count - 1) / 2);
+  const closedX = (ICON_CLOSED.width - ICON_SIZE) / 2;
+  const closedY = (ICON_CLOSED.height - ICON_SIZE) / 2;
+
+  return marks.map((mark, index) => {
+    const primary = index === primaryIndex;
+    const meta = ICON_META[mark];
+    const x = originX + index * (ICON_SIZE + ICON_GAP);
+
+    return {
+      id: `i-${mark}-${index}`,
+      x,
+      y: originY,
+      width: ICON_SIZE,
+      height: ICON_SIZE,
+      radius: ICON_ROUNDED_RADIUS,
+      resting: primary,
+      ring: Math.abs(index - primaryIndex),
+      shiftX: primary ? closedX - x : 0,
+      shiftY: primary ? closedY - originY : 0,
+      icon: { mark, rounded: true },
+      ...(primary && poster
+        ? { media: { layers: [{ kind: "image" as const, src: poster, position: "center", fit: "cover" as const }] } }
+        : {}),
+      aspect: 1,
+      label: meta.label,
+      description: meta.description,
+    };
+  });
+}
+
 export function iconPresentation(
   project: PresentationProject = ICON_PROJECT,
-  source?: IconCollectionInput,
+  source?: IconSource,
 ): PresentationSpec {
+  if (source && isIconSet(source)) {
+    return {
+      id: "icon",
+      label: "Icon",
+      openLabel: "Expand the dock",
+      project,
+      dock: true,
+      closed: placed(ICON_DOCK_CLOSED),
+      open: placed(PHONE_OPEN),
+      tiles: iconSetTiles(source.marks, source.poster),
+    };
+  }
+
   if (source) {
     return {
       id: "icon",

@@ -3,7 +3,7 @@ import path from "node:path";
 
 const GALLERY_PATH = path.join(process.cwd(), "content", "gallery.json");
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const IMAGE_PATTERN = /^\/media\/work\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp|svg)$/;
+const IMAGE_PATTERN = /^\/media\/work\/(?:[a-z0-9-]+\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp|svg)$/;
 const VIDEO_PATTERN = /^\/media\/work\/[a-z0-9-]+\.mp4$/;
 const FRAME_PATTERN = /^\/media\/work\/[a-z0-9-]+\.html$/;
 

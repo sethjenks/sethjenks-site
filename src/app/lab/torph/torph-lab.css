@@ -1,0 +1,129 @@
+.torph-lab .torph-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+  margin-block-start: 1.75rem;
+}
+
+.torph-lab .torph-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 14px;
+  color: var(--quiet);
+  cursor: pointer;
+  user-select: none;
+}
+
+.torph-lab .torph-toggle input {
+  width: 0.95rem;
+  height: 0.95rem;
+  accent-color: var(--ink);
+}
+
+.torph-lab .torph-ease {
+  display: inline-flex;
+  gap: 0.35rem;
+  margin-inline-start: auto;
+}
+
+.torph-lab .torph-ease button,
+.torph-lab .torph-chips button {
+  appearance: none;
+  border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+  background: color-mix(in oklch, var(--ink) 3%, transparent);
+  color: var(--ink);
+  border-radius: 0.45rem;
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+.torph-lab .torph-ease button:hover,
+.torph-lab .torph-chips button:hover {
+  background: color-mix(in oklch, var(--ink) 7%, transparent);
+}
+
+.torph-lab .torph-ease button.is-active,
+.torph-lab .torph-chips button.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--background);
+}
+
+.torph-lab .torph-stage {
+  /* Keep this out of flex layout: torph roots are inline-block and
+     animate their own width/height. As a flex item they blockify,
+     stretch, and reflow mid-morph. */
+  display: block;
+  min-height: 5.5rem;
+  padding-block-end: 0.35rem;
+}
+
+.torph-lab .torph-display {
+  margin: 0;
+  font-size: clamp(2rem, 1.2rem + 3.5vw, 3.25rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--ink);
+  /* Reinforce torph's injected root styles; text-wrap:balance was
+     undoing white-space:nowrap and letting phrases wrap mid-morph. */
+  display: inline-block;
+  white-space: nowrap;
+  text-wrap: nowrap;
+  vertical-align: top;
+}
+
+.torph-lab .torph-display-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.045em;
+}
+
+.torph-lab .torph-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-start: 1.25rem;
+}
+
+.torph-lab .torph-note {
+  margin-block-start: 1rem;
+  font-size: 15px;
+}
+
+.torph-lab .torph-field {
+  display: grid;
+  gap: 0.45rem;
+  margin-block-start: 1.25rem;
+  max-width: 28rem;
+}
+
+.torph-lab .torph-field-label {
+  font-size: 13px;
+  color: var(--quiet);
+}
+
+.torph-lab .torph-field input {
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--ink) 14%, transparent);
+  border-radius: 0.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.torph-lab .torph-field input:focus {
+  border-color: color-mix(in oklch, var(--ink) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ink) 8%, transparent);
+}
