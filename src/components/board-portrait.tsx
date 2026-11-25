@@ -95,6 +95,7 @@ export function BoardPortrait({ src }: { src?: string }) {
   const insideRef = useRef(false);
   const settlingRef = useRef(false);
   const rippleRef = useRef<number | null>(null);
+  const gestureRef = useRef<{ id: number; x: number; y: number } | null>(null);
 
   useEffect(() => {
     setGpu("gpu" in navigator);
@@ -223,6 +224,28 @@ export function BoardPortrait({ src }: { src?: string }) {
         setSettling(false);
         setMelt((value) => value + 1);
         setPlay("liquid");
+        if (event.pointerType === "touch") {
+          gestureRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+          return;
+        }
+        try {
+          event.currentTarget.setPointerCapture(event.pointerId);
+        } catch {
+          // The pointer is already gone, or this event cannot capture.
+        }
+      }}
+      onPointerMove={(event) => {
+        const gesture = gestureRef.current;
+        if (!gesture || gesture.id !== event.pointerId) return;
+        const dx = event.clientX - gesture.x;
+        const dy = event.clientY - gesture.y;
+        if (Math.hypot(dx, dy) < 8) return;
+        gestureRef.current = null;
+        if (Math.abs(dy) >= Math.abs(dx)) {
+          releaseLiquid();
+          return;
+        }
+        event.currentTarget.setAttribute("data-gesture", "");
         try {
           event.currentTarget.setPointerCapture(event.pointerId);
         } catch {
@@ -230,12 +253,16 @@ export function BoardPortrait({ src }: { src?: string }) {
         }
       }}
       onPointerUp={(event) => {
+        gestureRef.current = null;
+        event.currentTarget.removeAttribute("data-gesture");
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
           event.currentTarget.releasePointerCapture(event.pointerId);
         }
         releaseLiquid();
       }}
       onPointerCancel={(event) => {
+        gestureRef.current = null;
+        event.currentTarget.removeAttribute("data-gesture");
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
           event.currentTarget.releasePointerCapture(event.pointerId);
         }

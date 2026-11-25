@@ -38,3 +38,8 @@ export function imageLayer(media: CardMedia | undefined): Extract<CardLayer, { k
   const layer = media?.layers.find((item) => item.kind === "image");
   return layer?.kind === "image" ? layer : undefined;
 }
+
+export function videoLayer(media: CardMedia | undefined): Extract<CardLayer, { kind: "video" }> | undefined {
+  const layer = media?.layers.find((item) => item.kind === "video");
+  return layer?.kind === "video" ? layer : undefined;
+}

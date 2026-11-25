@@ -250,10 +250,16 @@ type GrabHold = {
   plane: { x: number; y: number; z: number };
 };
 
+type GrabPending = GrabHold & {
+  x: number;
+  y: number;
+};
+
 export function SoftMatterMark({ home }: SoftMatterMarkProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const grabPadRef = useRef<HTMLDivElement>(null);
   const holdRef = useRef<GrabHold | null>(null);
+  const pendingRef = useRef<GrabPending | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -414,7 +420,9 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
     }
 
     const claimTouch = (event: TouchEvent) => {
-      event.preventDefault();
+      if (holdRef.current) {
+        event.preventDefault();
+      }
     };
     pad.addEventListener("touchmove", claimTouch, { passive: false });
 
@@ -455,6 +463,35 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
     });
 
     const onMove = (event: globalThis.PointerEvent) => {
+      const pending = pendingRef.current;
+      if (pending && event.pointerId === pending.id && !holdRef.current) {
+        const dx = event.clientX - pending.x;
+        const dy = event.clientY - pending.y;
+        if (Math.hypot(dx, dy) < GRAB_SLOP_PX) {
+          return;
+        }
+        pendingRef.current = null;
+        if (Math.abs(dy) > Math.abs(dx)) {
+          return;
+        }
+        const pad = grabPadRef.current;
+        if (!pad) {
+          return;
+        }
+        try {
+          pad.setPointerCapture(event.pointerId);
+        } catch {
+          // Window listeners keep following the finger when capture is unavailable.
+        }
+        pad.setAttribute("data-gesture", "");
+        const point = screenToGrabPlane(event.clientX, event.clientY, pending.plane) ?? pending.plane;
+        window.__headerSoftBody?.grab?.(point);
+        holdRef.current = { id: pending.id, plane: pending.plane };
+        document.documentElement.dataset.headerGrab = "touch";
+        window.getSelection()?.removeAllRanges();
+        return;
+      }
+
       const hold = holdRef.current;
       if (!hold || event.pointerId !== hold.id) {
         return;
@@ -469,12 +506,17 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
     };
 
     const onUp = (event: globalThis.PointerEvent) => {
+      if (pendingRef.current?.id === event.pointerId) {
+        pendingRef.current = null;
+      }
       const hold = holdRef.current;
       if (!hold || event.pointerId !== hold.id) {
         return;
       }
 
       holdRef.current = null;
+      pendingRef.current = null;
+      grabPadRef.current?.removeAttribute("data-gesture");
       window.__headerSoftBody?.release?.();
       if (document.documentElement.dataset.headerGrab === "touch") {
         delete document.documentElement.dataset.headerGrab;
@@ -520,7 +562,8 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
     const plane = { x: center.x, y: center.y, z: center.z };
     const point = screenToGrabPlane(event.clientX, event.clientY, plane) ?? plane;
     if (event.pointerType !== "mouse") {
-      event.preventDefault();
+      pendingRef.current = { id: event.pointerId, plane, x: event.clientX, y: event.clientY };
+      return;
     }
     try {
       event.currentTarget.setPointerCapture(event.pointerId);

@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
+import { ColumnSheet } from "@/components/board/column-sheet";
 import { PhoneSheet } from "@/components/board/phone-sheet";
 import { CLOSE_MOVE_DELAY_S, CLOSE_TOTAL_S, OPEN_SHELL_S, moveTransition } from "@/components/board/presentations/motion";
 import { STUDIES } from "@/components/board/presentations/registry";
@@ -25,10 +26,20 @@ type ExpandLoopProps = {
 };
 
 export function ExpandLoop(props: ExpandLoopProps) {
-  const mode = usePagerMode(props.spec.id === "phone");
-  if (mode === "sheet") {
+  const mode = usePagerMode();
+  if (mode === "sheet" && props.spec.id === "phone") {
     return (
       <PhoneSheet
+        spec={props.spec}
+        heldSelector={props.heldSelector}
+        className={props.className}
+        onExited={props.onExited}
+      />
+    );
+  }
+  if (mode === "sheet") {
+    return (
+      <ColumnSheet
         spec={props.spec}
         heldSelector={props.heldSelector}
         className={props.className}
@@ -45,13 +56,13 @@ function subscribePager(onChange: () => void) {
   return () => media.removeEventListener("change", onChange);
 }
 
-function usePagerMode(eligible: boolean) {
+function usePagerMode() {
   const matches = useSyncExternalStore(
     subscribePager,
     () => window.matchMedia(PHONE_PAGER_QUERY).matches,
     () => false,
   );
-  return eligible && matches ? "sheet" : "stage";
+  return matches ? "sheet" : "stage";
 }
 
 function StageLoop({

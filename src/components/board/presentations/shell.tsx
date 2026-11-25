@@ -155,7 +155,7 @@ export function PresentationShell({
       className="card-shell"
       style={shellStyle}
       whileHover={
-        appearOpen || reduced
+        appearOpen || reduced || !fineHover
           ? undefined
           : {
               scale: CLOSED_HOVER_SCALE,

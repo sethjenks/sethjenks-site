@@ -644,7 +644,9 @@ html:has(.board-presentation-loop) {
   .board-card[data-presentation="icon"] .icon-dock {
     transition: transform 450ms cubic-bezier(0.23, 1, 0.32, 1);
   }
+}
 
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .board-card[data-presentation="icon"]:hover .icon-dock,
   .board-card[data-presentation="icon"]:focus-visible .icon-dock {
     transform: scale(var(--bg-to-scale, 1.08));
@@ -893,7 +895,6 @@ html:has(.board-presentation-loop) {
   inset: 0;
   display: flex;
   flex-direction: column;
-  block-size: 100dvh;
   overflow: clip;
   background: #ededed;
   color: #111;
@@ -1123,6 +1124,172 @@ html:has(.phone-sheet) {
 
   to {
     opacity: 0;
+  }
+}
+
+/* Full-viewport column for desktop, widget, and icon cards on a phone.
+   CSS pixels, not a scaled 1532 stage. */
+.column-sheet {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  background: #ededed;
+  color: #111;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html:has(.column-sheet) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.column-sheet-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-block-size: 44px;
+  padding-block: 8px 12px;
+  padding-block-start: calc(env(safe-area-inset-top, 0px) + 10px);
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  background: #ededed;
+  color: #111;
+}
+
+.column-sheet-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.column-sheet-track {
+  flex: 1;
+  min-block-size: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding-block-end: max(24px, env(safe-area-inset-bottom, 0px));
+}
+
+.column-sheet-row,
+.column-sheet-window {
+  width: min(calc(100% - 32px), 720px);
+  margin-inline: auto;
+}
+
+.column-sheet-row {
+  margin-block-end: 28px;
+  scroll-snap-align: start;
+}
+
+.column-sheet-window {
+  position: relative;
+}
+
+.column-sheet-window-row {
+  position: absolute;
+  inset-inline: 0;
+  scroll-snap-align: start;
+}
+
+.column-sheet-frame {
+  position: relative;
+  overflow: clip;
+  border-radius: 20px;
+  background: #e4e4e4;
+}
+
+.column-sheet-frame img,
+.column-sheet-frame video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.column-sheet-frame video {
+  pointer-events: auto;
+  background: #111;
+}
+
+.column-sheet-frame img[data-pixelated] {
+  image-rendering: pixelated;
+}
+
+.column-sheet-icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.column-sheet-icon .app-icon {
+  width: min(256px, 72%);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.column-sheet-caption,
+.column-sheet-copy {
+  color: #111;
+}
+
+.column-sheet-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-block-start: 12px;
+}
+
+.column-sheet-label,
+.column-sheet-description,
+.column-sheet-copy-title,
+.column-sheet-copy-body {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.column-sheet-label,
+.column-sheet-copy-title {
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.column-sheet-description,
+.column-sheet-copy-body {
+  font-weight: 400;
+}
+
+.column-sheet-copy-title + .column-sheet-copy-body {
+  margin-block-start: 8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .column-sheet {
+    animation: phone-sheet-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .column-sheet[data-closing] {
+    animation: phone-sheet-out 160ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
   }
 }
 

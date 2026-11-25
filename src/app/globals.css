@@ -1800,7 +1800,7 @@
 
   .study-title,
   .study h2 {
-    scroll-margin-top: calc(78px + env(safe-area-inset-top, 0px));
+    scroll-margin-top: 78px;
   }
 
   .study-title {
@@ -2201,10 +2201,14 @@
     position: absolute;
     z-index: 2;
     border-radius: 999px;
-    touch-action: none;
+    touch-action: pan-y;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+  }
+
+  .head-grab[data-gesture] {
+    touch-action: none;
   }
 
   .site-header[data-compact] {
