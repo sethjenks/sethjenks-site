@@ -6,10 +6,11 @@ import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "re
 import { createPortal } from "react-dom";
 
 import { AppIcon } from "@/components/app-icon";
-import { embedLayer, imageLayer, videoLayer } from "@/components/board/card-media";
+import { describedAlt, embedLayer, imageLayer, videoLayer } from "@/components/board/card-media";
 import { CommandKey } from "@/components/board/command-key";
 import { COMMAND_KEY_SRC } from "@/components/board/presentations/key-object";
 import type { PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+import { CaseStudyIntro } from "@/components/case-study-intro";
 import { collectionIsPixelated, openCollection, type CollectionCatalog } from "@/lib/collections";
 
 const HISTORY_KEY = "boardColumnSheet";
@@ -140,7 +141,7 @@ export function ColumnSheet({ spec, heldSelector, className, onExited }: ColumnS
       data-closing={closing ? "" : undefined}
     >
       <div className="column-sheet-bar">
-        <p className="column-sheet-title">{spec.project.title}</p>
+        <h2 className="column-sheet-title">{spec.project.title}</h2>
         <button
           ref={doneRef}
           type="button"
@@ -155,6 +156,7 @@ export function ColumnSheet({ spec, heldSelector, className, onExited }: ColumnS
         </button>
       </div>
       <div ref={trackRef} className="column-sheet-track">
+        <CaseStudyIntro project={spec.project} />
         {collection ? (
           <CollectionWindow
             trackRef={trackRef}
@@ -202,7 +204,7 @@ function ColumnRow({ tile, eager }: { tile: PresentationTile; eager: boolean }) 
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={src}
-            alt=""
+            alt={describedAlt(image?.alt, tile.description || tile.label)}
             draggable={false}
             decoding="async"
             loading={eager ? "eager" : "lazy"}
@@ -272,7 +274,7 @@ function CollectionWindow({
       <article className="column-sheet-row">
         <div className="column-sheet-frame" style={{ aspectRatio: "1" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={poster} alt="" draggable={false} decoding="async" />
+          <img src={poster} alt={title} draggable={false} decoding="async" />
         </div>
         <RowCaption label={title} description={failed ? "The collection didn’t load." : title} />
       </article>
@@ -293,7 +295,7 @@ function CollectionWindow({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={piece.src}
-              alt=""
+              alt={piece.name || title}
               draggable={false}
               decoding="async"
               data-pixelated={pixelated ? "" : undefined}

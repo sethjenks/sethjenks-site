@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { BoardFilterBar, BoardFilterProvider } from "@/components/board-filters";
+import { ProfileLinks } from "@/components/profile-links";
 import { BoardJelly } from "@/components/board-jelly";
 import { BoardPortrait } from "@/components/board-portrait";
 import { BoardRailMetrics } from "@/components/board-rail";
@@ -38,7 +39,7 @@ export function HomeBoard({ board, name, headline, bio }: HomeBoardProps) {
       {SHOW_BOARD_JELLY ? <BoardJelly /> : null}
       <BoardFilterProvider>
         <aside className="board-sidebar">
-          <p className="board-name">{name}</p>
+          <h1 className="board-name">{name}</h1>
           <div className="board-face">
             <BoardPortrait src={board.portrait} />
             <BoardFilterBar placement="rail" />
@@ -47,6 +48,7 @@ export function HomeBoard({ board, name, headline, bio }: HomeBoardProps) {
             <p className="board-headline">{headline}</p>
             {bio ? <p className="board-bio">{bio}</p> : null}
           </div>
+          <ProfileLinks />
           {SHOW_BOARD_PROJECTS ? <BoardProjects projects={board.projects} /> : null}
         </aside>
         <div className="home-board-main">

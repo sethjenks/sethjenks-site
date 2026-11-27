@@ -5,8 +5,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { imageLayer } from "@/components/board/card-media";
+import { describedAlt, imageLayer } from "@/components/board/card-media";
 import type { PresentationSpec, PresentationTile } from "@/components/board/presentations/types";
+import { CaseStudyIntro } from "@/components/case-study-intro";
 
 const HISTORY_KEY = "boardPhoneSheet";
 const CLOSE_MS = 160;
@@ -217,6 +218,7 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
         }
       }}
     >
+      <h2 className="sr-only">{spec.project.title}</h2>
       <div className="phone-sheet-bar">
         <p className="phone-sheet-count" aria-live="polite" aria-atomic="true">
           {few ? (
@@ -240,6 +242,7 @@ export function PhoneSheet({ spec, heldSelector, className, onExited }: PhoneShe
           <HugeiconsIcon icon={CollapseIcon} size={24} strokeWidth={2} color="currentColor" />
         </button>
       </div>
+      <CaseStudyIntro project={spec.project} />
       <div className="phone-sheet-view">
       <div
         ref={trackRef}
@@ -303,7 +306,7 @@ function SheetSlide({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={src}
-            alt=""
+            alt={describedAlt(imageLayer(tile.media)?.alt, tile.description || tile.label)}
             draggable={false}
             decoding="async"
             loading={eager ? "eager" : "lazy"}

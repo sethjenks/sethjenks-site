@@ -76,12 +76,14 @@ export type IconCollectionInput = {
   id: CollectionId;
   poster: string;
   title: string;
+  alt?: string;
 };
 
 /** A short set of App Icons (e.g. the three Chia marks). Optional poster is the closed face. */
 export type IconSetInput = {
   marks: readonly AppIconMark[];
   poster?: string;
+  alt?: string;
 };
 
 export type IconSource = IconCollectionInput | IconSetInput;
@@ -90,7 +92,7 @@ function isIconSet(source: IconSource): source is IconSetInput {
   return "marks" in source;
 }
 
-function collectionIconTile(poster: string, title: string): PresentationTile {
+function collectionIconTile(poster: string, title: string, alt = title): PresentationTile {
   const x = (ICON_CLOSED.width - ICON_SIZE) / 2;
   const y = (ICON_CLOSED.height - ICON_SIZE) / 2;
 
@@ -106,7 +108,7 @@ function collectionIconTile(poster: string, title: string): PresentationTile {
     shiftX: 0,
     shiftY: 0,
     aspect: 1,
-    media: { layers: [{ kind: "image", src: poster, position: "center", fit: "cover" }] },
+    media: { layers: [{ kind: "image", src: poster, alt, position: "center", fit: "cover" }] },
     label: title,
     description: title,
   };
@@ -116,6 +118,7 @@ function collectionIconTile(poster: string, title: string): PresentationTile {
 export function iconSetTiles(
   marks: readonly AppIconMark[] = CHIA_ICON_MARKS,
   poster?: string,
+  posterAlt = "",
 ): PresentationTile[] {
   const count = Math.max(1, marks.length);
   const totalW = count * ICON_SIZE + (count - 1) * ICON_GAP;
@@ -143,7 +146,19 @@ export function iconSetTiles(
       shiftY: primary ? closedY - originY : 0,
       icon: { mark, rounded: true },
       ...(primary && poster
-        ? { media: { layers: [{ kind: "image" as const, src: poster, position: "center", fit: "cover" as const }] } }
+        ? {
+            media: {
+              layers: [
+                {
+                  kind: "image" as const,
+                  src: poster,
+                  alt: posterAlt || meta.description,
+                  position: "center",
+                  fit: "cover" as const,
+                },
+              ],
+            },
+          }
         : {}),
       aspect: 1,
       label: meta.label,
@@ -165,7 +180,7 @@ export function iconPresentation(
       dock: true,
       closed: placed(ICON_DOCK_CLOSED),
       open: placed(PHONE_OPEN),
-      tiles: iconSetTiles(source.marks, source.poster),
+      tiles: iconSetTiles(source.marks, source.poster, source.alt),
     };
   }
 
@@ -179,7 +194,7 @@ export function iconPresentation(
       collection: { id: source.id, poster: source.poster, title: source.title },
       closed: placed(ICON_CLOSED),
       open: placed(PHONE_OPEN),
-      tiles: [collectionIconTile(source.poster, source.title)],
+      tiles: [collectionIconTile(source.poster, source.title, source.alt || source.title)],
     };
   }
 

@@ -88,6 +88,84 @@
   width: 100%;
 }
 
+.case-intro-anchor {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 0;
+  left: 0;
+  pointer-events: auto;
+}
+
+.case-intro {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 28px 24px 32px;
+  color: #111;
+}
+
+.case-intro-summary {
+  max-width: 65ch;
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
+
+.case-intro-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px 20px;
+  max-width: 65ch;
+  margin: 0;
+}
+
+.case-intro-facts div {
+  min-width: 0;
+}
+
+.case-intro dt {
+  margin: 0 0 4px;
+  color: #6b6b6b;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.case-intro dd {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.case-intro-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 65ch;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-intro-metrics li {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+@media (min-width: 720px) {
+  .case-intro-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: none;
+  }
+}
+
 .card-reveal {
   display: block;
   width: 100%;
@@ -113,6 +191,14 @@
   overflow: hidden;
   background: #000;
   will-change: transform, opacity;
+}
+
+h3.card-name {
+  margin-block: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 16px;
 }
 
 .card-shell .card-tile[data-image],
@@ -326,6 +412,11 @@
   text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.card-open-header-title a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .card-open-header-chips {
@@ -1170,6 +1261,17 @@ html:has(.column-sheet) {
   letter-spacing: -0.03em;
   line-height: 1.2;
   text-wrap: balance;
+}
+
+.column-sheet .case-intro,
+.phone-sheet .case-intro {
+  width: min(calc(100% - 32px), 720px);
+  margin-inline: auto;
+  padding: 0 0 20px;
+}
+
+.phone-sheet .case-intro-facts {
+  max-width: 65ch;
 }
 
 .column-sheet-track {

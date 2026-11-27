@@ -381,7 +381,7 @@ function Bubble({
           }}
         >
           {item.portrait ? (
-            <Image className="note-portrait" src={item.portrait} alt="" fill sizes="80px" quality={90} />
+            <Image className="note-portrait" src={item.portrait} alt={`Portrait of ${item.author}`} fill sizes="80px" quality={90} />
           ) : null}
         </button>
       ) : (

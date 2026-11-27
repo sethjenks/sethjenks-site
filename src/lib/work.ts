@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { readProjectIntro, type ProjectIntro } from "@/lib/project-intro";
+
 const WORK_PATH = path.join(process.cwd(), "content", "work.json");
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PLATE_SRC_PATTERN = /^\/media\/work\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
@@ -53,6 +55,8 @@ export type WorkItem = {
   blocks?: WorkBlock[];
   plates?: WorkPlate[];
   caseStudy?: boolean;
+  /** Dialog case study. Separate from the existing summary and role lines. */
+  intro?: ProjectIntro;
 };
 
 const DISPLAY_ORDER = [
@@ -252,6 +256,10 @@ function isWorkItem(value: unknown): value is WorkItem {
     return false;
   }
 
+  if (readProjectIntro(value.intro) === null) {
+    return false;
+  }
+
   return true;
 }
 
@@ -313,6 +321,8 @@ function toWorkSection(section: WorkSection): WorkSection {
 }
 
 function toWorkItem(item: WorkItem): WorkItem {
+  const intro = readProjectIntro(item.intro) ?? undefined;
+
   return {
     id: item.id,
     title: item.title.trim(),
@@ -338,6 +348,7 @@ function toWorkItem(item: WorkItem): WorkItem {
         }
       : {}),
     ...(item.caseStudy === false ? { caseStudy: false } : {}),
+    ...(intro ? { intro } : {}),
   };
 }
 

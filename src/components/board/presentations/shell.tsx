@@ -8,6 +8,8 @@ import { CardInspect, tileInspectSource } from "@/components/board/card-inspect"
 import { IconDock, iconDockClosed } from "@/components/icon-dock";
 import { IconLens } from "@/components/icon-lens";
 import { CardOpenHeader, CARD_OPEN_HEADER } from "@/components/card-open-header";
+import { CaseStudyIntro, useCaseIntroOffset } from "@/components/case-study-intro";
+import { hasProjectIntro } from "@/lib/project-intro";
 import { TileChrome } from "@/components/board/tile-chrome";
 import {
   CLOSE_APPEAR_BUFFER_S,
@@ -38,8 +40,8 @@ import { tunedContentRadius, type CardTune } from "@/components/card-tune-panel"
 
 const ICON_DOCK_FRAME = placed(iconDockClosed);
 
-export function contentHeight(tiles: PresentationTile[]) {
-  return tiles.reduce((max, tile) => Math.max(max, tile.y + tile.height), 0) + 64;
+export function contentHeight(tiles: PresentationTile[], intro = 0) {
+  return tiles.reduce((max, tile) => Math.max(max, tile.y + tile.height), 0) + 64 + intro;
 }
 
 export function PresentationShell({
@@ -103,6 +105,9 @@ export function PresentationShell({
   const captionRef = useRef<HTMLDivElement>(null);
   const captionText = useRef("");
   const fineHover = useFineHover();
+  const showIntro = hasProjectIntro(study.project);
+  const [introNode, setIntroNode] = useState<HTMLDivElement | null>(null);
+  const introHeight = useCaseIntroOffset(showIntro && expanded, introNode);
   if ((!expanded || lensOn || dockOn) && armed) {
     setArmed(false);
   }
@@ -283,8 +288,13 @@ export function PresentationShell({
             initial={false}
             animate={{ y: expanded ? CARD_OPEN_HEADER : 0 }}
             transition={moveTransition(reduced, OPEN_SHELL_S, expanded ? 0 : CLOSE_MOVE_DELAY_S)}
-            style={{ height: contentHeight(study.tiles) + CARD_OPEN_HEADER }}
+            style={{ height: contentHeight(study.tiles, introHeight) + CARD_OPEN_HEADER }}
           >
+            {showIntro && expanded ? (
+              <div ref={setIntroNode} className="case-intro-anchor" data-card-header="">
+                <CaseStudyIntro project={study.project} />
+              </div>
+            ) : null}
             {study.tiles.map((tile) => (
               <ShellTile
                 key={tile.id}
@@ -297,6 +307,7 @@ export function PresentationShell({
                 shift={shift}
                 fades={fades}
                 reduced={reduced}
+                introOffset={introHeight}
               />
             ))}
           </motion.div>
@@ -385,7 +396,13 @@ function moveCaption(
   node.setAttribute("data-show", "");
 }
 
-function frameVariants(tile: PresentationTile, reduced: boolean, closedRadius: number, openRadius: number) {
+function frameVariants(
+  tile: PresentationTile,
+  reduced: boolean,
+  closedRadius: number,
+  openRadius: number,
+  introOffset: number,
+) {
   const travel = moveTransition(reduced, OPEN_SHELL_S);
   const settle = moveTransition(reduced, OPEN_SHELL_S, CLOSE_MOVE_DELAY_S);
 
@@ -400,7 +417,7 @@ function frameVariants(tile: PresentationTile, reduced: boolean, closedRadius: n
     },
     open: {
       left: tile.x,
-      top: tile.y,
+      top: tile.y + introOffset,
       width: tile.width,
       height: tile.height,
       borderRadius: openRadius,
@@ -419,6 +436,7 @@ function ShellTile({
   shift,
   fades,
   reduced,
+  introOffset,
 }: {
   tile: PresentationTile;
   expanded: boolean;
@@ -429,6 +447,7 @@ function ShellTile({
   shift: ReturnType<typeof shiftVariants>;
   fades: Map<number, ReturnType<typeof tileVariants>>;
   reduced: boolean;
+  introOffset: number;
 }) {
   const moving = tile.shiftX !== 0 || tile.shiftY !== 0;
   const resized = tile.closedWidth !== undefined;
@@ -449,9 +468,10 @@ function ShellTile({
     tile.openRadius !== undefined
       ? tileContentRadius(tile, openTuned, masked)
       : tileOpenRadius(tile, tuned, masked);
+  const openTop = tile.y + (expanded ? introOffset : 0);
   const style = {
     left: resized ? undefined : tile.x,
-    top: resized ? undefined : tile.y,
+    top: resized ? undefined : openTop,
     width: resized ? undefined : tile.width,
     height: resized ? undefined : tile.height,
     // Resized tiles animate radius via variants; others keep the resting value.
@@ -460,7 +480,7 @@ function ShellTile({
   };
   const face = <TileFace tile={tile} masked={masked} appearOpen={appearOpen} scrollable={scrollable} />;
   // Media stays decorative. Copy and the live embed are readable once the card is open.
-  const exposed = (copy || tileHasEmbed(tile)) && (expanded || appearOpen);
+  const exposed = (copy || tileHasEmbed(tile) || tileHasImage(tile)) && (expanded || appearOpen);
   const hidden = exposed ? undefined : true;
 
   if (!moving && tile.resting && !resized) {
@@ -497,7 +517,7 @@ function ShellTile({
       animate={expanded ? "open" : "closed"}
       variants={
         resized
-          ? frameVariants(tile, reduced, closedRadius, openRadius)
+          ? frameVariants(tile, reduced, closedRadius, openRadius, expanded ? introOffset : 0)
           : moving
             ? shift
             : fades.get(Math.min(MAX_FADE_RING, Math.max(1, tile.ring)))

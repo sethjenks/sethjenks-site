@@ -170,6 +170,7 @@ export function imageFrame(input: {
     object: {
       type: "image",
       src: input.src,
+      alt: input.description,
       position: input.position ?? "center center",
       fit: input.fit,
     },
@@ -201,7 +202,7 @@ function toDesktopFrameInput(frame: DesktopFrameCatalog | DesktopFrameInput): De
     label: frame.label,
     description: frame.description,
     aspect: frame.aspect,
-    object: { type: "image", src: frame.src, position: frame.position },
+    object: { type: "image", src: frame.src, alt: frame.description, position: frame.position },
   };
 }
 

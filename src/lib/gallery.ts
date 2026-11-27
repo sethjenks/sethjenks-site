@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { readProjectIntro, type ProjectIntro } from "@/lib/project-intro";
+
 const GALLERY_PATH = path.join(process.cwd(), "content", "gallery.json");
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const IMAGE_PATTERN = /^\/media\/work\/(?:[a-z0-9-]+\/)?[a-z0-9-]+\.(?:jpg|jpeg|png|webp|svg)$/;
@@ -13,6 +15,7 @@ type GalleryBase = {
   width: number;
   height: number;
   alt: string;
+  intro?: ProjectIntro;
 };
 
 export type GalleryImage = GalleryBase & {
@@ -68,12 +71,18 @@ function readBase(value: Record<string, unknown>): GalleryBase | null {
     return null;
   }
 
+  const intro = readProjectIntro(value.intro);
+  if (intro === null) {
+    return null;
+  }
+
   return {
     id,
     title: title.trim(),
     width,
     height,
     alt: alt.trim(),
+    ...(intro ? { intro } : {}),
   };
 }
 

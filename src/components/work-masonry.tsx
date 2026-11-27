@@ -324,7 +324,7 @@ function MasonryVideo({
     <>
       <Image
         src={tile.poster}
-        alt=""
+        alt={tile.alt}
         width={tile.width}
         height={tile.height}
         sizes={IMAGE_SIZES}

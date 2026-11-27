@@ -12,7 +12,7 @@ export function TileChrome({
 }) {
   return (
     <>
-      <span className={titleClassName}>{label}</span>
+      <h3 className={titleClassName}>{label}</h3>
       <span className={expandClassName} aria-hidden="true">
         <HugeiconsIcon icon={ExpandIcon} size={16} strokeWidth={2} color="currentColor" />
       </span>

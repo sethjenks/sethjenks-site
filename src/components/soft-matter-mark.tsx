@@ -582,7 +582,7 @@ export function SoftMatterMark({ home }: SoftMatterMarkProps) {
       data-ready={ready && !failed ? "true" : undefined}
     >
       {home ? (
-        <h1 className="site-mark-label">Seth Jenks</h1>
+        <span className="site-mark-label">Seth Jenks</span>
       ) : (
         <Link href="/" className="site-mark-home" aria-label="Seth Jenks, home">
           <span className="site-mark-label">Seth Jenks</span>

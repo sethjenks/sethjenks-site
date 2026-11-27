@@ -45,7 +45,7 @@ export function WorkStudy({ item, related }: WorkStudyProps) {
                 >
                   <Image
                     src={entry.src}
-                    alt=""
+                    alt={entry.alt ?? entry.title}
                     width={entry.width}
                     height={entry.height}
                     sizes="(max-width: 900px) 46vw, 318px"
