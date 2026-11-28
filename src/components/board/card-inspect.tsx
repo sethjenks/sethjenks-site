@@ -4,7 +4,7 @@ import { useReducedMotion } from "motion/react";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { imageLayer } from "@/components/board/card-media";
+import { describedAlt, imageLayer } from "@/components/board/card-media";
 import type { PresentationTile } from "@/components/board/presentations/types";
 
 export type CardInspectSource = {
@@ -90,7 +90,12 @@ export function CardInspect({
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className="card-inspect-media" src={source.src} alt="" draggable={false} />
+          <img
+            className="card-inspect-media"
+            src={source.src}
+            alt={describedAlt(source.description, source.label)}
+            draggable={false}
+          />
         )}
         <figcaption className="card-inspect-caption">
           <span className="card-inspect-label">{source.label}</span>

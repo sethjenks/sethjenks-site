@@ -273,7 +273,7 @@ export function BoardPortrait({ src }: { src?: string }) {
       }}
     >
       {src ? (
-        <Image src={src} alt="" fill preload draggable={false} sizes="(max-width: 719px) 100vw, 218px" />
+        <Image src={src} alt="Portrait of Seth Jenks" fill preload draggable={false} sizes="(max-width: 719px) 100vw, 218px" />
       ) : null}
       {src && canPlay ? (
         <PortraitShader

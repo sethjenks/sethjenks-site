@@ -254,7 +254,7 @@ function toPhoneScreenInput(screen: PhoneScreen | PhoneScreenInput): PhoneScreen
     id: screen.id,
     label: screen.label,
     description: screen.description,
-    object: { type: "image", src: screen.src },
+    object: { type: "image", src: screen.src, alt: screen.description },
   };
 }
 

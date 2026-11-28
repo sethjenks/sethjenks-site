@@ -25,8 +25,10 @@ export function CardMediaSurface({
     interactive &&
     layers.some((layer) => layer.kind === "embed" || (layer.kind === "video" && reduced));
 
+  const hasDescribedImage = layers.some((layer) => layer.kind === "image" && layer.alt.trim().length > 0);
+
   return (
-    <div className="card-media" aria-hidden={exposed ? undefined : true}>
+    <div className="card-media" aria-hidden={exposed || hasDescribedImage ? undefined : true}>
       {layers.map((layer) => (
         <MediaLayer
           key={layer.kind}
@@ -57,7 +59,7 @@ function MediaLayer({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={layer.src}
-            alt=""
+            alt={layer.alt}
             draggable={false}
             style={{ objectPosition: imagePosition ?? layer.position ?? "center top" }}
           />
@@ -76,6 +78,7 @@ function MediaLayer({
             src={layer.src}
             title={layer.title}
             tabIndex={interactive ? 0 : -1}
+            aria-hidden={interactive ? undefined : true}
             sandbox="allow-scripts allow-same-origin"
           />
         </span>

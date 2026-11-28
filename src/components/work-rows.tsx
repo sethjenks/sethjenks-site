@@ -247,7 +247,7 @@ function WorkCard({
       <span className="work-card-frame" data-canvas={canvas ? "phone" : undefined}>
         <Image
           src={item.src}
-          alt=""
+          alt={item.alt ?? item.title}
           fill
           sizes="(max-width: 767px) calc(100vw - 48px), 480px"
           priority={priority}

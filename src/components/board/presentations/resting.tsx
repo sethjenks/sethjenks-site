@@ -50,6 +50,7 @@ export function PresentationResting({
   return (
     <span
       className="card-tile"
+      aria-hidden="true"
       data-image={tileHasImage(tile) ? "" : undefined}
       data-icon={tile.icon ? "" : undefined}
       data-embed={tileHasEmbed(tile) ? "" : undefined}

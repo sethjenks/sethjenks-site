@@ -75,12 +75,12 @@ export function faceMedia(face: TileFaceMedia): CardMedia {
 
   const fit = face.contain ? "contain" : "cover";
   if (!face.video) {
-    return { layers: [{ kind: "image", src: face.src, position: "center", fit }] };
+    return { layers: [{ kind: "image", src: face.src, alt: face.description, position: "center", fit }] };
   }
 
   return {
     layers: [
-      { kind: "image", src: face.src, position: "center", fit },
+      { kind: "image", src: face.src, alt: face.description, position: "center", fit },
       {
         kind: "video",
         src: face.video.src,

@@ -63,6 +63,12 @@ export type PresentationProject = {
   title: string;
   chips: readonly string[];
   href?: string;
+  /** Case study fields. Empty until Seth writes them. See project-intro.ts. */
+  summary?: string;
+  problem?: string;
+  role?: string;
+  outcome?: string;
+  metrics?: readonly string[];
 };
 
 export type PresentationCollection = {

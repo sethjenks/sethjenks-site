@@ -16,6 +16,7 @@ import {
   type PresentationProject,
   type PresentationSpec,
 } from "@/components/board/presentations/types";
+import { introFields } from "@/lib/project-intro";
 import { getWorkItems, type WorkItem } from "@/lib/work";
 
 const PORTRAIT_PUBLIC_PATH = "/media/people/seth-jenks.jpg";
@@ -437,6 +438,7 @@ function galleryDesktopFrame(item: GalleryItem, fit: "cover" | "contain" = "cont
       object: {
         type: "video",
         src: item.src,
+        alt: item.alt,
         poster: item.poster,
         play: "hover",
         fit,
@@ -449,7 +451,7 @@ function galleryDesktopFrame(item: GalleryItem, fit: "cover" | "contain" = "cont
       label: item.title,
       description: item.alt,
       aspect: item.width / item.height,
-      object: { type: "image", src: item.src, position: "center center", fit },
+      object: { type: "image", src: item.src, alt: item.alt, position: "center center", fit },
     };
   }
 
@@ -598,7 +600,7 @@ function galleryPresentation(
   stack: readonly GalleryItem[] = [],
   fill = false,
 ): { kind: PresentationKind; project: PresentationProject; media?: PresentationMedia } {
-  const project = { title: item.title, chips: [] as string[] };
+  const project = { title: item.title, chips: [] as string[], ...introFields(item.intro) };
   const box = frameBox(frame);
   const collection = collectionForGallery(item.id);
   let kind: PresentationKind = "widget";
@@ -651,6 +653,7 @@ function galleryPresentation(
         id: collection,
         poster: galleryPoster(item, foreground),
         title: item.title,
+        alt: item.alt,
       },
     };
   } else if (foreground?.type === "html" || item.media === "frame" || item.media === "site") {
@@ -750,7 +753,7 @@ function galleryPresentation(
             id: item.id,
             label: face.label,
             description: face.description,
-            object: { type: "image", src: face.src },
+            object: { type: "image", src: face.src, alt: face.description },
           },
         ],
       },
@@ -805,6 +808,7 @@ function galleryPresentation(
         iconSet: {
           marks: CHIA_ICON_MARKS,
           poster: galleryPoster(item, foreground),
+          alt: item.alt,
         },
       },
     };
@@ -824,7 +828,7 @@ function friendFrames(item: WorkItem, title: string) {
           aspect: block.frame.width / block.frame.height,
           label: title,
           description: block.frame.caption ?? block.frame.alt,
-          object: { type: "image" as const, src: block.frame.src, position: "center center" },
+          object: { type: "image" as const, src: block.frame.src, alt: block.frame.alt, position: "center center" },
         });
         break;
       case "statement":
@@ -847,7 +851,7 @@ function friendFrames(item: WorkItem, title: string) {
       aspect: item.width / item.height,
       label: title,
       description: item.summary,
-      object: { type: "image" as const, src: item.src, position: "center center" },
+      object: { type: "image" as const, src: item.src, alt: item.alt ?? item.summary, position: "center center" },
     },
   ];
 }
@@ -863,6 +867,7 @@ function workPresentation(
     title,
     chips: [item.year, item.role, ...(item.tags ?? [])],
     href: `/work/${item.id}`,
+    ...introFields(item.intro),
   };
   let kind: PresentationKind = "desktop";
   let media: PresentationMedia | undefined;
@@ -884,7 +889,7 @@ function workPresentation(
           aspect: item.width / item.height,
           label: title,
           description: item.summary,
-          object: { type: "image" as const, src: item.src, position: "center top" },
+          object: { type: "image" as const, src: item.src, alt: item.alt ?? item.summary, position: "center top" },
         },
         {
           aspect: 1440 / 900,
@@ -894,6 +899,7 @@ function workPresentation(
           object: {
             type: "video" as const,
             src: "/media/work/philo.mp4",
+            alt: "A jump cut through the Philo Ventures site, from the homepage through Explore, Build, Companies, and Team.",
             poster: "/media/work/philo-poster.jpg",
             play: "hover" as const,
             fit: "cover" as const,
@@ -903,7 +909,7 @@ function workPresentation(
           aspect: plate.width / plate.height,
           label: plate.label,
           description: plate.alt,
-          object: { type: "image" as const, src: plate.src, position: "center top" },
+          object: { type: "image" as const, src: plate.src, alt: plate.alt, position: "center top" },
         })),
         ...extras,
       ],
@@ -916,13 +922,13 @@ function workPresentation(
           aspect: item.width / item.height,
           label: title,
           description: item.summary,
-          object: { type: "image" as const, src: item.src, position: "center top" },
+          object: { type: "image" as const, src: item.src, alt: item.alt ?? item.summary, position: "center top" },
         },
         ...(item.plates ?? []).map((plate) => ({
           aspect: plate.width / plate.height,
           label: plate.label,
           description: plate.alt,
-          object: { type: "image" as const, src: plate.src, position: "center top" },
+          object: { type: "image" as const, src: plate.src, alt: plate.alt, position: "center top" },
         })),
         ...extras,
       ],

@@ -1,7 +1,7 @@
 export type VideoPlayMode = "auto" | "hover";
 
 export type CardLayer =
-  | { kind: "image"; src: string; position?: string; opacity?: number; fit?: "cover" | "contain" }
+  | { kind: "image"; src: string; alt: string; position?: string; opacity?: number; fit?: "cover" | "contain" }
   | { kind: "video"; src: string; poster?: string; playMode?: VideoPlayMode; opacity?: number; fit?: "cover" | "contain" }
   | { kind: "embed"; src: string; title: string; opacity?: number }
   | { kind: "texture"; gradient: string; opacity?: number }
@@ -42,4 +42,15 @@ export function imageLayer(media: CardMedia | undefined): Extract<CardLayer, { k
 export function videoLayer(media: CardMedia | undefined): Extract<CardLayer, { kind: "video" }> | undefined {
   const layer = media?.layers.find((item) => item.kind === "video");
   return layer?.kind === "video" ? layer : undefined;
+}
+
+/** Prefer the image's own alt, then a factual fallback from the tile. */
+export function describedAlt(alt: string | undefined, fallback = ""): string {
+  const value = alt?.trim();
+  if (value) {
+    return value;
+  }
+
+  const next = fallback.trim();
+  return next;
 }

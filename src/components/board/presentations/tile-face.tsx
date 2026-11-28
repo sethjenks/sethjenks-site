@@ -5,7 +5,7 @@ import { TextMorph } from "torph/react";
 
 import { AppIcon } from "@/components/app-icon";
 import { CommandKey } from "@/components/board/command-key";
-import { embedLayer, imageLayer } from "@/components/board/card-media";
+import { describedAlt, embedLayer, imageLayer } from "@/components/board/card-media";
 import { CardMediaSurface } from "@/components/board/card-media-surface";
 import { COMMAND_KEY_SRC } from "@/components/board/presentations/key-object";
 import type { PresentationTile } from "@/components/board/presentations/types";
@@ -101,7 +101,7 @@ export function TileFace({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={tile.image}
-          alt=""
+          alt={describedAlt(tile.description, tile.label)}
           draggable={false}
           style={{ objectPosition: openImage ? "center" : (tile.imagePosition ?? "center top") }}
         />

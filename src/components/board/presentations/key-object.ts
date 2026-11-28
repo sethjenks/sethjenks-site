@@ -2,10 +2,11 @@ import type { CardMedia } from "@/components/board/card-media";
 
 /** The resting / primary face on a phone or desktop card. */
 export type KeyObject =
-  | { type: "image"; src: string; position?: string; fit?: "cover" | "contain" }
+  | { type: "image"; src: string; alt: string; position?: string; fit?: "cover" | "contain" }
   | {
       type: "video";
       src: string;
+      alt?: string;
       poster?: string;
       play?: "auto" | "hover";
       fit?: "cover" | "contain";
@@ -23,6 +24,7 @@ export function keyObjectMedia(object: KeyObject): CardMedia {
           {
             kind: "image",
             src: object.src,
+            alt: object.alt,
             position: object.position ?? "center top",
             fit: object.fit,
           },
@@ -32,7 +34,7 @@ export function keyObjectMedia(object: KeyObject): CardMedia {
       return {
         layers: [
           ...(object.poster
-            ? [{ kind: "image" as const, src: object.poster, position: "center", fit: object.fit }]
+            ? [{ kind: "image" as const, src: object.poster, alt: object.alt ?? "", position: "center", fit: object.fit }]
             : []),
           {
             kind: "video",

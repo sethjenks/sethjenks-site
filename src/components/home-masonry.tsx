@@ -121,6 +121,9 @@ export function BoardMasonry({ columns }: { columns: HomeCard[][] }) {
 
   return (
     <>
+      <h2 id="selected-work" className="sr-only">
+        Selected work
+      </h2>
       <BoardFilterBar placement="top" />
       <div
         className="board-masonry"
