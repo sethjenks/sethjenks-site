@@ -1,24 +1,30 @@
 import posthog from "posthog-js";
 
-const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
-const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
-const missingConfiguration = !token
-  ? "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN"
-  : !host
-    ? "NEXT_PUBLIC_POSTHOG_HOST"
-    : null;
+import {
+  POSTHOG_DEFAULTS,
+  POSTHOG_PROXY_PATH,
+  posthogIngestionHost,
+  posthogProjectKey,
+  posthogUiHost,
+} from "./src/lib/posthog-config";
 
-if (token && host) {
-  posthog.init(token, {
-    api_host: host,
-    defaults: "2026-08-30",
-    capture_exceptions: true,
-    debug: process.env.NODE_ENV === "development",
-  });
-} else if (process.env.NODE_ENV === "development") {
-  console.error(
-    new Error(
-      `${missingConfiguration} variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once ${missingConfiguration} is configured`
-    )
-  );
+const key = posthogProjectKey();
+
+if (key) {
+  try {
+    posthog.init(key, {
+      api_host: POSTHOG_PROXY_PATH,
+      ui_host: posthogUiHost(posthogIngestionHost()),
+      defaults: POSTHOG_DEFAULTS,
+      // history_change covers the first load and App Router navigations.
+      capture_pageview: "history_change",
+      capture_pageleave: true,
+      autocapture: true,
+      // Recording still requires the project setting in PostHog.
+      disable_session_recording: false,
+      capture_exceptions: true,
+    });
+  } catch {
+    // Analytics must never take down the page.
+  }
 }
