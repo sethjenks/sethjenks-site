@@ -52,3 +52,4 @@ next-env.d.ts
 
 # Timeless Free Font License 1.2 allows embedding, not a public font repo.
 /src/fonts/*.woff2
+.env.local

@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 
 import { BoardFilterBar, useBoardFilter, type BoardFilter } from "@/components/board-filters";
@@ -294,6 +295,11 @@ function WorkCard({
       }}
       onBlur={pauseTileMedia}
       onClick={(event) => {
+        posthog.capture("portfolio_tile_opened", {
+          portfolio_key: card.key,
+          presentation: spec.id,
+          filter: card.filter,
+        });
         if (collectionId) {
           prefetchCollection(collectionId);
         }
