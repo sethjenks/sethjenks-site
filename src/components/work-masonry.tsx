@@ -15,6 +15,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { motion } from "motion/react";
 import dynamic from "next/dynamic";
+import posthog from "posthog-js";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import {
@@ -1712,7 +1713,17 @@ export function WorkMasonry({
     }
 
     const tile = tiles[index];
-    const collectionId = collectionForGallery(tile?.id);
+    if (!tile) {
+      return;
+    }
+
+    posthog.capture("gallery_item_opened", {
+      gallery: id,
+      item_id: tile.id,
+      media_type: tile.media,
+    });
+
+    const collectionId = collectionForGallery(tile.id);
     if (collectionId) {
       prefetchCollection(collectionId);
       void loadCollectionLens();

@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 
 const FILTERS = [
@@ -23,6 +24,11 @@ export function BoardFilterProvider({ children }: { children: ReactNode }) {
   const [filter, setFilter] = useState<BoardFilter>("product");
   const [revision, setRevision] = useState(0);
   const choose = (id: BoardFilter) => {
+    if (id === filter) {
+      return;
+    }
+
+    posthog.capture("work_filter_selected", { filter: id });
     setFilter(id);
     setRevision((value) => value + 1);
   };
