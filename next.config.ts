@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
+import { posthogIngestionHost, posthogProxyRewrites } from "./src/lib/posthog-config";
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "127.0.2.2"],
+  // PostHog capture paths end in a slash. Trailing-slash redirects for the
+  // rest of the site live in src/proxy.ts.
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return posthogProxyRewrites(posthogIngestionHost());
+  },
   async redirects() {
     return [
       { source: "/work/offer-builder", destination: "/work/chia-wallet", permanent: true },

@@ -25,6 +25,25 @@ The app listens on [http://127.0.0.1:43127](http://127.0.0.1:43127). `npm instal
 pnpm build
 ```
 
+## Analytics
+
+[PostHog](https://posthog.com/docs/libraries/next-js) records product analytics in the browser. It starts only when `NEXT_PUBLIC_POSTHOG_KEY` is set. With the key unset, local development and the production build run as usual and no events are sent.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | Project token from PostHog project settings. Leave it unset to disable analytics. |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | Ingestion API host. Defaults to `https://us.i.posthog.com`. EU projects use `https://eu.i.posthog.com`. |
+
+Copy `.env.example` to `.env.local` for local capture. On Vercel, set the same variables and redeploy. `NEXT_PUBLIC_` values are baked in at build time.
+
+The browser SDK sends events to `/ingest` on this site. Next.js rewrites that path to the ingestion host, so blockers that drop `posthog.com` are less likely to drop events. Page views include client-side route changes. Page leaves, autocapture, and session replay are enabled in the SDK. Session replay still has to be turned on in the PostHog project (Settings, then Session replay). Autocapture can be switched off in that project as well.
+
+To confirm events:
+
+1. Set the key, restart `pnpm dev` or redeploy, and open the site.
+2. In the browser network panel, look for requests to `/ingest` with status 200.
+3. In PostHog, open Activity. A page load shows `$pageview`. A client-side navigation shows another `$pageview` and a `$pageleave`. Clicks show `$autocapture`. With session replay enabled on the project, recordings appear under Session replay.
+
 ## ASCII Journal Studio
 
 Run the local-only Toolcraft workspace from the repo root:
